@@ -1,0 +1,11 @@
+{
+  "name": "slack_cli_webhook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node slack_cli_webhook"
+  },
+  "author": "Andrew Brantley",
+  "license": "ISC"
+}
