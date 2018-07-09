@@ -5,7 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "test": "clear;ts-node app.ts",
-    "preinstall":"echo '[]'>used_wallpaper.json"
+    "preinstall": "echo '[]'>used_wallpaper.json"
   },
   "author": "Andrew Brantley",
   "license": "ISC",
