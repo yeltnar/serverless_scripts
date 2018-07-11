@@ -12,6 +12,7 @@
   "author": "Andrew Brantley",
   "license": "ISC",
   "dependencies": {
+    "@types/es6-promise": "^3.3.0",
     "@types/node": "^10.5.2",
     "config": "^1.30.0",
     "node-schedule": "^1.3.0",
