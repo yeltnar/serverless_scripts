@@ -4,6 +4,12 @@
   "description": "",
   "main": "schedule_app.ts",
   "scripts": {
+    "test": "clear;nodemon;",
+
+    "restart": "pm2 restart schedule_app; pm2 logs",
+    "build": "tsc schedule_app --outDir build;",
+    "start": "pm2 start build/schedule_app.js; pm2 logs",
+
     "test": "clear;ts-node schedule_app.ts"
   },
   "author": "Andrew Brantley",
