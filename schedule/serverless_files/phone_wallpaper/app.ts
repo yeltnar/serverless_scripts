@@ -8,14 +8,14 @@ import { helpersInit } from '../../../helpers/helper';
 
 let helpers = helpersInit();
 
-const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file } = config;
+const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved_wallpaper_file } = config;
 
 // async to allow for await within the function 
 (async()=>{
 
     try{
         args = JSON.parse(args[0]||"{}");
-    }catch(e){console.log( args[0] );}
+    }catch(e){console.error(e);console.error("error");console.log( args[0] );}
 
     if( (args.preSelected===true||args.preSelected==="true") && args.imgUrl!==undefined){
         
@@ -42,6 +42,33 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file } 
             toPrint = JSON.parse(toPrint);
             toPrint = toPrint.pop();
             console.log(toPrint);
+        }catch(e){
+            console.error(e);
+        }
+    }else if( (args.saveLastWallpaper===true||args.saveLastWallpaper==="true") ){
+        
+        //console.log("get last wallpaper");
+        try{
+            let x = await helpers.fsPromise.readFile(used_wallpaper_file)
+            x = x.toString();
+            x = JSON.parse(x);
+            x = x[0];
+
+            let y = await helpers.fsPromise.readFile(saved_wallpaper_file);
+            y = y.toString();
+            try{
+                y = JSON.parse(y);
+            }catch(e){
+                y = [];
+            }
+            if(y.indexOf(x)<0){
+                y.push(x);
+            }
+            await helpers.fsPromise.writeFile(saved_wallpaper_file, JSON.stringify(y));
+
+            console.log(x);
+            console.log(JSON.stringify(y));
+            console.log("done");
         }catch(e){
             console.error(e);
         }

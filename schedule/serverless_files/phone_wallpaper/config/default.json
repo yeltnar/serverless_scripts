@@ -1,5 +1,6 @@
 {
 	"search_url":"https://www.reddit.com/search.json?q=subreddit:earthporn&sort=top&subreddit=earthporn&limit=15&t=day",
 	"set_wallpaper_url":"https://maker.ifttt.com/trigger/set_wallpaper/with/key/bXrf4Mm5tIy0Bjis08SiYC",
-	"used_wallpaper_file":"used_wallpaper.json"
+	"used_wallpaper_file":"used_wallpaper.json",
+	"saved_wallpaper_file":"saved_wallpaper.json"
 }
