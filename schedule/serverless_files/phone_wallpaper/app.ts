@@ -69,6 +69,16 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, s
         }catch(e){
             console.error(e);
         }
+    }else if( args.openSavedWallpapers===true||args.openSavedWallpapers==="true" ){
+        try{
+            let last_used_wallpaper_url = (await helpers.fsPromise.readFile(used_wallpaper_file)).toString();
+
+            let toLog = "<script>"+last_used_wallpaper_url+".forEach((ele)=>{window.open(ele);}); </script>";
+
+            console.log(toLog)
+        }catch(e){
+            console.error(e);
+        }
     }else{
         
            console.log("running top wallpaper");
