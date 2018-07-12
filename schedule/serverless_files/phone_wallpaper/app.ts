@@ -49,26 +49,23 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, s
         
         //console.log("get last wallpaper");
         try{
-            let x = await helpers.fsPromise.readFile(used_wallpaper_file)
-            x = x.toString();
-            x = JSON.parse(x);
-            x = x[0];
+            let last_used_wallpaper_url = (await helpers.fsPromise.readFile(used_wallpaper_file)).toString();
+            last_used_wallpaper_url = JSON.parse(last_used_wallpaper_url);
+            last_used_wallpaper_url = last_used_wallpaper_url[last_used_wallpaper_url.length-1];
 
-            let y = await helpers.fsPromise.readFile(saved_wallpaper_file);
-            y = y.toString();
+            let savedWallpaperArr = ( await helpers.fsPromise.readFile(saved_wallpaper_file) ).toString();
             try{
-                y = JSON.parse(y);
+                savedWallpaperArr = JSON.parse(savedWallpaperArr);
             }catch(e){
-                y = [];
+                savedWallpaperArr = [];
             }
-            if(y.indexOf(x)<0){
-                y.push(x);
-            }
-            await helpers.fsPromise.writeFile(saved_wallpaper_file, JSON.stringify(y));
 
-            console.log(x);
-            console.log(JSON.stringify(y));
-            console.log("done");
+            if(savedWallpaperArr.indexOf(last_used_wallpaper_url)<0){
+                savedWallpaperArr.push(last_used_wallpaper_url);
+            }
+            await helpers.fsPromise.writeFile(saved_wallpaper_file, JSON.stringify(savedWallpaperArr));
+
+            console.log(JSON.stringify(savedWallpaperArr));
         }catch(e){
             console.error(e);
         }
