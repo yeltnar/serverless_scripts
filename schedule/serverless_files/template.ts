@@ -2,7 +2,7 @@ let fs = require('fs');
 import { pushNotification } from '../../helpers/ifttt';
 
 
-pushNotification( {"title":"title","message":"message", "link":"https://ws-expose.mybluemix.net/v1/get-log?token=hello"} )
+pushNotification( {"title":"template","message":"prob for the car", "link":"https://ws-expose.mybluemix.net/v1/get-log?token=hello"} )
 
 // if( process.argv[2] === undefined ){
 // 	console.log("no args found");

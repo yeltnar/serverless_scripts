@@ -29,7 +29,7 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, s
         
         console.log("setting new wallpaper");
         try{
-            let walpaper_info = await getNewPhoneWallpaper()
+            let walpaper_info = await getPhoneWallpaper( false )
             setPhoneWallpaper(walpaper_info);
         }catch(e){
             console.error(e);
@@ -126,52 +126,10 @@ async function setPhoneWallpaper(walpaper_info) {
     }
 }
 
-async function getPhoneWallpaper() {
+async function getPhoneWallpaper( force_new=false ) {
 
     let wallpaper_url="";
-    let used_wallpaper:any=[];
-
-    try {
-        let options = {
-            "url": search_url
-        }
-
-        used_wallpaper = await helpers.fsPromise.readFile(used_wallpaper_file);
-        used_wallpaper = JSON.parse(used_wallpaper);
-
-        let search_result = await requestP(options)
-        search_result = JSON.parse(search_result);
-        search_result = search_result.data.children;
-        search_result = search_result.map((ele) => {
-            return ele.data.url;
-        });
-
-        if( used_wallpaper.indexOf(search_result[0])<0 ){
-            wallpaper_url = search_result[0]; // did this to only send top result
-        }else{
-            wallpaper_url = undefined;
-        }
-
-
-        // let walpaper_to_set = search_result.reduce((acc, cur) => {
-        //     if (acc === undefined && used_wallpaper.indexOf(cur)<0) {
-        //         acc = cur;
-        //     }
-        //     return acc;
-        // }, undefined);
-
-        // wallpaper_url = walpaper_to_set || default_wallpaper;
-
-    } catch (e) {
-        console.error(e)
-    }
-    return {wallpaper_url,used_wallpaper};
-}
-
-async function getNewPhoneWallpaper() {
-
-    let wallpaper_url="";
-    let used_wallpaper:any=[];
+    let used_wallpapers:any=[];
 
     try {
         let options = {
@@ -182,23 +140,36 @@ async function getNewPhoneWallpaper() {
         search_result = JSON.parse(search_result);
         search_result = search_result.data.children;
         search_result = search_result.map((ele) => {
-            return ele.data.url;
-        });
-
-        used_wallpaper = await helpers.fsPromise.readFile(used_wallpaper_file);
-        used_wallpaper = JSON.parse(used_wallpaper);
-
-        let walpaper_to_set = search_result.reduce((acc, cur) => {
-            if (acc === undefined && used_wallpaper.indexOf(cur)<0) {
-                acc = cur;
+            let toReturn = undefined;
+            if( !ele.data.over_18 ){
+                return ele.data.url;
             }
-            return acc;
-        }, undefined);
+            return toReturn;
+        });
 
-        wallpaper_url = walpaper_to_set || default_wallpaper;
+        used_wallpapers = JSON.parse( await helpers.fsPromise.readFile(used_wallpaper_file) );
+
+        if( force_new ){
+
+            // find wallpaper not in the save 
+            wallpaper_url = search_result.reduce((acc, cur) => {
+                if (acc === undefined && used_wallpapers.indexOf(cur)<0) {
+                    acc = cur;
+                }
+                return acc;
+            }, undefined);
+
+        }else{
+
+            if( used_wallpapers.indexOf(search_result[0])<0 ){
+                wallpaper_url = search_result[0]; // only send top result
+            }else{
+                wallpaper_url = undefined;
+            }
+        }
 
     } catch (e) {
         console.error(e)
     }
-    return {wallpaper_url,used_wallpaper};
+    return {wallpaper_url,used_wallpapers};
 }
