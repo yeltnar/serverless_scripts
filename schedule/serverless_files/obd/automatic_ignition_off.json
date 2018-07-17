@@ -1,0 +1,137 @@
+{
+    "connection": {
+        "preferedResponseName": null
+    },
+    "request": {
+        "_readableState": {
+            "objectMode": false,
+            "highWaterMark": 16384,
+            "buffer": {
+                "head": null,
+                "tail": null,
+                "length": 0
+            },
+            "length": 0,
+            "pipes": null,
+            "pipesCount": 0,
+            "flowing": true,
+            "ended": true,
+            "endEmitted": true,
+            "reading": false,
+            "sync": false,
+            "needReadable": false,
+            "emittedReadable": false,
+            "readableListening": false,
+            "resumeScheduled": false,
+            "destroyed": false,
+            "defaultEncoding": "utf8",
+            "awaitDrain": 0,
+            "readingMore": false,
+            "decoder": null,
+            "encoding": null
+        },
+        "readable": false,
+        "domain": null,
+        "_events": {},
+        "_eventsCount": 0,
+        "httpVersionMajor": 1,
+        "httpVersionMinor": 1,
+        "httpVersion": "1.1",
+        "complete": true,
+        "headers": {
+            "host": "ws-expose.mybluemix.net",
+            "user-agent": "Java/1.8.0_171",
+            "content-length": "470",
+            "$wscs": "ECDHE-RSA-AES256-GCM-SHA384",
+            "$wsis": "true",
+            "$wsra": "54.165.39.255",
+            "$wssc": "https",
+            "$wssn": "ws-expose.mybluemix.net",
+            "$wssp": "443",
+            "accept": "application/json",
+            "content-type": "application/json",
+            "via": "1.1 BwAAALgG0iE-",
+            "x-b3-spanid": "7d60640aafd8502e",
+            "x-b3-traceid": "7d60640aafd8502e",
+            "x-cf-applicationid": "e68f5516-a561-42c7-ac49-af54fea27ed3",
+            "x-cf-instanceid": "26fd7cae-ecbb-45d3-46c6-b5dc",
+            "x-cf-instanceindex": "0",
+            "x-client-ip": "54.165.39.255",
+            "x-forwarded-for": "54.165.39.255, 10.107.72.243",
+            "x-forwarded-proto": "https",
+            "x-global-transaction-id": "3785346867",
+            "x-newrelic-id": "XQ8HVlVTGwYCUlBaBwcG",
+            "x-newrelic-transaction": "PxQFBVRRXQJSUVMHVQBRAAdVFB8EBw8RVU4aUFwKBlcCBwxTVAMCBAJVU0NKQVoDB1NTVwJSFTs=",
+            "x-request-start": "1531852626617",
+            "x-vcap-request-id": "f5fb2b77-fad9-4f11-779c-409a75129571"
+        },
+        "rawHeaders": ["Host", "ws-expose.mybluemix.net", "User-Agent", "Java/1.8.0_171", "Content-Length", "470", "$wscs", "ECDHE-RSA-AES256-GCM-SHA384", "$wsis", "true", "$wsra", "54.165.39.255", "$wssc", "https", "$wssn", "ws-expose.mybluemix.net", "$wssp", "443", "Accept", "application/json", "Content-Type", "application/json", "Via", "1.1 BwAAALgG0iE-", "X-B3-Spanid", "7d60640aafd8502e", "X-B3-Traceid", "7d60640aafd8502e", "X-Cf-Applicationid", "e68f5516-a561-42c7-ac49-af54fea27ed3", "X-Cf-Instanceid", "26fd7cae-ecbb-45d3-46c6-b5dc", "X-Cf-Instanceindex", "0", "X-Client-Ip", "54.165.39.255", "X-Forwarded-For", "54.165.39.255, 10.107.72.243", "X-Forwarded-Proto", "https", "X-Global-Transaction-Id", "3785346867", "X-Newrelic-Id", "XQ8HVlVTGwYCUlBaBwcG", "X-Newrelic-Transaction", "PxQFBVRRXQJSUVMHVQBRAAdVFB8EBw8RVU4aUFwKBlcCBwxTVAMCBAJVU0NKQVoDB1NTVwJSFTs=", "X-Request-Start", "1531852626617", "X-Vcap-Request-Id", "f5fb2b77-fad9-4f11-779c-409a75129571"],
+        "trailers": {},
+        "rawTrailers": [],
+        "upgrade": false,
+        "url": "/?token=hello",
+        "method": "POST",
+        "statusCode": null,
+        "statusMessage": null,
+        "_consuming": true,
+        "_dumped": false,
+        "baseUrl": "/v1/dash",
+        "originalUrl": "/v1/dash?token=hello",
+        "_parsedUrl": {
+            "protocol": null,
+            "slashes": null,
+            "auth": null,
+            "host": null,
+            "port": null,
+            "hostname": null,
+            "hash": null,
+            "search": "?token=hello",
+            "query": "token=hello",
+            "pathname": "/v1/dash",
+            "path": "/v1/dash?token=hello",
+            "href": "/v1/dash?token=hello",
+            "_raw": "/v1/dash?token=hello"
+        },
+        "params": {
+            "0": "dash"
+        },
+        "query": {
+            "token": "hello"
+        },
+        "body": {
+            "type": "ignition:off",
+            "vehicle": {
+                "vin": "jtdkbrfu4j3063166",
+                "id": "C_fff9e219d34ef6bb",
+                "make": "Toyota",
+                "model": "Prius",
+                "submodel": "Two",
+                "year": 2018,
+                "display_name": null,
+                "color": ""
+            },
+            "created_at": 1531852626236,
+            "time_zone": "America/New_York",
+            "device": {
+                "id": "00a230058554f981b3d5b40f"
+            },
+            "location": {
+                "lat": 16,
+                "lon": -36,
+                "accuracy_m": 12447463.21,
+                "ts": 1531852626236
+            },
+            "user": {
+                "id": "U_13a97a19d6bbe6e0",
+                "v2_id": "U_13a97a19d6bbe6e0"
+            },
+            "id": "7e007f85-3559-4ad2-9c8c-d0c180af37f7"
+        }
+    },
+    "errors": {},
+    "date": "2018-07-17T18:37:06.624Z",
+    "send_to_device": {
+        "uuid": "66561997-143a-4a63-80fd-f7865de4da4c",
+        "index": 0
+    }
+}

@@ -1,0 +1,190 @@
+{
+    "connection": {
+        "preferedResponseName": null
+    },
+    "request": {
+        "_readableState": {
+            "objectMode": false,
+            "highWaterMark": 16384,
+            "buffer": {
+                "head": null,
+                "tail": null,
+                "length": 0
+            },
+            "length": 0,
+            "pipes": null,
+            "pipesCount": 0,
+            "flowing": true,
+            "ended": true,
+            "endEmitted": true,
+            "reading": false,
+            "sync": false,
+            "needReadable": false,
+            "emittedReadable": false,
+            "readableListening": false,
+            "resumeScheduled": false,
+            "destroyed": false,
+            "defaultEncoding": "utf8",
+            "awaitDrain": 0,
+            "readingMore": false,
+            "decoder": null,
+            "encoding": null
+        },
+        "readable": false,
+        "domain": null,
+        "_events": {},
+        "_eventsCount": 0,
+        "httpVersionMajor": 1,
+        "httpVersionMinor": 1,
+        "httpVersion": "1.1",
+        "complete": true,
+        "headers": {
+            "host": "ws-expose.mybluemix.net",
+            "user-agent": "Java/1.8.0_171",
+            "content-length": "1895",
+            "$wscs": "ECDHE-RSA-AES256-GCM-SHA384",
+            "$wsis": "true",
+            "$wsra": "54.165.39.255",
+            "$wssc": "https",
+            "$wssn": "ws-expose.mybluemix.net",
+            "$wssp": "443",
+            "accept": "application/json",
+            "content-type": "application/json",
+            "via": "1.1 AQAAAD63fCU-",
+            "x-b3-spanid": "8c96b5fcd5709230",
+            "x-b3-traceid": "8c96b5fcd5709230",
+            "x-cf-applicationid": "e68f5516-a561-42c7-ac49-af54fea27ed3",
+            "x-cf-instanceid": "26fd7cae-ecbb-45d3-46c6-b5dc",
+            "x-cf-instanceindex": "0",
+            "x-client-ip": "54.165.39.255",
+            "x-forwarded-for": "54.165.39.255, 10.107.72.243",
+            "x-forwarded-proto": "https",
+            "x-global-transaction-id": "941112747",
+            "x-newrelic-id": "XQ8HVlVTGwYCUlBaBwcG",
+            "x-newrelic-transaction": "PxRVWAUCCQAHUANVBQUCAlUHFB8EBw8RVU4aAAFbVQMAUg0DBlMHVwAHAUNKQVoDB1NTVwJSFTs=",
+            "x-request-start": "1531852682081",
+            "x-vcap-request-id": "418a758e-2567-4eae-6821-8cda6f33109a"
+        },
+        "rawHeaders": ["Host", "ws-expose.mybluemix.net", "User-Agent", "Java/1.8.0_171", "Content-Length", "1895", "$wscs", "ECDHE-RSA-AES256-GCM-SHA384", "$wsis", "true", "$wsra", "54.165.39.255", "$wssc", "https", "$wssn", "ws-expose.mybluemix.net", "$wssp", "443", "Accept", "application/json", "Content-Type", "application/json", "Via", "1.1 AQAAAD63fCU-", "X-B3-Spanid", "8c96b5fcd5709230", "X-B3-Traceid", "8c96b5fcd5709230", "X-Cf-Applicationid", "e68f5516-a561-42c7-ac49-af54fea27ed3", "X-Cf-Instanceid", "26fd7cae-ecbb-45d3-46c6-b5dc", "X-Cf-Instanceindex", "0", "X-Client-Ip", "54.165.39.255", "X-Forwarded-For", "54.165.39.255, 10.107.72.243", "X-Forwarded-Proto", "https", "X-Global-Transaction-Id", "941112747", "X-Newrelic-Id", "XQ8HVlVTGwYCUlBaBwcG", "X-Newrelic-Transaction", "PxRVWAUCCQAHUANVBQUCAlUHFB8EBw8RVU4aAAFbVQMAUg0DBlMHVwAHAUNKQVoDB1NTVwJSFTs=", "X-Request-Start", "1531852682081", "X-Vcap-Request-Id", "418a758e-2567-4eae-6821-8cda6f33109a"],
+        "trailers": {},
+        "rawTrailers": [],
+        "upgrade": false,
+        "url": "/?token=hello",
+        "method": "POST",
+        "statusCode": null,
+        "statusMessage": null,
+        "_consuming": true,
+        "_dumped": false,
+        "baseUrl": "/v1/dash",
+        "originalUrl": "/v1/dash?token=hello",
+        "_parsedUrl": {
+            "protocol": null,
+            "slashes": null,
+            "auth": null,
+            "host": null,
+            "port": null,
+            "hostname": null,
+            "hash": null,
+            "search": "?token=hello",
+            "query": "token=hello",
+            "pathname": "/v1/dash",
+            "path": "/v1/dash?token=hello",
+            "href": "/v1/dash?token=hello",
+            "_raw": "/v1/dash?token=hello"
+        },
+        "params": {
+            "0": "dash"
+        },
+        "query": {
+            "token": "hello"
+        },
+        "body": {
+            "trip": {
+                "id": "T_c7ad7413d5f6ce19",
+                "start_location": {
+                    "name": "123 E Sandy Lake Rd, Coppell, TX 75019",
+                    "display_name": "123 E Sandy Lake Rd, Coppell, TX 75019",
+                    "city": "Coppell",
+                    "country": "US",
+                    "street_name": "E Sandy Lake Rd",
+                    "state": "TX",
+                    "street_number": "123",
+                    "lat": 32.968894,
+                    "lon": -96.992449,
+                    "accuracy_m": 9.600000381469727,
+                    "ts": 1531851304300
+                },
+                "end_location": {
+                    "name": "100 Airline Dr, Coppell, TX 75019",
+                    "display_name": "100 Airline Dr, Coppell, TX 75019",
+                    "city": "Coppell",
+                    "country": "US",
+                    "street_name": "Airline Dr",
+                    "state": "TX",
+                    "street_number": "100",
+                    "lat": 32.94341,
+                    "lon": -96.994705,
+                    "accuracy_m": 9.600000381469727,
+                    "ts": 1531851744899
+                },
+                "start_time": 1531851304300,
+                "end_time": 1531851744899,
+                "start_time_zone": "America/Chicago",
+                "end_time_zone": "America/Chicago",
+                "path": "}hfhExy~nQ?A?aDK?M?@bBAt@?lF???^XA`DIl@A^A^Ap@AzDAp@?xA@fE@hC?vEAbCAzEAt@?pABf@Cz@EtAAtGCB?T?bC@vDCP@~@@h@@T?bA?`@?n@?jB@f@?R?~B?lD?jB?rB?bD?\\?nB@zD?`@?nD@@?v@?\\?^?J?R@jFAB?nGAfC?r@@j@?R@@rF?t@?bC?cC?[?u@??",
+                "distance_m": 3435.6380555555543,
+                "duration_s": 440.599,
+                "hard_accels": 0,
+                "hard_brakes": 0,
+                "duration_over80_s": 0,
+                "duration_over75_s": 0,
+                "duration_over70_s": 0,
+                "fuel_cost_usd": 0.15760155146691146,
+                "fuel_volume_gal": 0.05972017865362314,
+                "average_mpg": 35.59856217656303,
+                "average_from_epa_mpg": 54,
+                "idling_time_s": 0,
+                "score_events": 50,
+                "score_speeding": 50,
+                "city_fraction": 1,
+                "highway_fraction": 0,
+                "night_driving_fraction": 0,
+                "fuel_level": null,
+                "vehicle_events": null
+            },
+            "type": "trip:finished",
+            "vehicle": {
+                "vin": "jtdkbrfu4j3063166",
+                "id": "C_fff9e219d34ef6bb",
+                "make": "Toyota",
+                "model": "Prius",
+                "submodel": "Two",
+                "year": 2018,
+                "display_name": null,
+                "color": ""
+            },
+            "created_at": 1531852681810,
+            "time_zone": "America/New_York",
+            "device": {
+                "id": "00a230058554f981b3d5b40f"
+            },
+            "location": {
+                "lat": 30,
+                "lon": -64,
+                "accuracy_m": 12447463.21,
+                "ts": 1531852681810
+            },
+            "user": {
+                "id": "U_13a97a19d6bbe6e0",
+                "v2_id": "U_13a97a19d6bbe6e0"
+            },
+            "id": "3c3266c3-5665-47e5-ae33-e37a574e8242"
+        }
+    },
+    "errors": {},
+    "date": "2018-07-17T18:38:02.090Z",
+    "send_to_device": {
+        "uuid": "10af24ad-4abf-4066-bc5d-c16eb23b662b",
+        "index": 0
+    }
+}
