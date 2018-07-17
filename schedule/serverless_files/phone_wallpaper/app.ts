@@ -29,7 +29,7 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, s
         
         console.log("setting new wallpaper");
         try{
-            let walpaper_info = await getPhoneWallpaper( false )
+            let walpaper_info = await getPhoneWallpaper( true )
             setPhoneWallpaper(walpaper_info);
         }catch(e){
             console.error(e);
