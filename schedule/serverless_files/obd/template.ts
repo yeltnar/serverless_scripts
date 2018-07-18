@@ -5,11 +5,16 @@ let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello";
 
 let event_type;
 try{
-    event_type = JSON.parse( process.argv[2] );
+    let file_contents = fs.readFileSync("data.json").toString();
+    //console.log(file_contents);
+    let file_obj = JSON.parse( file_contents );
+    event_type = file_obj.request.body.type;
 }catch(e){
-    console.log("obd/template.ts could not parse process.argv[2]");
-    pushNotification( {"title":"Car message", "message":"could not parse process.argv[2]", link} )
+    console.log(e);
+    //pushNotification( {"title":"Car message", "message":"could not parse process.argv[2]", link} )
 }
+
+console.log(event_type);
 
 if( /notification\:.+/.test(event_type) ){
     pushNotification( {"title":"From car","message":event_type, "link":"https://ws-expose.mybluemix.net/v1/get-log?token=hello"} )
@@ -41,7 +46,7 @@ if( /ignition\:.+/.test(event_type) ){
 
 if( /trip\:.+/.test(event_type) ){  
 
-    let title = "Trip done";
+    let title = "Trip";
     let message;
 
     if( /.+\:finished/.test(event_type) ){
