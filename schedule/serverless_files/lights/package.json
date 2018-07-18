@@ -1,0 +1,14 @@
+{
+  "name": "lights",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lights.ts",
+  "scripts": {
+    "test": "ts-node lights.ts"
+  },
+  "author": "Andrew Brantley",
+  "license": "ISC",
+  "dependencies": {
+    "huejay": "^1.8.4"
+  }
+}
