@@ -4,7 +4,7 @@ rm -rf $DIR;
 mkdir $DIR
 cd $DIR
 pwd
-git clone "https://git.ng.bluemix.net/andcbrant/drew-iot-new.git" .
+git clone -b bluemix --single-branch https://github.com/yeltnar/ws-expose-server.git .
 date > date.txt
 git add .
 git commit -m "keep alive"
