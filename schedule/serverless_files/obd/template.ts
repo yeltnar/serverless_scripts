@@ -3,39 +3,42 @@ import { pushNotification } from '../../../helpers/ifttt';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello";
 
-let event_type;
+let event={type:undefined, category:undefined};
 try{
     let file_contents = fs.readFileSync("data.json").toString();
     //console.log(file_contents);
     let file_obj = JSON.parse( file_contents );
-    event_type = file_obj.request.body.type;
+
+    let regex_result = /(.+):(.+)/.exec( file_obj.request.body.type )
+
+    event = { type:regex_result[1], category:regex_result[2] };
 }catch(e){
     console.log(e);
     //pushNotification( {"title":"Car message", "message":"could not parse process.argv[2]", link} )
 }
 
-console.log(event_type);
+console.log(event);
 
-if( /notification\:.+/.test(event_type) ){
-    pushNotification( {"title":"From car","message":event_type, "link":"https://ws-expose.mybluemix.net/v1/get-log?token=hello"} )
+if( event.type === "notification" ){
+    pushNotification( {"title":"From car","message":JSON.stringify(event), "link":"https://ws-expose.mybluemix.net/v1/get-log?token=hello"} )
 }
 
-if( /vehicle\:.+/.test(event_type) ){ 
-    if( /vehicle\:status_report/.test(event_type) ){
+if( event.type==="vehicle" ){ 
+    if( event.category === "status_report" ){
         // currently do nothing... is just a report 
     }
 }
 
-if( /ignition\:.+/.test(event_type) ){   
+if( event.type==="ignition" ){   
 
     let title = "Car ignition";
     let message;
 
-    if( /.+\:off/.test(event_type) ){
+    if( event.category === "off" ){
 
         message = "off";
 
-    }else if( /.+\:on/.test(event_type) ){
+    }else if( event.category === "on" ){
 
         message = "on";
 
@@ -44,12 +47,12 @@ if( /ignition\:.+/.test(event_type) ){
     pushNotification( {title, message, link} )
 }
 
-if( /trip\:.+/.test(event_type) ){  
+if( event.type==="trip" ){  
 
     let title = "Trip";
     let message;
 
-    if( /.+\:finished/.test(event_type) ){
+    if( event.category === "finished" ){
         // currently do nothing... is just a report 
         message = "finished";
     }
