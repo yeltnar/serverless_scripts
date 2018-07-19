@@ -3,9 +3,11 @@ import { pushNotification } from '../../../helpers/ifttt';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello";
 
+let data_file_location = process.argv[2];
+
 let event={type:undefined, category:undefined};
 try{
-    let file_contents = fs.readFileSync("data.json").toString();
+    let file_contents = fs.readFileSync(data_file_location).toString();
     //console.log(file_contents);
     let file_obj = JSON.parse( file_contents );
 
