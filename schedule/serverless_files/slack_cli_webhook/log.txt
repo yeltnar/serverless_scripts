@@ -1,1 +1,0 @@
-{"group":"home_pi","token":"83MN59p8eEh5EmhUVgg6fXX6","port":"3002","request_host":"http://127.0.0.1","clearParams":"false","responseOnly":"true","toExec":"ts-node serverless_files/slack_cli_webhook/slack_cli_webhook"}
