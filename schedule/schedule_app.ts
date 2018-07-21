@@ -46,7 +46,7 @@ function loadScheduledItems(){
 				try{
 					result = await runShell(command,options,params);
 				}catch(e){
-					console.error("schedule app 21 if error is uncaught promise ignore it");
+					console.error("schedule app 49 if error is uncaught promise ignore it");
 					console.error(e);
 				}
 				console.log("`"+name +"` result...");

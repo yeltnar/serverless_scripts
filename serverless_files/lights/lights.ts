@@ -75,3 +75,5 @@ async function setUpLightsObj(){
     }
     return obj;
 }
+
+export default {}

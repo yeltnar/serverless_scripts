@@ -1,6 +1,34 @@
 {
+  "name": "serverless_scripts",
+  "version": "1.0.0",
+  "description": "serverless_scripts",
+  "main": "ws_parser.ts",
+  "scripts": {
+    "test": "clear;nodemon;",
+    "test_start":"ts-node ws_parser.ts input_files/t.json",
+
+    "start": "pm2 start build/ws_parser.js; pm2 logs",
+    "restart": "pm2 restart ws_parser; pm2 logs",
+
+    "build": "tsc ws_parser --outDir build; date > build/date.txt",
+    "setup": "npm i -g typescript; npm i -g ts-node; npm i -g pm2;",
+    "postinstall": "npm run-script build;"
+  },
+  "author": "Andrew Brantley",
   "dependencies": {
+    "@types/node": "^10.5.2",
+    "config": "^1.30.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5"
+  },
+  "nodemonConfig": {
+    "ext": "ts",
+    "ignore": [
+      "test/*",
+      "build/*",
+      "docs/*"
+    ],
+    "delay": "100",
+    "exec": "npm run-script test_start "
   }
 }

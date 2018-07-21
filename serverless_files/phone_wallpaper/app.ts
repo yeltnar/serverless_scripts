@@ -1,21 +1,14 @@
-let args:any = process.argv;
-args.shift();
-args.shift();
-
 const requestP = require('request-promise-native');
 const config = require('config');
-import { helpersInit } from '../../../helpers/helper';
 
-let helpers = helpersInit();
+let helpers;
 
 const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved_wallpaper_file } = config;
 
 // async to allow for await within the function 
-(async()=>{
+async function parse ( obj ){
 
-    try{
-        args = JSON.parse(args[0]||"{}");
-    }catch(e){console.error(e);console.error("error");console.log( args[0] );}
+    let args = obj.request.body;
 
     if( (args.preSelected===true||args.preSelected==="true") && args.imgUrl!==undefined){
         
@@ -90,7 +83,7 @@ const { search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, s
         }
     }
 
-})()
+}
 
 async function setPhoneWallpaper(walpaper_info) {
 
@@ -173,3 +166,10 @@ async function getPhoneWallpaper( force_new=false ) {
     }
     return {wallpaper_url,used_wallpapers};
 }
+
+function wallpaper_init(local_helpers){
+    helpers = local_helpers;
+    return parse;
+}
+
+export default wallpaper_init;
