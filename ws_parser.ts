@@ -9,12 +9,11 @@ import lights from './serverless_files/lights/lights';
 import obd_init from './serverless_files/obd/obd';
 import wallpaper_init  from './serverless_files/phone_wallpaper/app';
 import slack from './serverless_files/slack/slack';
-import { parse } from 'querystring';
 
 let helpers =  helpersInit();
 
 let parsers = {
-    phone_wallpaper: wallpaper_init( helpers ),
+    phone_wallpaper: wallpaper_init( helpers, config.phone_wallpaper ),
     obd: obd_init( helpers, pushNotification )
 }
 
