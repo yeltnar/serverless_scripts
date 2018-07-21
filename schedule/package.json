@@ -6,7 +6,7 @@
   "scripts": {
     "test": "clear;ts-node schedule_app.ts",
     "restart": "pm2 restart schedule_app; pm2 logs",
-    "build": "tsc schedule_app --outDir build;",
+    "build": "tsc schedule_app --outDir build; date > build/date.txt",
     "start": "pm2 start build/schedule_app.js; pm2 logs"
   },
   "author": "Andrew Brantley",
