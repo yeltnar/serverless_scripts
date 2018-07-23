@@ -12,7 +12,9 @@
 
     "build": "tsc ws_parser --outDir build; date > build/date.txt",
     "setup": "npm i -g typescript; npm i -g ts-node; npm i -g pm2;",
-    "postinstall": "npm run-script build;"
+    
+    "postinstall": "npm run-script build;",
+    "preinstall": "./preinstall.sh"
   },
   "author": "Andrew Brantley",
   "dependencies": {

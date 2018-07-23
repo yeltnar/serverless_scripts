@@ -75,8 +75,8 @@
         "statusMessage": null,
         "_consuming": true,
         "_dumped": false,
-        "baseUrl": "/v1/wallpaper",
-        "originalUrl": "/v1/wallpaper?token=hello",
+        "baseUrl": "/v1/obd",
+        "originalUrl": "/v1/obd?token=hello",
         "_parsedUrl": {
             "protocol": null,
             "slashes": null,
@@ -87,13 +87,13 @@
             "hash": null,
             "search": "?token=hello",
             "query": "token=hello",
-            "pathname": "/v1/wallpaper",
-            "path": "/v1/wallpaper?token=hello",
-            "href": "/v1/wallpaper?token=hello",
-            "_raw": "/v1/wallpaper?token=hello"
+            "pathname": "/v1/obd",
+            "path": "/v1/obd?token=hello",
+            "href": "/v1/obd?token=hello",
+            "_raw": "/v1/obd?token=hello"
         },
         "params": {
-            "0": "wallpaper"
+            "0": "obd"
         },
         "query": {
             "token": "hello"

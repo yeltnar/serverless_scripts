@@ -37,69 +37,10 @@ async function parseObj(obj) {
 
     console.log("parseObj with pathName of `"+pathName+"`");
 
-    if ( /dash-trip-ended/.test(pathName) ) {
-
-        let toExec = "ts-node "+serverless_folder+"template.ts"
-        let options = "";
-        let params = JSON.stringify(JSON.stringify(obj));
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-        }catch(e){
-            obj.errors.runShell = e;
-            console.error(e);
-        }
-    }
-
-    if ( /github/.test(pathName) ) {
-
-        let toExec = "ts-node "+serverless_folder+"template.ts"
-        let options = "";
-        let params = JSON.stringify(JSON.stringify(obj));
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-        }catch(e){
-            obj.errors.runShell = e;
-            console.error(e);
-        }
-    }
-
-    if ( /nest/.test(pathName) ) {
-
-        let toExec = "ts-node "+serverless_folder+"template.ts"
-        let options = "";
-        let params = JSON.stringify(JSON.stringify(obj));
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-        }catch(e){
-            obj.errors.runShell = e;
-            console.error(e);
-        }
-    }
-
     if( /wallpaper/.test(pathName) ){
 
         parsers.phone_wallpaper( obj );
 
-    }
-
-    // if(/testing/.test(pathName)){
-
-    //     let res_arr = await Promise.all([
-    //         recursive_parseObj( obj, "local_obj_1_result"),  
-    //         recursive_parseObj( obj, "local_obj_2_result")  
-    //     ])
-
-    //     obj.result = res_arr[0].result+" "+res_arr[1].result;
-    //
-
-    if( /local_obj_1_result/.test(pathName) ){
-        obj.result = "local_obj_1_result";
-    }
-    if( /local_obj_2_result/.test(pathName) ){
-        obj.result = "local_obj_2_result";
     }
 
     if ( /obd/.test(pathName) ) {
@@ -122,21 +63,6 @@ async function parseObj(obj) {
         }
     }
 
-    if ( /lights/.test(pathName) ) {
-
-        let toExec = "ts-node "+serverless_folder+"lights/lights.ts"
-        let options = "";
-        let params = JSON.stringify(JSON.stringify(obj));
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-            obj.result_only=true;
-        }catch(e){
-            obj.errors.runShell = e;
-            console.error(e);
-        }
-    }
-
     if(/shell/.test(pathName)){
         let toExec = obj.request.body.toExec || obj.request.query.toExec || "";
         let options = obj.request.body.options || obj.request.query.options || "";
@@ -156,7 +82,7 @@ async function parseObj(obj) {
         console.log( "got it" );
         obj.result = "got it";
         obj.result_only = true;
-        fs.writeFileSync( "t.json", JSON.stringify(obj) );
+        fs.writeFileSync( "oauth_automatic.json", JSON.stringify(obj) );
     }
 
     // leave at end of function 
