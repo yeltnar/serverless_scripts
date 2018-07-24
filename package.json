@@ -5,14 +5,11 @@
   "main": "ws_parser.ts",
   "scripts": {
     "test": "clear;nodemon;",
-    "test_start":"ts-node ws_parser.ts input_files/t.json",
-
+    "test_start": "ts-node ws_parser.ts input_files/t_car_on.json",
     "start": "pm2 start build/ws_parser.js; pm2 logs",
     "restart": "pm2 restart ws_parser; pm2 logs",
-
     "build": "tsc ws_parser --outDir build; date > build/date.txt",
     "setup": "npm i -g typescript; npm i -g ts-node; npm i -g pm2;",
-    
     "postinstall": "npm run-script build;",
     "preinstall": "./preinstall.sh"
   },
@@ -20,6 +17,7 @@
   "dependencies": {
     "@types/node": "^10.5.2",
     "config": "^1.30.0",
+    "huejay": "^1.8.4",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5"
   },
