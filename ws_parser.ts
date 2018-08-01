@@ -5,7 +5,7 @@ const fs = require("fs")
 //my files
 import {helpersInit} from './helpers/helper'
 import {pushNotification} from './helpers/ifttt'
-import lights from './serverless_files/lights/lights';
+//import lights from './serverless_files/lights/lights';
 import obd_init from './serverless_files/obd/obd';
 import wallpaper_init  from './serverless_files/phone_wallpaper/app';
 import slack from './serverless_files/slack/slack';
@@ -39,7 +39,17 @@ async function parseObj(obj) {
 
     if( /wallpaper/.test(pathName) ){
 
-        parsers.phone_wallpaper( obj );
+        let wallpaper_obj = {};
+
+        for(let k in obj.request.query){
+            wallpaper_obj[k] = obj.request.query[k];
+        }
+
+        for(let k in obj.request.body){
+            wallpaper_obj[k] = obj.request.body[k];
+        }
+
+        parsers.phone_wallpaper( wallpaper_obj );
 
     }
 

@@ -6,19 +6,20 @@ let helpers;
 let search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved_wallpaper_file;
 
 // async to allow for await within the function 
-async function parse ( obj ){
+async function parse ( wallpaper_obj ){
 
-    let args = obj.request.body;
+    //console.log(JSON.stringify(obj));
+    console.log(JSON.stringify(wallpaper_obj));
 
-    if( (args.preSelected===true||args.preSelected==="true") && args.imgUrl!==undefined){
+    if( (wallpaper_obj.preSelected===true||wallpaper_obj.preSelected==="true") && wallpaper_obj.imgUrl!==undefined){
         
-        console.log("using preselected: "+args.imgUrl);
+        console.log("using preselected: "+wallpaper_obj.imgUrl);
         try{
-            setPhoneWallpaper({"wallpaper_url":args.imgUrl});
+            setPhoneWallpaper({"wallpaper_url":wallpaper_obj.imgUrl});
         }catch(e){
             console.error(e);
         }
-    }else if( (args.newWallpaper===true||args.newWallpaper==="true") ){
+    }else if( (wallpaper_obj.newWallpaper===true||wallpaper_obj.newWallpaper==="true") ){
         
         console.log("setting new wallpaper");
         try{
@@ -27,7 +28,7 @@ async function parse ( obj ){
         }catch(e){
             console.error(e);
         }
-    }else if( (args.getLastWallpaper===true||args.getLastWallpaper==="true") ){
+    }else if( (wallpaper_obj.getLastWallpaper===true||wallpaper_obj.getLastWallpaper==="true") ){
         
         //console.log("get last wallpaper");
         try{
@@ -38,7 +39,7 @@ async function parse ( obj ){
         }catch(e){
             console.error(e);
         }
-    }else if( (args.saveLastWallpaper===true||args.saveLastWallpaper==="true") ){
+    }else if( (wallpaper_obj.saveLastWallpaper===true||wallpaper_obj.saveLastWallpaper==="true") ){
         
         //console.log("get last wallpaper");
         try{
@@ -62,7 +63,7 @@ async function parse ( obj ){
         }catch(e){
             console.error(e);
         }
-    }else if( args.openSavedWallpapers===true||args.openSavedWallpapers==="true" ){
+    }else if( wallpaper_obj.openSavedWallpapers===true||wallpaper_obj.openSavedWallpapers==="true" ){
         try{
             let last_used_wallpaper_arr = (await helpers.fsPromise.readFile(saved_wallpaper_file)).toString();
 

@@ -3,3 +3,6 @@ node_modules
 build
 */build
 config/local.json
+input_files/^[0-9]{1,2}_[0-9]{2}_[0-9]{4}$
+input_files/6_29_2018
+input_files/^[0-9]{1,2}_[0-9]{2}_[0-9]{4}$
