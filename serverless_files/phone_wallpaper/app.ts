@@ -9,7 +9,7 @@ let search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved
 async function parse ( wallpaper_obj ){
 
     //console.log(JSON.stringify(obj));
-    console.log(JSON.stringify(wallpaper_obj));
+    //console.log(JSON.stringify(wallpaper_obj));
 
     if( (wallpaper_obj.preSelected===true||wallpaper_obj.preSelected==="true") && wallpaper_obj.imgUrl!==undefined){
         
@@ -41,7 +41,6 @@ async function parse ( wallpaper_obj ){
         }
     }else if( (wallpaper_obj.saveLastWallpaper===true||wallpaper_obj.saveLastWallpaper==="true") ){
         
-        //console.log("get last wallpaper");
         try{
             let last_used_wallpaper_url = (await helpers.fsPromise.readFile(used_wallpaper_file)).toString();
             last_used_wallpaper_url = JSON.parse(last_used_wallpaper_url);

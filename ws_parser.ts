@@ -35,7 +35,7 @@ try{
 async function parseObj(obj) {
     let pathName = obj.request._parsedUrl.pathname;
 
-    console.log("parseObj with pathName of `"+pathName+"`");
+    //console.log("parseObj with pathName of `"+pathName+"`");
 
     if( /wallpaper/.test(pathName) ){
 
