@@ -3,7 +3,7 @@ const config = require('config');
 
 let helpers;
 
-let search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved_wallpaper_file;
+let search_url, set_wallpaper_url, default_wallpaper, used_wallpaper_file, saved_wallpaper_file, parseObj;
 
 // async to allow for await within the function 
 async function parse ( wallpaper_obj ){
@@ -167,12 +167,13 @@ async function getPhoneWallpaper( force_new=false ) {
     return {wallpaper_url,used_wallpapers};
 }
 
-function wallpaper_init(local_helpers, phone_wallpaper_config){
+function wallpaper_init(local_helpers, phone_wallpaper_config, local_parseObj){
     search_url =            phone_wallpaper_config.search_url;
     set_wallpaper_url =     phone_wallpaper_config.set_wallpaper_url;
     default_wallpaper =     phone_wallpaper_config.default_wallpaper;
     used_wallpaper_file =   phone_wallpaper_config.used_wallpaper_file;
     saved_wallpaper_file =  phone_wallpaper_config.saved_wallpaper_file;
+    parseObj = local_parseObj;
 
     helpers = local_helpers;
     return parse;

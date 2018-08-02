@@ -8,25 +8,29 @@ import {pushNotification} from './helpers/ifttt'
 //import lights from './serverless_files/lights/lights';
 import obd_init from './serverless_files/obd/obd';
 import wallpaper_init  from './serverless_files/phone_wallpaper/app';
+import hue_init  from './serverless_files/hue/hue';
 import slack from './serverless_files/slack/slack';
 
 let helpers =  helpersInit();
 
-let parsers = {
-    phone_wallpaper: wallpaper_init( helpers, config.phone_wallpaper ),
-    obd: obd_init( helpers, pushNotification )
-}
+let parsers = {phone_wallpaper:null,obd:null,hue:null}
+
+parsers.phone_wallpaper = wallpaper_init( helpers, config.phone_wallpaper, parseObj )
+parsers.obd = obd_init( helpers, pushNotification, parseObj, parsers )
+parsers.hue = hue_init( helpers, config.hue, parseObj )
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
-let file_location = process.argv[2];
+let in_file_location = process.argv[2];
+let out_file_name = process.argv[3];
+let out_folder_location = process.argv[4];
 
-if( file_location === undefined ){
+if( in_file_location === undefined ){
     throw "file_location not defined";
 }
 
 try{
-    let obj = JSON.parse(fs.readFileSync( file_location ).toString());
+    let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
     parseObj( obj );
 }catch(e){
     console.error(e);
@@ -34,71 +38,37 @@ try{
 
 async function parseObj(obj) {
     let pathName = obj.request._parsedUrl.pathname;
+    let query_body = {};
+    let result={};
 
-    //console.log("parseObj with pathName of `"+pathName+"`");
+    for(let k in obj.request.query){
+        query_body[k] = obj.request.query[k];
+    }
+    for(let k in obj.request.body){
+        query_body[k] = obj.request.body[k];
+    }
 
     if( /wallpaper/.test(pathName) ){
 
-        let wallpaper_obj = {};
-
-        for(let k in obj.request.query){
-            wallpaper_obj[k] = obj.request.query[k];
-        }
-
-        for(let k in obj.request.body){
-            wallpaper_obj[k] = obj.request.body[k];
-        }
-
-        parsers.phone_wallpaper( wallpaper_obj );
+        parsers.phone_wallpaper( query_body );
 
     }
 
     if ( /obd/.test(pathName) ) {
-        parsers.obd( obj );
+        result = await parsers.obd( obj );
     }
 
-    if( /get-log/.test(pathName) ){
-
-        let toExec = "cd "+serverless_folder+"; cd ../../../ws-expose-client; cat parse_log.txt";
-        let options= "";
-        let params= "";
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-            obj.result_only = true;
-        }catch(e){
-            //toReturn = e.toString();
-            obj.errors.runShell = e;
-            console.error(e); 
-        }
-    }
-
-    if(/shell/.test(pathName)){
-        let toExec = obj.request.body.toExec || obj.request.query.toExec || "";
-        let options = obj.request.body.options || obj.request.query.options || "";
-        let params = obj.request.body.params || obj.request.query.params || "";
-
-        try{ 
-            obj.result = await runShell(toExec, options, params);
-            obj.result_only = true;
-        }catch(e){
-            //toReturn = e.toString();
-            obj.errors.runShell = e;
-            console.error(e);
-        }
-    }
-
-    if(/oauth\/automatic/.test(pathName)){ // oauth/automatic
-        console.log( "got it" );
-        obj.result = "got it";
-        obj.result_only = true;
-        fs.writeFileSync( "oauth_automatic.json", JSON.stringify(obj) );
+    if(/hue/.test(pathName)  ){
+        result = await parsers.hue( query_body );
     }
 
     // leave at end of function 
     if( !obj.result ){
 
     }
+
+
+    writeToOutFile(result);
 }
 
 
@@ -127,4 +97,25 @@ function log(obj){
         if(err){console.error(err);}
         console.log("wrote file");
     });
+}
+
+function writeToOutFile(out_data){
+
+    console.log("trying "+out_file_name+" "+out_folder_location)
+
+    if( out_file_name === undefined || out_folder_location === undefined ){return}
+
+    if (!fs.existsSync(out_folder_location)){
+        fs.mkdirSync(out_folder_location);
+        fs.writeFile(out_folder_location+"/.gitignore", "*", ()=>{})
+    }
+
+    //out_file_location
+    let out_str;
+    if( typeof out_data === "object" ){
+        out_str = JSON.stringify(out_data);
+    }else{ // assume string
+        out_str = out_data;
+    }
+    fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
 }

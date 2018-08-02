@@ -1,12 +1,12 @@
 let fs = require('fs');
-let helpers;
-let pushNotification;
+let helpers, pushNotification, parseObj, parsers;
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello";
 
-function main( obj ){
+async function main( obj ){
 
     let event={type:undefined, category:undefined};
+    let result;
 
     try{
         let regex_result = /(.+):(.+)/.exec( obj.request.body.type )
@@ -37,6 +37,13 @@ function main( obj ){
 
             message = "off";
 
+            let location_obj = {
+                lat:obj.request.body.location.lat, 
+                lon:obj.request.body.location.lon
+            };
+
+            result = checkSetLightOn( location_obj );
+
         }else if( event.category === "on" ){
 
             message = "on";
@@ -59,12 +66,37 @@ function main( obj ){
         pushNotification( {title, message, link} )
     }
 
+    return result;
+
 }
 
-function obd_init( local_helpers, local_pushNotification ){
+function obd_init( local_helpers, local_pushNotification, local_parseObj, local_parsers ){
     helpers = local_helpers;
     pushNotification = local_pushNotification
+    parseObj = local_parseObj;
+    parsers = local_parsers;
+    console.log("local_parsers")
+    console.log(local_parsers)
     return main;
+}
+
+async function checkSetLightOn( location_obj ){
+
+    // console.log('hi')
+
+    // let now = Date.now();
+
+    // let promiseResult = Promise.all([ parsers.weather({"report":"sunset"}), check_car_at_on_locataion(location_obj) ]);
+    // let sunset = promiseResult[0];
+    // let car_at_on_locataion = promiseResult[1];
+
+    // if( now > sunset  && car_at_on_locataion ){
+    //     await parsers.hue({"light_name":"living_room","state":"on"})
+    // }
+}
+
+async function check_car_at_on_locataion(location_obj){
+    return false;
 }
 
 export default obd_init;

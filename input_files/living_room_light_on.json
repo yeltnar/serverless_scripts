@@ -1,0 +1,8 @@
+{
+    "request": {
+        "query": {
+            "light_name": "living_room",
+            "state": "on"
+        }
+    }
+}
