@@ -9,15 +9,17 @@ import {pushNotification} from './helpers/ifttt'
 import obd_init from './serverless_files/obd/obd';
 import wallpaper_init  from './serverless_files/phone_wallpaper/app';
 import hue_init  from './serverless_files/hue/hue';
+import weather_init  from './serverless_files/weather/weather';
 import slack from './serverless_files/slack/slack';
 
 let helpers =  helpersInit();
 
-let parsers = {phone_wallpaper:null,obd:null,hue:null}
+let parsers = {phone_wallpaper:null,obd:null,hue:null,weather:null};
 
 parsers.phone_wallpaper = wallpaper_init( helpers, config.phone_wallpaper, parseObj )
 parsers.obd = obd_init( helpers, pushNotification, parseObj, parsers )
 parsers.hue = hue_init( helpers, config.hue, parseObj )
+parsers.weather = weather_init( helpers, config.hue, parseObj, config.weather )
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
@@ -60,6 +62,10 @@ async function parseObj(obj) {
 
     if(/hue/.test(pathName)  ){
         result = await parsers.hue( query_body );
+    }
+
+    if(/weather/.test(pathName)  ){
+        result = await parsers.weather( {query_body,pathName} );
     }
 
     // leave at end of function 

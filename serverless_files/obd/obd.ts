@@ -16,6 +16,7 @@ async function main( obj ){
         console.log(e);
     }
 
+    console.log("event...");
     console.log(event);
 
     if( event.type === "notification" ){
@@ -75,24 +76,34 @@ function obd_init( local_helpers, local_pushNotification, local_parseObj, local_
     pushNotification = local_pushNotification
     parseObj = local_parseObj;
     parsers = local_parsers;
-    console.log("local_parsers")
-    console.log(local_parsers)
     return main;
 }
 
 async function checkSetLightOn( location_obj ){
 
-    // console.log('hi')
+    let query_body = {
+        lat:location_obj.lat, 
+        lon:location_obj.lon
+    };
 
-    // let now = Date.now();
+    //try{}catch(e){}
 
-    // let promiseResult = Promise.all([ parsers.weather({"report":"sunset"}), check_car_at_on_locataion(location_obj) ]);
-    // let sunset = promiseResult[0];
-    // let car_at_on_locataion = promiseResult[1];
+    let sun_up; 
+    //sun_up = await parsers.weather({query_body,pathName:"/sun_up/"});
+    try{
+        sun_up = await parsers.weather({query_body,pathName:"/sun_up/"});
+    }catch(e){
+        console.log(e);
+        sun_up=null;
+    }
+    let car_at_home = false;
 
-    // if( now > sunset  && car_at_on_locataion ){
-    //     await parsers.hue({"light_name":"living_room","state":"on"})
-    // }
+    if( sun_up && car_at_home  ){
+        await parsers.hue({"light_name":"living_room","state":"on"});
+    }
+
+    pushNotification( {"title":"From car","message":{sun_up,car_at_home}} )
+    return {sun_up,car_at_home,location_obj};
 }
 
 async function check_car_at_on_locataion(location_obj){
