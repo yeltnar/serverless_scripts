@@ -1,8 +1,94 @@
 {
     "request": {
+        "_readableState": {
+            "objectMode": false,
+            "highWaterMark": 16384,
+            "buffer": {
+                "head": null,
+                "tail": null,
+                "length": 0
+            },
+            "length": 0,
+            "pipes": null,
+            "pipesCount": 0,
+            "flowing": null,
+            "ended": false,
+            "endEmitted": false,
+            "reading": false,
+            "sync": true,
+            "needReadable": false,
+            "emittedReadable": false,
+            "readableListening": false,
+            "resumeScheduled": false,
+            "destroyed": false,
+            "defaultEncoding": "utf8",
+            "awaitDrain": 0,
+            "readingMore": true,
+            "decoder": null,
+            "encoding": null
+        },
+        "readable": true,
+        "domain": null,
+        "_events": {},
+        "_eventsCount": 0,
+        "httpVersionMajor": 1,
+        "httpVersionMinor": 1,
+        "httpVersion": "1.1",
+        "complete": false,
+        "headers": {
+            "host": "ws-expose.mybluemix.net",
+            "user-agent": "PostmanRuntime/6.4.1",
+            "$wscs": "ECDHE-RSA-AES256-GCM-SHA384",
+            "$wsis": "true",
+            "$wsra": "66.25.244.159",
+            "$wssc": "https",
+            "$wssn": "ws-expose.mybluemix.net",
+            "$wssp": "443",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "cache-control": "no-transform",
+            "via": "1.1 BwAAAGBgiyk-",
+            "x-b3-spanid": "46697afac631acc1",
+            "x-b3-traceid": "46697afac631acc1",
+            "x-cf-applicationid": "e68f5516-a561-42c7-ac49-af54fea27ed3",
+            "x-cf-instanceid": "942a6057-2eaa-4911-7f26-b62a",
+            "x-cf-instanceindex": "0",
+            "x-client-ip": "66.25.244.159",
+            "x-forwarded-for": "66.25.244.159, 10.107.72.244",
+            "x-forwarded-proto": "https",
+            "x-global-transaction-id": "2593367817",
+            "x-request-start": "1533185148608",
+            "x-vcap-request-id": "5e1736af-24ed-4200-4bec-2f134b781fa7"
+        },
+        "rawHeaders": ["Host", "ws-expose.mybluemix.net", "User-Agent", "PostmanRuntime/6.4.1", "$wscs", "ECDHE-RSA-AES256-GCM-SHA384", "$wsis", "true", "$wsra", "66.25.244.159", "$wssc", "https", "$wssn", "ws-expose.mybluemix.net", "$wssp", "443", "Accept", "*/*", "Accept-Encoding", "gzip, deflate", "Cache-Control", "no-transform", "Via", "1.1 BwAAAGBgiyk-", "X-B3-Spanid", "46697afac631acc1", "X-B3-Traceid", "46697afac631acc1", "X-Cf-Applicationid", "e68f5516-a561-42c7-ac49-af54fea27ed3", "X-Cf-Instanceid", "942a6057-2eaa-4911-7f26-b62a", "X-Cf-Instanceindex", "0", "X-Client-Ip", "66.25.244.159", "X-Forwarded-For", "66.25.244.159, 10.107.72.244", "X-Forwarded-Proto", "https", "X-Global-Transaction-Id", "2593367817", "X-Request-Start", "1533185148608", "X-Vcap-Request-Id", "5e1736af-24ed-4200-4bec-2f134b781fa7"],
+        "trailers": {},
+        "rawTrailers": [],
+        "upgrade": false,
+        "url": "/?token=hello&light_name=living_room&state=on",
+        "method": "GET",
+        "statusCode": null,
+        "statusMessage": null,
+        "_consuming": false,
+        "_dumped": false,
+        "baseUrl": "/v1/result_only/hue",
+        "originalUrl": "/v1/result_only/hue?token=hello&light_name=living_room&state=on",
+        "_parsedUrl": {
+            "pathname": "/v1/result_only/hue"
+        },
+        "params": {
+            "0": "result_only/hue"
+        },
         "query": {
+            "token": "hello",
             "light_name": "living_room",
             "state": "on"
-        }
+        },
+        "body": {}
+    },
+    "errors": {},
+    "date": "2018-08-02T04:45:48.606Z",
+    "send_to_device": {
+        "uuid": "9a7c0bf7-2cd5-4754-96a5-ddd824d73ecf",
+        "index": 0
     }
 }

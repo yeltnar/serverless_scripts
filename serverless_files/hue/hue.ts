@@ -10,8 +10,7 @@ let helpers, pushNotification, parseObj;
 
 let light_lookup_table = {
     "living_room":"1",
-    "bedroom":"2",
-    "both":["1","2"]
+    "bedroom":"2"
 }
 
 // TODO move to config file
@@ -22,6 +21,8 @@ async function hue_parse( query_body ){
 
     let light_id;
     let state = query_body.state;
+
+    console.log(query_body)
 
     if( query_body.light_id !== undefined ){
         light_id = query_body.id
