@@ -21,7 +21,7 @@ function check_geofence( in_lat, in_lon ){
 
         let distance = Math.sqrt( Math.pow(lat_distance,2)+Math.pow(lon_distance,2) );
 
-        if( distance <= geofence_config.threashold ){
+        if( distance <= geofence_config.points[k].threashold ){
             matched_locations.push(k);
         }
     }

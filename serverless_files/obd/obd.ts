@@ -97,10 +97,11 @@ async function checkSetLightOn( location_obj ){
         sun_up=null;
     }
 
+    let geofence_locations
 
     let car_at_home; 
     try{
-        let geofence_locations = await parsers.geofence({query_body,pathName:null});
+        geofence_locations = await parsers.geofence({query_body,pathName:null});
         car_at_home = geofence_locations.indexOf("home")>=0;
         console.log("car is at home");
     }catch(e){
@@ -115,7 +116,7 @@ async function checkSetLightOn( location_obj ){
     }
 
     pushNotification( {"title":"From car","message":{sun_up,car_at_home}} )
-    return {sun_up,car_at_home,location_obj};
+    return {sun_up,car_at_home,geofence_locations,location_obj};
 }
 
 async function check_car_at_on_locataion(location_obj){
