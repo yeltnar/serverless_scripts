@@ -96,10 +96,22 @@ async function checkSetLightOn( location_obj ){
         console.log(e);
         sun_up=null;
     }
-    let car_at_home = false;
+
+
+    let car_at_home; 
+    try{
+        let geofence_locations = await parsers.geofence({query_body,pathName:null});
+        car_at_home = geofence_locations.indexOf("home")>=0;
+        console.log("car is at home");
+    }catch(e){
+        console.log(e);
+        car_at_home=null;
+    }
 
     if( sun_up && car_at_home  ){
-        await parsers.hue({"light_name":"living_room","state":"on"});
+        try{
+            await parsers.hue({"light_name":"living_room","state":"on"});
+        }catch(e){console.error(e);}
     }
 
     pushNotification( {"title":"From car","message":{sun_up,car_at_home}} )

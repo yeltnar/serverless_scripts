@@ -4,5 +4,14 @@
         "set_wallpaper_url":"https://maker.ifttt.com/trigger/set_wallpaper/with/key/bXrf4Mm5tIy0Bjis08SiYC",
         "used_wallpaper_file":"./serverless_files/phone_wallpaper/used_wallpaper.json",
         "saved_wallpaper_file":"./serverless_files/phone_wallpaper/saved_wallpaper.json"
+    },
+    "geofence":{
+        "threashold":0.0007,
+        "points":{
+            "no_where":{
+                "lat":0,
+                "lon":0
+            }
+        }
     }
 }

@@ -8,6 +8,9 @@ const iftttConfig={
 
 function pushNotification(msgObj){
 
+	console.log("msgObj...");
+	console.log(msgObj);
+
 	let title;
 	let message;
 	let link;

@@ -10,16 +10,18 @@ import obd_init from './serverless_files/obd/obd';
 import wallpaper_init  from './serverless_files/phone_wallpaper/app';
 import hue_init  from './serverless_files/hue/hue';
 import weather_init  from './serverless_files/weather/weather';
+import geofence_init  from './serverless_files/geofence/geofence';
 import slack from './serverless_files/slack/slack';
 
 let helpers =  helpersInit();
 
-let parsers = {phone_wallpaper:null,obd:null,hue:null,weather:null};
+let parsers = {phone_wallpaper:null,obd:null,hue:null,weather:null, geofence:null};
 
 parsers.phone_wallpaper = wallpaper_init( helpers, config.phone_wallpaper, parseObj )
 parsers.obd = obd_init( helpers, pushNotification, parseObj, parsers )
 parsers.hue = hue_init( helpers, config.hue, parseObj )
-parsers.weather = weather_init( helpers, config.hue, parseObj, config.weather )
+parsers.weather = weather_init( helpers, config.hue, parseObj, config.weather ) // TODO these names seem so broken
+parsers.geofence = geofence_init( helpers, config.geofence )
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
@@ -66,6 +68,10 @@ async function parseObj(obj) {
 
     if(/weather/.test(pathName)  ){
         result = await parsers.weather( {query_body,pathName} );
+    }
+
+    if(/geofence/.test(pathName)  ){
+        result = await parsers.geofence( {query_body,pathName} );
     }
 
     // leave at end of function 
