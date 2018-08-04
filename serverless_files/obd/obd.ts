@@ -121,7 +121,7 @@ class obdParser extends Parser{
 
         this.pushNotification( {"title":"From car","message":toReturn} )
 
-        if( sun_up && car_at_home  ){
+        if( !sun_up && car_at_home  ){
             try{
                 await this.parsers.hue.parse({"light_name":"living_room","state":"on"});
             }catch(e){console.error(e);}
