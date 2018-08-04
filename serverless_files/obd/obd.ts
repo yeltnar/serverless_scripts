@@ -113,7 +113,6 @@ class obdParser extends Parser{
         try{
             geofence_locations = await this.parsers.geofence({query_body,pathName:null});
             car_at_home = geofence_locations.indexOf("home")>=0;
-            console.log("car is at home");
         }catch(e){
             console.log(e);
             car_at_home=null;
@@ -128,7 +127,7 @@ class obdParser extends Parser{
         const toReturn = {sun_up,car_at_home,geofence_locations,location_obj};
 
         this.pushNotification( {"title":"From car","message":toReturn} )
-        return {sun_up,car_at_home,geofence_locations,location_obj};
+        return toReturn;
     }
 
 }
