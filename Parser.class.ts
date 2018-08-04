@@ -7,12 +7,8 @@ abstract class Parser{
     private static parserList=[];
 
     static parseAll(obj){
-        
-        let parserObj={pathName:null,query_body:null,obj};
 
-        let {pathName,query_body} = Parser._abstractTransformObj(obj);
-        parserObj.pathName = pathName;
-        parserObj.query_body = query_body;
+        let parserObj = Parser._abstractTransformObj(obj);
 
         Parser.parserList.forEach(( current_parser )=>{
     
@@ -57,7 +53,7 @@ abstract class Parser{
             query_body[k] = obj.request.body[k];
         }
 
-        return {pathName,query_body};
+        return {pathName,query_body,obj};
 
     };
 }
