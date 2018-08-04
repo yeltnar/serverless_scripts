@@ -4,8 +4,8 @@ class geofence extends Parser{
     constructor( helpers, config, parsers ){
         super( helpers, config, parsers );
     }
-    _shouldParse(){
-        return false;
+    _shouldParse(parserObj){
+        return /geofence/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
     _doParse( parserObj ){
