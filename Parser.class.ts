@@ -4,11 +4,35 @@ abstract class Parser{
     config;
     parsers;
 
+    private static parserList=[];
+
+    static parseAll(obj){
+        
+        let doParseObj;
+        let parserObj={pathName:null,query_body:null,obj};
+
+        let {pathName,query_body} = Parser._abstractTransformObj(obj);
+        parserObj.pathName = pathName;
+        parserObj.query_body = query_body;
+
+        Parser.parserList.forEach(( current_parser )=>{
+    
+            if( !current_parser._shouldParse(parserObj) ){ return; }
+    
+            let current_doParseObj = current_parser._transformObj(parserObj)
+
+            current_parser.parse( current_doParseObj );
+        })
+        
+    }
+
     constructor( helpers, config, parsers ){
 
         this.helpers = helpers;
         this.config = config;
         this.parsers = parsers;
+
+        Parser.parserList.push(this);
         
     }
 
@@ -16,26 +40,9 @@ abstract class Parser{
     abstract _transformObj(parserObj);
     abstract _doParse(doParseObj): Promise<any>;
 
-    parse( obj, local_call=false ){
-
-        let doParseObj;
-
-        if( local_call ){
-            doParseObj = obj;
-        }else{
-
-            let parserObj={pathName:null,query_body:null,obj};
-
-            let {pathName,query_body} = Parser._abstractTransformObj(obj);
-            parserObj.pathName = pathName;
-            parserObj.query_body = query_body;
-
-            if( !this._shouldParse(parserObj) ){ return; }
-
-            doParseObj = this._transformObj(parserObj)
-        }
+    parse( obj ){
         
-        this._doParse(doParseObj);
+        this._doParse( obj );
 
     };
 

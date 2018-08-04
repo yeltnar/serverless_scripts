@@ -12,6 +12,7 @@ class geofence extends Parser{
 
     constructor( helpers, config, parsers ){
         super( helpers, config, parsers );
+
         this.search_url =            config.search_url;
         this.set_wallpaper_url =     config.set_wallpaper_url;
         this.default_wallpaper =     config.default_wallpaper;
