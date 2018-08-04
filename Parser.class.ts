@@ -8,7 +8,6 @@ abstract class Parser{
 
     static parseAll(obj){
         
-        let doParseObj;
         let parserObj={pathName:null,query_body:null,obj};
 
         let {pathName,query_body} = Parser._abstractTransformObj(obj);
