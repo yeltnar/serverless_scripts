@@ -115,7 +115,9 @@ async function checkSetLightOn( location_obj ){
         }catch(e){console.error(e);}
     }
 
-    pushNotification( {"title":"From car","message":{sun_up,car_at_home}} )
+    const toReturn = {sun_up,car_at_home,geofence_locations,location_obj};
+
+    pushNotification( {"title":"From car","message":toReturn} )
     return {sun_up,car_at_home,geofence_locations,location_obj};
 }
 
