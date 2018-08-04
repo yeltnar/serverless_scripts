@@ -53,7 +53,20 @@ abstract class Parser{
             query_body[k] = obj.request.body[k];
         }
 
-        return {pathName,query_body,obj};
+        let toReturn = {pathName,query_body,obj,response_device:undefined}
+
+        if( obj.response_device!==undefined ){
+            toReturn.response_device = obj.response_device;
+        }else{
+            obj.response_device = { 
+                device_name: null,
+                device_group: null,
+                token:null,
+                token_type:null
+            };
+        }
+
+        return toReturn ;
 
     };
 }
