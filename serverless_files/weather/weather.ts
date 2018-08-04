@@ -1,4 +1,3 @@
-import { lstat } from "fs";
 const requestP = require('request-promise-native');
 
 let helpers,parseObj,parsers,weather_config;
@@ -9,18 +8,17 @@ async function main( parse_obj ){
 
     if( /sun_status/.test(parse_obj.pathName) ){
         const results = await getCurrentLocalAstronomy( parse_obj.query_body.lat, parse_obj.query_body.lon );
-        
-        console.log("results")
-        console.log(Object.keys(results))
-        console.log(results.moon_phase)
-
 
         toReturn.sunrise = results.moon_phase.sunrise;
         toReturn.sunset = results.moon_phase.sunset;
         toReturn.time = results.current_observation.local_time_rfc822;
     }
 
-    if( /sun_up/.test(parse_obj.pathName) ){
+    if( /sun_up_home/.test(parse_obj.pathName) ){
+        let query_body = {lat:32.917795, lon:-96.769769};
+        toReturn = await main({query_body,pathName:"/sun_up/"});
+    }
+    else if( /sun_up/.test(parse_obj.pathName) ){
 
         let query_body = {lat:parse_obj.query_body.lat, lon:parse_obj.query_body.lon};
 
@@ -48,7 +46,6 @@ async function main( parse_obj ){
             console.log("sun is down")
         }
     }
-
 
 
     return toReturn;
