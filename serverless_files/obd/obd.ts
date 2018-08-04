@@ -59,7 +59,7 @@ class obdParser extends Parser{
                     lon:obj.request.body.location.lon
                 };
     
-                result = this.checkSetLightOn( location_obj );
+                result = this.checkSetLightOn( location_obj, obj.response_device.device_name );
     
             }else if( event.category === "on" ){
     
@@ -89,7 +89,7 @@ class obdParser extends Parser{
 
 
 
-    async checkSetLightOn( location_obj ){
+    async checkSetLightOn( location_obj, response_device_name ){
 
         let query_body = {
             lat:location_obj.lat, 
@@ -119,7 +119,9 @@ class obdParser extends Parser{
 
         const toReturn = {sun_up,car_at_home,geofence_locations,location_obj};
 
-        this.pushNotification( {"title":"From car","message":toReturn} )
+        let pushData = {"title":"From car/"+response_device_name,"message":toReturn};
+        this.pushNotification( pushData );
+        console.log( pushData );
 
         if( sun_up && car_at_home  ){
             try{
