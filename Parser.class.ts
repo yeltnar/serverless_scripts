@@ -14,7 +14,7 @@ abstract class Parser{
 
     abstract _shouldParse(parserObj): boolean;
     abstract _transformObj(parserObj);
-    abstract async _doParse(doParseObj);
+    abstract _doParse(doParseObj): Promise<any>;
 
     parse( obj, local_call=false ){
 
