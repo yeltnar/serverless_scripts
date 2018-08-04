@@ -12,21 +12,29 @@ abstract class Parser{
         
     }
 
-    abstract _shouldParse(obj): boolean;
-    abstract _transformObj(obj);
+    abstract _shouldParse(parserObj): boolean;
+    abstract _transformObj(parserObj);
     abstract async _doParse(doParseObj);
 
-    parse( obj ){
+    parse( obj, local_call=false ){
 
-        let parserObj={pathName:null,query_body:null,obj};
+        let doParseObj;
 
-        let {pathName,query_body} = Parser._abstractTransformObj(obj);
-        parserObj.pathName = pathName;
-        parserObj.query_body = query_body;
+        if( local_call ){
+            doParseObj = obj;
+        }else{
 
-        if( !this._shouldParse(parserObj) ){ return; }
+            let parserObj={pathName:null,query_body:null,obj};
 
-        let doParseObj = this._transformObj(parserObj)
+            let {pathName,query_body} = Parser._abstractTransformObj(obj);
+            parserObj.pathName = pathName;
+            parserObj.query_body = query_body;
+
+            if( !this._shouldParse(parserObj) ){ return; }
+
+            doParseObj = this._transformObj(parserObj)
+        }
+        
         this._doParse(doParseObj);
 
     };

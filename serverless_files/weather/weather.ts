@@ -2,13 +2,19 @@ import Parser from '../../Parser.class';
 const requestP = require('request-promise-native');
 
 class weatherParser extends Parser {
-    _transformObj(parserObj){
-        return parserObj;
+
+    constructor( helpers, config, parsers ){
+        super( helpers, config, parsers );
     }
 
     _shouldParse( parserObj ):boolean{
         return /weather/.test(parserObj.pathName);
     }
+
+    _transformObj(parserObj){
+        return parserObj;
+    }
+
     async _doParse( parserObj ){
 
         let toReturn:any={};
