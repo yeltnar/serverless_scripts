@@ -5,7 +5,7 @@
   "main": "ws_parser.ts",
   "scripts": {
     "test": "clear;nodemon;",
-    "test_start": "ts-node ws_parser.ts input_files/t_car_on.json",
+    "test_start": "ts-node ws_parser.ts input_files/t.car_off_at_home.json",
     "start": "pm2 start build/ws_parser.js; pm2 logs",
     "restart": "pm2 restart ws_parser; pm2 logs",
     "build": "tsc ws_parser --outDir build; date > build/date.txt",

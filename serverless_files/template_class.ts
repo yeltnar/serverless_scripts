@@ -1,0 +1,14 @@
+import Parser from '../../Parser.class';
+
+class geofence extends Parser{
+    constructor( helpers, config, parsers ){
+        super( helpers, config, parsers );
+    }
+    _shouldParse(parserObj){
+        return false; // return /geofence/.test(parserObj.pathName);
+    }
+    _transformObj(parserObj){return parserObj;}
+    async _doParse(){}
+}
+
+export default geofence;
