@@ -8,7 +8,7 @@ class geofence extends Parser{
         return false; // return /geofence/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
-    _doParse(){}
+    async _doParse(){}
 }
 
 export default geofence;

@@ -101,6 +101,8 @@ class geofence extends Parser{
                 console.error(e);
             }
         }
+
+        return "done";
     
     }
 

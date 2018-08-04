@@ -8,7 +8,7 @@ class geofence extends Parser{
         return /geofence/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
-    _doParse( parserObj ){
+    async _doParse( parserObj ){
         let toReturn;
     
         toReturn = this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );

@@ -99,9 +99,8 @@ class obdParser extends Parser{
         //try{}catch(e){}
 
         let sun_up; 
-        //sun_up = await parsers.weather({query_body,pathName:"/sun_up/"});
         try{
-            sun_up = await this.parsers.weather({query_body,pathName:"/sun_up/"}, true);
+            sun_up = await this.parsers.weather.parse({query_body,pathName:"/sun_up/"});
         }catch(e){
             console.log(e);
             sun_up=null;
@@ -111,22 +110,22 @@ class obdParser extends Parser{
 
         let car_at_home; 
         try{
-            geofence_locations = await this.parsers.geofence({query_body,pathName:null});
+            geofence_locations = await this.parsers.geofence.parse({query_body,pathName:null});
             car_at_home = geofence_locations.indexOf("home")>=0;
         }catch(e){
             console.log(e);
             car_at_home=null;
         }
 
-        if( sun_up && car_at_home  ){
-            try{
-                await this.parsers.hue({"light_name":"living_room","state":"on"});
-            }catch(e){console.error(e);}
-        }
-
         const toReturn = {sun_up,car_at_home,geofence_locations,location_obj};
 
         this.pushNotification( {"title":"From car","message":toReturn} )
+
+        if( sun_up && car_at_home  ){
+            try{
+                await this.parsers.hue.parse({"light_name":"living_room","state":"on"});
+            }catch(e){console.error(e);}
+        }
         return toReturn;
     }
 

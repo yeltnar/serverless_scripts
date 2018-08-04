@@ -37,7 +37,7 @@ abstract class Parser{
 
     parse( obj ){
         
-        this._doParse( obj );
+        return this._doParse( obj );
 
     };
 
