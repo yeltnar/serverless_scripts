@@ -1,14 +1,14 @@
-import Parser from '../../Parser.class';
+import {Parser,ParserContainer} from '../../Parser.class';
 
 class geofence extends Parser{
-    constructor( helpers, config, parsers ){
-        super( helpers, config, parsers );
+    constructor( helpers, config ){
+        super( helpers, config );
     }
     _shouldParse(parserObj){
         return /geofence/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
-    async _doParse( parserObj ){
+    async _parse( parserObj ){
         let toReturn;
     
         toReturn = this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );

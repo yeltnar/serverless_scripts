@@ -1,10 +1,10 @@
-import Parser from '../../Parser.class';
+import {Parser,ParserContainer} from '../../Parser.class';
 const requestP = require('request-promise-native');
 
 class weatherParser extends Parser {
 
-    constructor( helpers, config, parsers ){
-        super( helpers, config, parsers );
+    constructor( helpers, config ){
+        super( helpers, config );
     }
 
     _shouldParse( parserObj ):boolean{
@@ -15,7 +15,7 @@ class weatherParser extends Parser {
         return parserObj;
     }
 
-    async _doParse( parserObj ){
+    async _parse( parserObj ){
 
         let toReturn:any={};
     
@@ -29,13 +29,13 @@ class weatherParser extends Parser {
     
         if( /sun_up_home/.test(parserObj.pathName) ){
             let query_body = {lat:32.917795, lon:-96.769769};
-            toReturn = await this._doParse({query_body,pathName:"/sun_up/"});
+            toReturn = await this._parse({query_body,pathName:"/sun_up/"});
         }
         else if( /sun_up/.test(parserObj.pathName) ){
     
             let query_body = {lat:parserObj.query_body.lat, lon:parserObj.query_body.lon};
     
-            let sunsetData = await this._doParse({query_body,pathName:"/sun_status/"});
+            let sunsetData = await this._parse({query_body,pathName:"/sun_status/"});
     
             let now = new Date();
             
