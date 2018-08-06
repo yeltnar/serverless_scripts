@@ -6,11 +6,13 @@
         "saved_wallpaper_file":"./serverless_files/phone_wallpaper/saved_wallpaper.json"
     },
     "geofence":{
-        "points":{
-            "no_where":{
+        "points":[
+            {
+                "name":"no_where",
                 "lat":0,
-                "lon":0
+                "lon":0,
+                "threashold":0.0007
             }
-        }
+        ]
     }
 }
