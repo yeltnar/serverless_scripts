@@ -1,4 +1,4 @@
-import Parser from '../../Parser.class';
+import {Parser,ParserContainer} from '../../Parser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
@@ -6,8 +6,8 @@ class obdParser extends Parser{
 
     pushNotification;
 
-    constructor( helpers, config, parsers, pushNotification ){
-        super( helpers, config, parsers );
+    constructor( helpers, config, pushNotification ){
+        super( helpers, config );
         this.pushNotification = pushNotification;
     }
 
@@ -19,7 +19,7 @@ class obdParser extends Parser{
         return parserObj.obj;
     }
 
-    async _doParse( obj ){
+    async _parse( obj ){
 
         let event={type:undefined, category:undefined};
         let result;
@@ -100,7 +100,7 @@ class obdParser extends Parser{
 
         let sun_up; 
         try{
-            sun_up = await this.parsers.weather.parse({query_body,pathName:"/sun_up/"});
+            sun_up = await ParserContainer.parse("weather",{query_body,pathName:"/sun_up/"});
         }catch(e){
             console.log(e);
             sun_up=null;
@@ -110,7 +110,7 @@ class obdParser extends Parser{
 
         let car_at_home; 
         try{
-            geofence_locations = await this.parsers.geofence.parse({query_body,pathName:null});
+            geofence_locations = await ParserContainer.parse("geofence",{query_body,pathName:null});
             car_at_home = geofence_locations.indexOf("home")>=0;
         }catch(e){
             console.log(e);
@@ -125,7 +125,7 @@ class obdParser extends Parser{
 
         if( !sun_up && car_at_home  ){
             try{
-                await this.parsers.hue.parse({"light_name":"living_room","state":"on"});
+                await ParserContainer.parse("hue",{"light_name":"living_room","state":"on"});
             }catch(e){console.error(e);}
         }
         return toReturn;

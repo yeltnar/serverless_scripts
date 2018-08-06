@@ -1,43 +1,36 @@
+const uuidv4 = require('uuid/v4');
 abstract class Parser{
 
     helpers;
     config;
-    parsers;
+    parserContainer;
 
-    private static parserList=[];
-
-    static parseAll(obj){
-
-        let parserObj = Parser._abstractTransformObj(obj);
-
-        Parser.parserList.forEach(( current_parser )=>{
-    
-            if( !current_parser._shouldParse(parserObj) ){ return; }
-    
-            let current_doParseObj = current_parser._transformObj(parserObj)
-
-            current_parser.parse( current_doParseObj );
-        })
-        
-    }
-
-    constructor( helpers, config, parsers ){
+    constructor( helpers, config ){
 
         this.helpers = helpers;
         this.config = config;
-        this.parsers = parsers;
-
-        Parser.parserList.push(this);
         
     }
 
     abstract _shouldParse(parserObj): boolean;
     abstract _transformObj(parserObj);
-    abstract _doParse(doParseObj): Promise<any>;
+    abstract _parse(doParseObj): Promise<any>;
+
+    checkAndParse(parserObj){
+
+        if( this._shouldParse(parserObj) ){
+
+            let current_doParseObj = this._transformObj(parserObj)
+
+            this.parse( current_doParseObj );
+
+        }
+
+    }
 
     parse( obj ){
         
-        return this._doParse( obj );
+        return this._parse( obj );
 
     };
 
@@ -71,4 +64,103 @@ abstract class Parser{
     };
 }
 
-export default Parser;
+class ParserContainer{
+
+    private static exposedParsers:any = {};
+    private static privateParsers:any = {};
+
+    // add parsers
+
+    static addExposedParser(parser:Parser, name=uuidv4(), allowReplace=false ){
+
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
+
+        if( allowReplace===true || !alreadyThere ){
+            ParserContainer.exposedParsers[name] = parser;
+        }else if( alreadyThere ){
+            throw "ParserContainer.exposedParsers["+name+"] is defined!";
+        }
+    }
+
+    static addPrivateParser(parser:Parser, name=uuidv4(), allowReplace=false ){
+
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
+
+        if( allowReplace===true || !alreadyThere ){
+            ParserContainer.privateParsers[name] = parser;
+        }else if( alreadyThere ){
+            throw "ParserContainer.privateParsers["+name+"] is defined!";
+        }
+    }
+
+    // call parsers
+    
+    static async parse(name, parseObj):Promise<any>{
+
+        let parser = ParserContainer.exposedParsers[name] || ParserContainer.privateParsers[name];
+
+        let parseResult;
+
+        if( parser ){
+            parseResult = parser.parse(parseObj);
+        }
+        
+        return parseResult;
+    }
+    
+    static parseAll(obj):Array<any>{
+        const parseObj = Parser._abstractTransformObj(obj)
+        
+        let exposedResult = ParserContainer.parseExposed(obj, parseObj);
+        let privateResult = ParserContainer.parsePrivate(obj, parseObj);
+
+        return exposedResult.concat(privateResult);
+    }
+
+    static parseExposed(obj, parserObj?):Array<any>{
+        return ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
+    }
+    
+    static parsePrivate(obj, parserObj?):Array<any>{
+        return ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
+    }
+
+    private static parseListObj(listObj, obj, parserObj):Array<any>{
+
+        parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
+
+        let results = [];
+
+        for(let k in listObj ){
+            results.push(listObj[k].checkAndParse(parserObj));
+        }
+
+        return results;
+
+    }
+
+    // remove parsers
+
+    static removeExposedParser(name){
+        if( ParserContainer.exposedParsers[name]!==undefined ){
+            delete ParserContainer.exposedParsers[name];
+        }else if( ParserContainer.exposedParsers[name]!==undefined ){
+            throw "ParserContainer.exposedParsers["+name+"] is not defined!";
+        }
+    }
+
+    static removePrivateParser(name){
+        if( ParserContainer.privateParsers[name]!==undefined ){
+            delete ParserContainer.privateParsers[name];
+        }else if( ParserContainer.privateParsers[name]!==undefined ){
+            throw "ParserContainer.privateParsers["+name+"] is not defined!";
+        }
+    }
+
+    //TODO do this...mebe
+    private static removeParser(name:string){
+
+    }
+}
+
+export {Parser, ParserContainer};

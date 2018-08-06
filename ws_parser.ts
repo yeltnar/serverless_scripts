@@ -3,7 +3,7 @@ const {exec} = require("child_process")
 const fs = require("fs")
 
 //my files
-import Parser from './Parser.class';
+import {Parser,ParserContainer} from './Parser.class';
 import {helpersInit} from './helpers/helper'
 import {pushNotification} from './helpers/ifttt'
 //import lights from './serverless_files/lights/lights';
@@ -16,19 +16,11 @@ import slack from './serverless_files/slack/slack';
 
 let helpers =  helpersInit();
 
-let parsers = {phone_wallpaper:null,obd:null,hue:null,weather:null, geofence:null};
-
-// parsers.phone_wallpaper = wallpaper_init( helpers, config.phone_wallpaper, parseObj )
-// parsers.obd = obd_init( helpers, pushNotification, parseObj, parsers )
-// parsers.hue = hue_init( helpers, config.hue, parseObj )
-// parsers.weather = weather_init( helpers, config.hue, parseObj, config.weather ) // TODO these names seem so broken
-// parsers.geofence = geofence_init( helpers, config.geofence )
-
-parsers.obd = new ObdParser(helpers, config.obd, parsers, pushNotification);
-parsers.phone_wallpaper = new PhoneWallpaperParser(helpers, config.phone_wallpaper, parsers);
-parsers.hue = new HueParser(helpers, config.hue, parsers);
-parsers.weather = new WeatherParser(helpers, config.weather, parsers);
-parsers.geofence = new GeofenceParser(helpers, config.geofence, parsers);
+ParserContainer.addExposedParser(new ObdParser(helpers, config.obd, pushNotification), "obd");
+ParserContainer.addExposedParser(new PhoneWallpaperParser(helpers, config.phone_wallpaper), "phoneWallpaper");
+ParserContainer.addExposedParser(new HueParser(helpers, config.hue), "hue");
+ParserContainer.addExposedParser(new WeatherParser(helpers, config.weather), "weather"); // TODO these names seem so broken
+ParserContainer.addExposedParser(new GeofenceParser(helpers, config.geofence), "geofence");
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
@@ -59,7 +51,7 @@ async function parseObj(obj) {
         query_body[k] = obj.request.body[k];
     }
 
-    Parser.parseAll(obj);
+    ParserContainer.parseExposed(obj);
 
     // leave at end of function 
     if( !obj.result ){

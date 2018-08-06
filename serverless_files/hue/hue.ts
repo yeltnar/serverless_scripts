@@ -1,4 +1,4 @@
-import Parser from '../../Parser.class';
+import {Parser,ParserContainer} from '../../Parser.class';
 const requestP = require('request-promise-native');
 class geofence extends Parser{
 
@@ -11,8 +11,8 @@ class geofence extends Parser{
     user = "EByeQOPuSZvgsiSgKGYpOTqKwYJnpVo6TqkxZ5Gh"; // TODO move this to config
     baseAddress = "http://192.168.1.111/api"
 
-    constructor( helpers, config, parsers ){
-        super( helpers, config, parsers );
+    constructor( helpers, config ){
+        super( helpers, config );
     }
     _shouldParse(parserObj){
         return /hue/.test(parserObj.pathName);
@@ -22,7 +22,7 @@ class geofence extends Parser{
         return parserObj.query_body;
     }
 
-    async _doParse( query_body ){
+    async _parse( query_body ){
 
         let light_id;
         let state = query_body.state;

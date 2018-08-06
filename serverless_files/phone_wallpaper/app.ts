@@ -1,4 +1,4 @@
-import Parser from '../../Parser.class';
+import {Parser,ParserContainer} from '../../Parser.class';
 const requestP = require("request-promise-native");
 
 class geofence extends Parser{
@@ -10,8 +10,8 @@ class geofence extends Parser{
     saved_wallpaper_file;
     parseObj;
 
-    constructor( helpers, config, parsers ){
-        super( helpers, config, parsers );
+    constructor( helpers, config ){
+        super( helpers, config );
 
         this.search_url =            config.search_url;
         this.set_wallpaper_url =     config.set_wallpaper_url;
@@ -25,7 +25,7 @@ class geofence extends Parser{
     _transformObj(parserObj){
         return parserObj.query_body;
     }
-    async _doParse( query_body ){
+    async _parse( query_body ){
 
         //console.log(JSON.stringify(obj));
         //console.log(JSON.stringify(wallpaper_obj));
