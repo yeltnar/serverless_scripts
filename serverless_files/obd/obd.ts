@@ -6,8 +6,15 @@ class obdParser extends Parser{
 
     pushNotification;
 
-    constructor( helpers, config, pushNotification ){
-        super( helpers, config );
+    constructor( helpers, config, name, pushNotification ){
+
+        // TODO replace this with mongo 
+        let parser_starting_state  = {
+            "engine":"off"
+        };
+
+        super( helpers, config, name, parser_starting_state );
+        
         this.pushNotification = pushNotification;
     }
 
@@ -29,11 +36,14 @@ class obdParser extends Parser{
     
             event = { type:regex_result[1], category:regex_result[2] };
         }catch(e){
-            console.log(e);
+            console.error(e);
         }
     
         console.log("event...");
         console.log(event);
+
+        let state = this.getState();
+        let state_changed = false;
     
         if( event.type === "notification" ){
             this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
@@ -48,26 +58,44 @@ class obdParser extends Parser{
         if( event.type==="ignition" ){   
     
             let title = "Car ignition";
-            let message;
+            let engine_state;
     
             if( event.category === "off" ){
     
-                message = "off";
-    
-                let location_obj = {
-                    lat:obj.request.body.location.lat, 
-                    lon:obj.request.body.location.lon
-                };
-    
-                result = this.checkSetLightOn( location_obj, obj.response_device.device_name );
+                engine_state = "off";
     
             }else if( event.category === "on" ){
     
-                message = "on";
+                engine_state = "on";
     
             }
     
-            this.pushNotification( {title, message, link} )
+            let location_obj = {
+                lat:obj.request.body.location.lat, 
+                lon:obj.request.body.location.lon
+            };
+
+            try{
+                state.geofence_locations = await ParserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
+            }catch(e){
+                console.error(e);
+            }
+            
+            state.engine = engine_state;
+            state.location = location_obj;
+            state_changed = true;
+
+            let pushData = {
+                "title":"From car/"+obj.response_device.device_name,
+                "message":{
+                    geofence_locations:state.geofence_locations,
+                    location_obj,
+                    engine_state
+                }, 
+                link
+            };
+            this.pushNotification( pushData );
+            console.log( pushData.message );
         }
     
         if( event.type==="trip" ){  
@@ -82,53 +110,13 @@ class obdParser extends Parser{
     
             this.pushNotification( {title, message, link} )
         }
+
+        if( state_changed ){
+            this.setState(state);
+        }
     
         return result;
     
-    }
-
-
-
-    async checkSetLightOn( location_obj, response_device_name ){
-
-        let query_body = {
-            lat:location_obj.lat, 
-            lon:location_obj.lon
-        };
-
-        //try{}catch(e){}
-
-        let sun_up; 
-        try{
-            sun_up = await ParserContainer.parse("weather",{query_body,pathName:"/sun_up/"});
-        }catch(e){
-            console.log(e);
-            sun_up=null;
-        }
-
-        let geofence_locations
-
-        let car_at_home; 
-        try{
-            geofence_locations = await ParserContainer.parse("geofence",{query_body,pathName:null});
-            car_at_home = geofence_locations.indexOf("home")>=0;
-        }catch(e){
-            console.log(e);
-            car_at_home=null;
-        }
-
-        const toReturn = {sun_up,car_at_home,geofence_locations,location_obj};
-
-        let pushData = {"title":"From car/"+response_device_name,"message":toReturn};
-        this.pushNotification( pushData );
-        console.log( pushData );
-
-        if( !sun_up && car_at_home  ){
-            try{
-                await ParserContainer.parse("hue",{"light_name":"living_room","state":"on"});
-            }catch(e){console.error(e);}
-        }
-        return toReturn;
     }
 
 }

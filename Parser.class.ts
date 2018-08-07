@@ -1,15 +1,23 @@
+import State from './Redux';
+const schedule = require('node-schedule');
+
 const uuidv4 = require('uuid/v4');
+
+let state:State = new State();
+
 abstract class Parser{
 
+    name;
     helpers;
     config;
-    parserContainer;
 
-    constructor( helpers, config ){
+    constructor( helpers, config, name:string, parser_starting_state={} ){
 
         this.helpers = helpers;
         this.config = config;
-        
+        this.name = name;
+
+        state.replaceParserState(this.name, parser_starting_state);
     }
 
     abstract _shouldParse(parserObj): boolean;
@@ -25,7 +33,6 @@ abstract class Parser{
             this.parse( current_doParseObj );
 
         }
-
     }
 
     parse( obj ){
@@ -33,6 +40,18 @@ abstract class Parser{
         return this._parse( obj );
 
     };
+
+    getState(){
+        return state.getParserState(this.name);
+    }
+
+    setState( newState ){
+        return state.replaceParserState(this.name, newState)
+    }
+
+    registerForStateChanges( funct ){
+        state.registerForStateChanges( funct );
+    }
 
     static _abstractTransformObj( obj ){
 
@@ -62,6 +81,7 @@ abstract class Parser{
         return toReturn ;
 
     };
+
 }
 
 class ParserContainer{
@@ -71,7 +91,9 @@ class ParserContainer{
 
     // add parsers
 
-    static addExposedParser(parser:Parser, name=uuidv4(), allowReplace=false ){
+    static addExposedParser(parser:Parser, allowReplace=false ){
+
+        let name = parser.name || uuidv4();
 
         let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
 
@@ -82,7 +104,9 @@ class ParserContainer{
         }
     }
 
-    static addPrivateParser(parser:Parser, name=uuidv4(), allowReplace=false ){
+    static addPrivateParser(parser:Parser, allowReplace=false ){
+
+        const name = parser.name
 
         let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
 
