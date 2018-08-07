@@ -7,7 +7,7 @@ class State{
 
     constructor(){
         this.store = createStore( this.reduxParse, this.stateObj );
-        this.store.subscribe(this.stateChanged)
+        //this.store.subscribe(this.stateChanged)
     }
 
     private reduxParse=(state, action)=>{
@@ -50,6 +50,12 @@ class State{
 
     getParserState(parser:string){
         return this.store.getState()[parser];
+    }
+
+    registerForStateChanges(funct){
+        return this.store.subscribe(()=>{
+            funct( this.store.getState() );
+        });
     }
 
     private stateChanged=()=>{

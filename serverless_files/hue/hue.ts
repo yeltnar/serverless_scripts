@@ -13,6 +13,8 @@ class geofence extends Parser{
 
     constructor( helpers, config, name ){
         super( helpers, config, name );
+
+        this.registerForStateChanges(this.car_home_sun_down_lights_on);
     }
     _shouldParse(parserObj){
         return /hue/.test(parserObj.pathName);
@@ -61,6 +63,37 @@ class geofence extends Parser{
               body: JSON.stringify({on})
         };
         return requestP(options).then(this.helpers.tryToParsePromise);
+    }
+
+    car_home_sun_down_lights_on= async(state)=>{
+
+        let at_home 
+        if( state.obd.geofence_locations ){
+            at_home = state.obd.geofence_locations.indexOf('home')>=0;
+        }
+
+        let sun_up; 
+        if( state.obd.location ){
+
+            try{
+                sun_up = await ParserContainer.parse("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
+            }catch(e){
+                console.error(e);
+                sun_up=null;
+            }
+        }
+
+        // TODO remove when you can
+        state.weather.sun_up = sun_up;
+
+        if( state.obd.engine === 'off' && at_home && state.weather.sun_status !== 'up' ){
+            let query_body = {
+                light_name:"living_room",
+                state:"on"
+            }
+            await this._parse( query_body );
+            
+        }
     }
 }
 

@@ -49,6 +49,10 @@ abstract class Parser{
         return state.replaceParserState(this.name, newState)
     }
 
+    registerForStateChanges( funct ){
+        state.registerForStateChanges( funct );
+    }
+
     static _abstractTransformObj( obj ){
 
         let pathName = obj.request._parsedUrl.pathname;
