@@ -6,8 +6,15 @@ class obdParser extends Parser{
 
     pushNotification;
 
-    constructor( helpers, config, pushNotification ){
-        super( helpers, config );
+    constructor( helpers, config, name, pushNotification ){
+
+        // TODO replace this with mongo 
+        let parser_starting_state  = {
+            "engine":"off"
+        };
+
+        super( helpers, config, name, parser_starting_state );
+        
         this.pushNotification = pushNotification;
     }
 
@@ -48,11 +55,11 @@ class obdParser extends Parser{
         if( event.type==="ignition" ){   
     
             let title = "Car ignition";
-            let message;
+            let engine_state;
     
             if( event.category === "off" ){
     
-                message = "off";
+                engine_state = "off";
     
                 let location_obj = {
                     lat:obj.request.body.location.lat, 
@@ -63,11 +70,15 @@ class obdParser extends Parser{
     
             }else if( event.category === "on" ){
     
-                message = "on";
+                engine_state = "on";
     
             }
+
+            let state = this.getState();
+            state.engine = engine_state;
+            this.setState(state);
     
-            this.pushNotification( {title, message, link} )
+            this.pushNotification( {title, message:engine_state, link} )
         }
     
         if( event.type==="trip" ){  
@@ -86,8 +97,6 @@ class obdParser extends Parser{
         return result;
     
     }
-
-
 
     async checkSetLightOn( location_obj, response_device_name ){
 

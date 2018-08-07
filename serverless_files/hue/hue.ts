@@ -11,8 +11,8 @@ class geofence extends Parser{
     user = "EByeQOPuSZvgsiSgKGYpOTqKwYJnpVo6TqkxZ5Gh"; // TODO move this to config
     baseAddress = "http://192.168.1.111/api"
 
-    constructor( helpers, config ){
-        super( helpers, config );
+    constructor( helpers, config, name ){
+        super( helpers, config, name );
     }
     _shouldParse(parserObj){
         return /hue/.test(parserObj.pathName);
