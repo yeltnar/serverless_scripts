@@ -2,20 +2,16 @@ import {Parser,ParserContainer} from '../../Parser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
-class obdParser extends Parser{
+class obdParser extends Parser{;
 
-    pushNotification;
-
-    constructor( helpers, config, name, pushNotification ){
+    constructor( name ){
 
         // TODO replace this with mongo 
         let parser_starting_state  = {
             "engine":"off"
         };
 
-        super( helpers, config, name, parser_starting_state );
-        
-        this.pushNotification = pushNotification;
+        super( name, parser_starting_state );
     }
 
     _shouldParse( parserObj ){

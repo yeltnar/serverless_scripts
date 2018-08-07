@@ -1,20 +1,24 @@
 import State from './Redux';
 const schedule = require('node-schedule');
-
 const uuidv4 = require('uuid/v4');
+
+let pushNotification, helpers, config;
 
 let state:State = new State();
 
 abstract class Parser{
 
-    name;
-    helpers;
-    config;
+    helpers; config; name; pushNotification;
 
-    constructor( helpers, config, name:string, parser_starting_state={} ){
+    constructor( name:string, parser_starting_state={} ){
 
+        if( name===undefined || name==="" ){
+            name = uuidv4();
+        }
+
+        this.pushNotification = pushNotification;
         this.helpers = helpers;
-        this.config = config;
+        this.config = config[name] || {"error":"not_defined"};
         this.name = name;
 
         state.replaceParserState(this.name, parser_starting_state);
@@ -85,6 +89,7 @@ abstract class Parser{
 }
 
 class ParserContainer{
+    
 
     private static exposedParsers:any = {};
     private static privateParsers:any = {};
@@ -185,6 +190,17 @@ class ParserContainer{
     private static removeParser(name:string){
 
     }
+
+    notify(){
+
+    }
 }
 
-export {Parser, ParserContainer};
+function parseInit(init_pushNotification, init_helpers, init_config){
+    pushNotification = init_pushNotification;
+    helpers = init_helpers
+    config = init_config
+    return {};
+}
+
+export {Parser, ParserContainer, parseInit}

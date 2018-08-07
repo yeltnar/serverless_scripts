@@ -1,4 +1,4 @@
-import {Parser} from '../Parser.class';
+import {Parser,ParserContainer} from '../Parser.class';
 
 class geofence extends Parser{
     constructor( helpers, config, parsers ){

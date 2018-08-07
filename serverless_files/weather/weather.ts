@@ -3,8 +3,8 @@ const requestP = require('request-promise-native');
 
 class weatherParser extends Parser {
 
-    constructor( helpers, config, name ){
-        super( helpers, config, name );
+    constructor( name ){
+        super( name );
     }
 
     _shouldParse( parserObj ):boolean{

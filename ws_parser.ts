@@ -3,7 +3,7 @@ const {exec} = require("child_process")
 const fs = require("fs")
 
 //my files
-import {ParserContainer} from './Parser.class';
+import {ParserContainer,parseInit} from './Parser.class';
 import {helpersInit} from './helpers/helper'
 import {pushNotification} from './helpers/ifttt'
 //import lights from './serverless_files/lights/lights';
@@ -16,12 +16,13 @@ import GeofenceParser  from './serverless_files/geofence/geofence';
 import slack from './serverless_files/slack/slack';
 
 let helpers =  helpersInit();
+parseInit(pushNotification, helpers, config);
 
-ParserContainer.addExposedParser(new ObdParser(helpers, config.obd, "obd", pushNotification));
-ParserContainer.addExposedParser(new PhoneWallpaperParser(helpers, config.phone_wallpaper, "phoneWallpaper"));
-ParserContainer.addExposedParser(new HueParser(helpers, config.hue, "hue"));
-ParserContainer.addExposedParser(new WeatherParser(helpers, config.weather, "weather")); // TODO these names seem so brok)en
-ParserContainer.addExposedParser(new GeofenceParser(helpers, config.geofence, "geofence"));
+ParserContainer.addExposedParser(new ObdParser("obd"));
+ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper"));
+ParserContainer.addExposedParser(new HueParser("hue"));
+ParserContainer.addExposedParser(new WeatherParser("weather")); // TODO these names seem so brok)en
+ParserContainer.addExposedParser(new GeofenceParser("geofence"));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 

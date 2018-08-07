@@ -2,22 +2,10 @@ import {Parser,ParserContainer} from '../../Parser.class';
 const requestP = require("request-promise-native");
 
 class geofence extends Parser{
-
-    search_url;
-    set_wallpaper_url;
-    default_wallpaper;
-    used_wallpaper_file;
-    saved_wallpaper_file;
     parseObj;
 
-    constructor( helpers, config, name ){
-        super( helpers, config, name );
-
-        this.search_url =            config.search_url;
-        this.set_wallpaper_url =     config.set_wallpaper_url;
-        this.default_wallpaper =     config.default_wallpaper;
-        this.used_wallpaper_file =   config.used_wallpaper_file;
-        this.saved_wallpaper_file =  config.saved_wallpaper_file;
+    constructor( name ){
+        super( name );
     }
     _shouldParse(parserObj){
         return /wallpaper/.test(parserObj.pathName);
@@ -51,7 +39,7 @@ class geofence extends Parser{
             
             //console.log("get last wallpaper");
             try{
-                let toPrint = await this.helpers.fsPromise.readFile(this.used_wallpaper_file);
+                let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
                 toPrint = JSON.parse(toPrint);
                 toPrint = toPrint.pop();
                 console.log(toPrint);
@@ -61,11 +49,11 @@ class geofence extends Parser{
         }else if( (query_body.saveLastWallpaper===true||query_body.saveLastWallpaper==="true") ){
             
             try{
-                let last_used_wallpaper_url = (await this.helpers.fsPromise.readFile(this.used_wallpaper_file)).toString();
+                let last_used_wallpaper_url = (await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file)).toString();
                 last_used_wallpaper_url = JSON.parse(last_used_wallpaper_url);
                 last_used_wallpaper_url = last_used_wallpaper_url[last_used_wallpaper_url.length-1];
     
-                let savedWallpaperArr = ( await this.helpers.fsPromise.readFile(this.saved_wallpaper_file) ).toString();
+                let savedWallpaperArr = ( await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file) ).toString();
                 try{
                     savedWallpaperArr = JSON.parse(savedWallpaperArr);
                 }catch(e){
@@ -75,7 +63,7 @@ class geofence extends Parser{
                 if(savedWallpaperArr.indexOf(last_used_wallpaper_url)<0){
                     savedWallpaperArr.push(last_used_wallpaper_url);
                 }
-                await this.helpers.fsPromise.writeFile(this.saved_wallpaper_file, JSON.stringify(savedWallpaperArr));
+                await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr));
     
                 console.log(JSON.stringify(savedWallpaperArr));
             }catch(e){
@@ -83,7 +71,7 @@ class geofence extends Parser{
             }
         }else if( query_body.openSavedWallpapers===true||query_body.openSavedWallpapers==="true" ){
             try{
-                let last_used_wallpaper_arr = (await this.helpers.fsPromise.readFile(this.saved_wallpaper_file)).toString();
+                let last_used_wallpaper_arr = (await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)).toString();
     
                 let toLog = "<script>"+last_used_wallpaper_arr+".forEach((ele)=>{window.open(ele);}); </script>";
     
@@ -112,7 +100,7 @@ class geofence extends Parser{
     
         if(used_wallpaper===undefined){
             try{
-                used_wallpaper = await this.helpers.fsPromise.readFile(this.used_wallpaper_file);
+                used_wallpaper = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
                 used_wallpaper = JSON.parse(used_wallpaper);
             }catch(e){
                 used_wallpaper=[];
@@ -123,7 +111,7 @@ class geofence extends Parser{
             console.log("setting walpaper to " + wallpaper_url);
             
             let options = {
-                "url":this.set_wallpaper_url,
+                "url":this.config.set_wallpaper_url,
                 "method": "post",
                 "body": {
                     "value1":wallpaper_url,
@@ -134,7 +122,7 @@ class geofence extends Parser{
             await requestP(options);
             used_wallpaper.push(wallpaper_url);
             used_wallpaper=used_wallpaper.slice(-10);
-            this.helpers.fsPromise.writeFile(this.used_wallpaper_file, JSON.stringify(used_wallpaper));
+            this.helpers.fsPromise.writeFile(this.config.used_wallpaper_file, JSON.stringify(used_wallpaper));
         }else{
             console.log("not setting walpaper to " + wallpaper_url);
         }
@@ -147,7 +135,7 @@ class geofence extends Parser{
     
         try {
             let options = {
-                "url": this.search_url
+                "url": this.config.search_url
             }
     
             let search_result = await requestP(options)
@@ -161,7 +149,7 @@ class geofence extends Parser{
                 return toReturn;
             });
     
-            used_wallpapers = JSON.parse( await this.helpers.fsPromise.readFile(this.used_wallpaper_file) );
+            used_wallpapers = JSON.parse( await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file) );
     
             if( force_new ){
     
