@@ -1,7 +1,7 @@
-import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 const requestP = require('request-promise-native');
 
-class weatherParser extends Parser {
+class weatherParser extends HttpParser {
 
     constructor( name ){
         super( {}, name );

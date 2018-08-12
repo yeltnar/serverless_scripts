@@ -1,4 +1,4 @@
-import {HttpParser} from '../../HTTP_Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 
 class geofence extends HttpParser{
     constructor(name ){

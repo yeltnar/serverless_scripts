@@ -1,9 +1,16 @@
-import {Parser} from './parse_framework/Parser.class'
-\
+import {Parser,ParserContainer} from './parse_framework/Parser.class'
 
-class HttpParser extends Parser {
+abstract class HttpParser extends Parser {
 
-    static _abstractTransformObj( obj ){
+    parserContainer;
+
+    constructor(parser_starting_state,name){
+        super( parser_starting_state, name );
+
+        this.parserContainer = ParserContainer;
+    }
+
+    _abstractTransformObj( obj ){
 
         let pathName = obj.request._parsedUrl.pathname;
         let query_body = {};
@@ -31,6 +38,11 @@ class HttpParser extends Parser {
         return toReturn ;
 
     };
+
+    abstract _shouldParse(parserObj): boolean;
+    abstract _transformObj(parserObj);
+    abstract _parse(doParseObj): Promise<any>;
+
 
 }
 

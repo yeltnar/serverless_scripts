@@ -1,6 +1,6 @@
-import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 const requestP = require('request-promise-native');
-class geofence extends Parser{
+class geofence extends HttpParser{
 
     light_lookup_table = {
         "living_room":"1",
@@ -76,7 +76,7 @@ class geofence extends Parser{
         if( state.obd.location ){
 
             try{
-                sun_up = await ParserContainer.parse("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
+                sun_up = await this.parserContainer.parse("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
             }catch(e){
                 console.error(e);
                 sun_up=null;

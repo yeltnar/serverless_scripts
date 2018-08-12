@@ -53,9 +53,14 @@ async function parseObj(obj) {
         query_body[k] = obj.request.body[k];
     }
 
-    result = await ParserContainer.parseExposed(obj);
+    try{
+        result = await ParserContainer.parseExposed(obj);
 
-    result = result.length===1 ? result[0] : result;
+        result = result.length===1 ? result[0] : result;
+    }catch(e){
+        console.log(e);
+        result = e;
+    }
 
     // leave at end of function 
     if( !obj.result ){

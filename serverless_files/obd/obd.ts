@@ -1,8 +1,8 @@
-import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
-class obdParser extends Parser{;
+class obdParser extends HttpParser{;
 
     constructor( name ){
 
@@ -77,7 +77,7 @@ class obdParser extends Parser{;
             };
 
             try{
-                state.geofence_locations = await ParserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
+                state.geofence_locations = await this.parserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
             }catch(e){
                 console.error(e);
             }

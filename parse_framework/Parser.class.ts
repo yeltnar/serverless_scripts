@@ -6,7 +6,7 @@ let pushNotification, helpers, config;
 
 let state:State = new State();
 
-class Parser{
+abstract class AbstractParser{
 
     helpers; config; name; pushNotification; master_config;
 
@@ -25,20 +25,12 @@ class Parser{
         state.replaceParserState(this.name, parser_starting_state);
     }
 
-    // TODO flesh out or reomve
-    _shouldParse(parserObj): boolean{
-        return true;
-    };
-    
-    // TODO flesh out or reomve
-    _transformObj(parserObj): boolean{
-        return parserObj;
-    };
+    // this _should_ be overridden by any class that extends this one
+    abstract _abstractTransformObj(obj): object;
 
-    // TODO flesh out or reomve
-    _parse(doParseObj): Promise<any>{
-        return doParseObj;
-    };
+    abstract _shouldParse(parserObj): boolean;
+    abstract _transformObj(parserObj): boolean;
+    abstract _parse(doParseObj): Promise<any>;
 
     async checkAndParse(parserObj){
 
@@ -75,6 +67,33 @@ class Parser{
     _delete(){
         ParserContainer.removeParser(this.name);
     }
+
+}
+
+class Parser extends AbstractParser{
+
+    constructor( parser_starting_state, name ){
+        super( parser_starting_state, name );
+    }
+    
+    // this should be overwritten by any class that extends this one
+    _abstractTransformObj(obj):object{
+        return obj;
+    };
+    
+    // this should be overwritten by any class that extends this one
+    _shouldParse(parserObj):boolean{
+        return true;
+    };
+    
+    // this should be overwritten by any class that extends this one
+    _transformObj(parserObj):boolean{
+        return parserObj;
+    };
+    
+    async _parse(doParseObj):Promise<any>{
+
+    };
 
 }
 
@@ -128,19 +147,9 @@ class ParserContainer{
         
         return parseResult;
     }
-    
-    static parseAll(obj):Array<any>{
-        const parseObj = Parser._abstractTransformObj(obj)
-
-        let resArr = Promise.all([ParserContainer.parseExposed(obj, parseObj), ParserContainer.parsePrivate(obj, parseObj)]);
-
-        let exposedResult = resArr[0];
-        let privateResult = resArr[1];
-
-        return exposedResult.concat(privateResult);
-    }
 
     static async parseExposed(obj, parserObj?):Promise<Array<any>>{
+        
         return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
     }
     
@@ -148,14 +157,18 @@ class ParserContainer{
         return await ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
     }
 
+    // function for parseExposed and parsePrivate to call
     private static async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
 
-        parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
+        //parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
 
         let results = [];
 
         for(let k in listObj ){
+            parserObj = parserObj!==undefined ? parserObj : listObj[k]._abstractTransformObj(obj);
+
             let parseResult = await listObj[k].checkAndParse(parserObj);
+
             if( parseResult!==undefined ){
                 results.push( parseResult );
             }
@@ -216,4 +229,4 @@ function parseInit(init_pushNotification, init_helpers, init_config){
     return {};
 }
 
-export {Parser, ParserContainer, parseInit}
+export {Parser, ParserContainer, AbstractParser, parseInit}

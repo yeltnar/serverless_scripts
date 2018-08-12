@@ -1,7 +1,7 @@
-import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 const requestP = require("request-promise-native");
 
-class geofence extends Parser{
+class geofence extends HttpParser{
     parseObj;
 
     constructor( name ){
