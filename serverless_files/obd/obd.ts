@@ -1,4 +1,4 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
@@ -8,10 +8,15 @@ class obdParser extends Parser{;
 
         // TODO replace this with mongo 
         let parser_starting_state  = {
-            "engine":"off"
+            "engine":"off",
+            "location":{
+                "lat":0,
+                "lon":0
+            }
         };
 
-        super( name, parser_starting_state );
+        // TODO keep track of state so we can just use this one to modify making reading from file easier 
+        super( parser_starting_state, name );
     }
 
     _shouldParse( parserObj ){

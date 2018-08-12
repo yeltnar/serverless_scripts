@@ -1,4 +1,4 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
 const requestP = require('request-promise-native');
 class geofence extends Parser{
 
@@ -12,7 +12,7 @@ class geofence extends Parser{
     baseAddress = "http://192.168.1.111/api"
 
     constructor( name ){
-        super( name );
+        super( {}, name );
 
         this.registerForStateChanges(this.car_home_sun_down_lights_on);
     }

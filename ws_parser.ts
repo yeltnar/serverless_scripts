@@ -3,7 +3,7 @@ const {exec} = require("child_process")
 const fs = require("fs")
 
 //my files
-import {ParserContainer,parseInit} from './Parser.class';
+import {ParserContainer,parseInit} from './parse_framework/Parser.class';
 import {helpersInit} from './helpers/helper'
 import {pushNotification} from './helpers/ifttt'
 //import lights from './serverless_files/lights/lights';
@@ -44,7 +44,7 @@ try{
 async function parseObj(obj) {
     let pathName = obj.request._parsedUrl.pathname;
     let query_body = {};
-    let result={};
+    let result:any=[];
 
     for(let k in obj.request.query){
         query_body[k] = obj.request.query[k];
@@ -53,7 +53,9 @@ async function parseObj(obj) {
         query_body[k] = obj.request.body[k];
     }
 
-    ParserContainer.parseExposed(obj);
+    result = await ParserContainer.parseExposed(obj);
+
+    result = result.length===1 ? result[0] : result;
 
     // leave at end of function 
     if( !obj.result ){

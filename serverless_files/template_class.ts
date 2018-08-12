@@ -1,8 +1,8 @@
-import {Parser,ParserContainer} from '../Parser.class';
+import {Parser,ParserContainer} from '../parse_framework/Parser.class';
 
 class geofence extends Parser{
-    constructor( helpers, config, parsers ){
-        super( helpers, config, parsers );
+    constructor( name ){
+        super( {}, name );
     }
     _shouldParse(parserObj){
         return false; // return /geofence/.test(parserObj.pathName);

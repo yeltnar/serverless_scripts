@@ -1,10 +1,10 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
 const requestP = require('request-promise-native');
 
 class weatherParser extends Parser {
 
     constructor( name ){
-        super( name );
+        super( {}, name );
     }
 
     _shouldParse( parserObj ):boolean{
@@ -85,7 +85,13 @@ class weatherParser extends Parser {
 
         return requestP(url).then((res)=>{
             // if lat/lon don't have reading this will fail
-            return JSON.parse(res);
+            let res_parsed = JSON.parse(res);
+
+            if( res_parsed ){
+                // handle error here
+            }
+
+            return res_parsed;
         });
     }
 }

@@ -6,11 +6,11 @@ let pushNotification, helpers, config;
 
 let state:State = new State();
 
-abstract class Parser{
+class Parser{
 
-    helpers; config; name; pushNotification;
+    helpers; config; name; pushNotification; master_config;
 
-    constructor( name:string, parser_starting_state={} ){
+    constructor( parser_starting_state:object, name:string ){
 
         if( name===undefined || name==="" ){
             name = uuidv4();
@@ -20,23 +20,39 @@ abstract class Parser{
         this.helpers = helpers;
         this.config = config[name] || {"error":"not_defined"};
         this.name = name;
+        this.master_config = config;
 
         state.replaceParserState(this.name, parser_starting_state);
     }
 
-    abstract _shouldParse(parserObj): boolean;
-    abstract _transformObj(parserObj);
-    abstract _parse(doParseObj): Promise<any>;
+    // TODO flesh out or reomve
+    _shouldParse(parserObj): boolean{
+        return true;
+    };
+    
+    // TODO flesh out or reomve
+    _transformObj(parserObj): boolean{
+        return parserObj;
+    };
 
-    checkAndParse(parserObj){
+    // TODO flesh out or reomve
+    _parse(doParseObj): Promise<any>{
+        return doParseObj;
+    };
+
+    async checkAndParse(parserObj){
+
+        let toReturn;
 
         if( this._shouldParse(parserObj) ){
 
             let current_doParseObj = this._transformObj(parserObj)
 
-            this.parse( current_doParseObj );
+            toReturn = this.parse( current_doParseObj );
 
         }
+
+        return toReturn;
     }
 
     parse( obj ){
@@ -54,37 +70,11 @@ abstract class Parser{
     }
 
     registerForStateChanges( funct ){
-        state.registerForStateChanges( funct );
+        return state.registerForStateChanges( funct );
     }
-
-    static _abstractTransformObj( obj ){
-
-        let pathName = obj.request._parsedUrl.pathname;
-        let query_body = {};
-
-        for(let k in obj.request.query){
-            query_body[k] = obj.request.query[k];
-        }
-        for(let k in obj.request.body){
-            query_body[k] = obj.request.body[k];
-        }
-
-        let toReturn = {pathName,query_body,obj,response_device:undefined}
-
-        if( obj.response_device!==undefined ){
-            toReturn.response_device = obj.response_device;
-        }else{
-            obj.response_device = { 
-                device_name: null,
-                device_group: null,
-                token:null,
-                token_type:null
-            };
-        }
-
-        return toReturn ;
-
-    };
+    _delete(){
+        ParserContainer.removeParser(this.name);
+    }
 
 }
 
@@ -107,6 +97,8 @@ class ParserContainer{
         }else if( alreadyThere ){
             throw "ParserContainer.exposedParsers["+name+"] is defined!";
         }
+
+        return parser;
     }
 
     static addPrivateParser(parser:Parser, allowReplace=false ){
@@ -139,29 +131,34 @@ class ParserContainer{
     
     static parseAll(obj):Array<any>{
         const parseObj = Parser._abstractTransformObj(obj)
-        
-        let exposedResult = ParserContainer.parseExposed(obj, parseObj);
-        let privateResult = ParserContainer.parsePrivate(obj, parseObj);
+
+        let resArr = Promise.all([ParserContainer.parseExposed(obj, parseObj), ParserContainer.parsePrivate(obj, parseObj)]);
+
+        let exposedResult = resArr[0];
+        let privateResult = resArr[1];
 
         return exposedResult.concat(privateResult);
     }
 
-    static parseExposed(obj, parserObj?):Array<any>{
-        return ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
+    static async parseExposed(obj, parserObj?):Promise<Array<any>>{
+        return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
     }
     
-    static parsePrivate(obj, parserObj?):Array<any>{
-        return ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
+    static async parsePrivate(obj, parserObj?):Promise<Array<any>>{
+        return await ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
     }
 
-    private static parseListObj(listObj, obj, parserObj):Array<any>{
+    private static async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
 
         parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
 
         let results = [];
 
         for(let k in listObj ){
-            results.push(listObj[k].checkAndParse(parserObj));
+            let parseResult = await listObj[k].checkAndParse(parserObj);
+            if( parseResult!==undefined ){
+                results.push( parseResult );
+            }
         }
 
         return results;
@@ -170,7 +167,28 @@ class ParserContainer{
 
     // remove parsers
 
-    static removeExposedParser(name){
+    //TODO do this...mebe
+    static removeParser(name:string){
+
+        let result = {
+            removeExposedParser_result:undefined,
+            removePrivateParser_result:undefined
+        };
+
+        try{
+            result.removeExposedParser_result = this.removeExposedParser(name);
+        }catch(e){}
+        
+        try{
+            result.removePrivateParser_result = this.removePrivateParser(name);
+        }catch(e){}
+
+        return result;
+        
+
+    }
+
+    static removeExposedParser(name:string){
         if( ParserContainer.exposedParsers[name]!==undefined ){
             delete ParserContainer.exposedParsers[name];
         }else if( ParserContainer.exposedParsers[name]!==undefined ){
@@ -178,17 +196,12 @@ class ParserContainer{
         }
     }
 
-    static removePrivateParser(name){
+    static removePrivateParser(name:string){
         if( ParserContainer.privateParsers[name]!==undefined ){
             delete ParserContainer.privateParsers[name];
         }else if( ParserContainer.privateParsers[name]!==undefined ){
             throw "ParserContainer.privateParsers["+name+"] is not defined!";
         }
-    }
-
-    //TODO do this...mebe
-    private static removeParser(name:string){
-
     }
 
     notify(){

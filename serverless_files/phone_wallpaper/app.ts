@@ -1,11 +1,11 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
 const requestP = require("request-promise-native");
 
 class geofence extends Parser{
     parseObj;
 
     constructor( name ){
-        super( name );
+        super( {}, name );
     }
     _shouldParse(parserObj){
         return /wallpaper/.test(parserObj.pathName);
