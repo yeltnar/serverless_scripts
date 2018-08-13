@@ -1,21 +1,22 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
-class obdParser extends Parser{
+class obdParser extends HttpParser{;
 
-    pushNotification;
-
-    constructor( helpers, config, name, pushNotification ){
+    constructor( name, config ){
 
         // TODO replace this with mongo 
         let parser_starting_state  = {
-            "engine":"off"
+            "engine":"off",
+            "location":{
+                "lat":0,
+                "lon":0
+            }
         };
 
-        super( helpers, config, name, parser_starting_state );
-        
-        this.pushNotification = pushNotification;
+        // TODO keep track of state so we can just use this one to modify making reading from file easier 
+        super( parser_starting_state, name, config );
     }
 
     _shouldParse( parserObj ){
@@ -76,7 +77,7 @@ class obdParser extends Parser{
             };
 
             try{
-                state.geofence_locations = await ParserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
+                state.geofence_locations = await this.parserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
             }catch(e){
                 console.error(e);
             }

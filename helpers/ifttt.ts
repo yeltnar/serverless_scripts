@@ -6,6 +6,7 @@ const iftttConfig={
     "push_notification":"push_notification"
 }
 
+// title, message, link
 function pushNotification(msgObj){
 
 	console.log("msgObj...");
