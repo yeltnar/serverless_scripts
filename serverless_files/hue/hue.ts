@@ -73,7 +73,7 @@ class geofence extends HttpParser{
         }
 
         let sun_up; 
-        if( state.obd.location ){
+        if( state.obd.location && state.obd.location.lat!==0 && state.obd.location.lon!==0 ){
 
             try{
                 sun_up = await this.parserContainer.parse("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
