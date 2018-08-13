@@ -8,9 +8,6 @@ abstract class HttpParser extends AbstractParser {
         super( parser_starting_state, name, config );
 
         this.parserContainer = ParserContainer;
-
-        console.log(name)
-        console.log(this.config)
     }
 
     _abstractTransformObj( obj ){

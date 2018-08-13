@@ -132,8 +132,6 @@ class geofence extends HttpParser{
     
         let wallpaper_url="";
         let used_wallpapers:any=[];
-
-        console.log(this.config)
     
         try {
             let options = {
