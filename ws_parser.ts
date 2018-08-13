@@ -5,7 +5,7 @@ const fs = require("fs")
 //my files
 import {ParserContainer,parseInit} from './parse_framework/Parser.class';
 import {helpersInit} from './helpers/helper'
-import {pushNotification} from './helpers/ifttt'
+import {pushNotification} from './helpers/ifttt' 
 //import lights from './serverless_files/lights/lights';
 
 import ObdParser from './serverless_files/obd/obd';
@@ -18,11 +18,11 @@ import slack from './serverless_files/slack/slack';
 let helpers =  helpersInit();
 parseInit(pushNotification, helpers, config);
 
-ParserContainer.addExposedParser(new ObdParser("obd"));
-ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper"));
-ParserContainer.addExposedParser(new HueParser("hue"));
-ParserContainer.addExposedParser(new WeatherParser("weather")); // TODO these names seem so brok)en
-ParserContainer.addExposedParser(new GeofenceParser("geofence"));
+ParserContainer.addExposedParser(new ObdParser("obd", config.obd));
+ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
+ParserContainer.addExposedParser(new HueParser("hue", config.hue));
+ParserContainer.addExposedParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
+ParserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 

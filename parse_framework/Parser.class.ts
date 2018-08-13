@@ -10,7 +10,7 @@ abstract class AbstractParser{
 
     helpers; config; name; pushNotification; master_config;
 
-    constructor( parser_starting_state:object, name:string ){
+    constructor( parser_starting_state:object, name:string, init_config:object ){
 
         if( name===undefined || name==="" ){
             name = uuidv4();
@@ -18,7 +18,7 @@ abstract class AbstractParser{
 
         this.pushNotification = pushNotification;
         this.helpers = helpers;
-        this.config = config[name] || {"error":"not_defined"};
+        this.config = init_config || {"error":"not_defined"};
         this.name = name;
         this.master_config = config;
 
@@ -72,8 +72,8 @@ abstract class AbstractParser{
 
 class Parser extends AbstractParser{
 
-    constructor( parser_starting_state, name ){
-        super( parser_starting_state, name );
+    constructor( parser_starting_state, name, config={} ){
+        super( parser_starting_state, name, config );
     }
     
     // this should be overwritten by any class that extends this one
