@@ -1,36 +1,57 @@
-import {Parser,ParserContainer} from '../../parse_framework/Parser.class';
+import {AbstractParser,ParserContainer} from '../../parse_framework/Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 
-class NotifyLeavingController extends Parser{
-    constructor( name ){
-        super( {}, name );
+let file_location = "serverless_files/notify_leaving/leaving_state.json";
+
+class NotifyLeaving extends HttpParser{
+    constructor( name, config ){
+        super( {}, name, config );
         
     }
     _shouldParse(parserObj){
-        return /add_notify_leaving/.test(parserObj.pathName);
+        return /notify_leaving/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
+    
     async _parse(obj){
-        let parser = ParserContainer.addExposedParser( new NotifyLeaving() );
-        return "worked "+parser.name;
+
+        let toReturn;
+
+        if( /add/.test(obj.pathName) ){
+
+            let data = {leaving:true};
+    
+            await this.helpers.fsPromise.writeFile(file_location,JSON.stringify(data));
+    
+            toReturn = data;
+        }
+
+        if( /remove/.test(obj.pathName) ){
+
+            let data = {leaving:false};
+    
+            await this.helpers.fsPromise.writeFile(file_location,JSON.stringify(data));
+    
+            toReturn = data;
+        }
+
+
+        if( /run/.test(obj.pathName) ){
+
+            let data = JSON.parse(await this.helpers.fsPromise.readFile(file_location));
+
+            if( data.leaving ){
+                toReturn = "true";
+                toReturn = await this._parse({"pathName":"remove"});
+            }else{
+                toReturn = "false";
+            }
+            
+
+        }
+
+        return toReturn;
     }
 }
 
-class NotifyLeaving extends Parser{
-    constructor(){
-        super( {"notify_leaving_call_count":0}, "" );
-    }
-    _shouldParse(parserObj){
-        return /call_notify_leaving/.test(parserObj.pathName);
-    }
-    _transformObj(parserObj){return parserObj;}
-    async _parse(){
-        let title="Title";
-        let message="About to remove one time call";
-        this.pushNotification({title,message})
-        console.log({title,message});
-        this._delete();
-        return "worked...it won't again"
-    }
-}
-
-export {NotifyLeaving, NotifyLeavingController};
+export {NotifyLeaving};
