@@ -4,3 +4,4 @@ build
 */build
 config/local.json
 serverless_files/phone_wallpaper/used_wallpaper.json
+serverless_files/phone_wallpaper/saved_wallpaper.json

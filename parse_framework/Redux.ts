@@ -24,6 +24,11 @@ class State{
             newState = this.stateObj;
         }
 
+        if( type==="INIT_PARSER_STATE" ){
+            this.stateObj[action.name] = action.newState;
+            newState = this.stateObj;
+        }
+
         //newState = newState ? newState : {};
 
         return JSON.parse(JSON.stringify(newState)); // make sure new refrence 
@@ -39,6 +44,14 @@ class State{
     replaceParserState(name, newState){
         this.store.dispatch({
             type:"REPLACE_PARSER_STATE",
+            newState,
+            name
+        });
+    }
+
+    initParserState(name, newState){
+        this.store.dispatch({
+            type:"INIT_PARSER_STATE",
             newState,
             name
         });

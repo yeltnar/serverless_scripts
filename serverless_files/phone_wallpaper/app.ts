@@ -1,11 +1,11 @@
-import {Parser,ParserContainer} from '../../Parser.class';
+import {HttpParser} from '../../HttpParser.class';
 const requestP = require("request-promise-native");
 
-class geofence extends Parser{
+class geofence extends HttpParser{
     parseObj;
 
-    constructor( name ){
-        super( name );
+    constructor( name, config ){
+        super( {}, name, config );
     }
     _shouldParse(parserObj){
         return /wallpaper/.test(parserObj.pathName);
@@ -17,6 +17,8 @@ class geofence extends Parser{
 
         //console.log(JSON.stringify(obj));
         //console.log(JSON.stringify(wallpaper_obj));
+
+        let toReturn = "done";
     
         if( (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined){
             
@@ -42,6 +44,7 @@ class geofence extends Parser{
                 let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
                 toPrint = JSON.parse(toPrint);
                 toPrint = toPrint.pop();
+                toReturn = toPrint;
                 console.log(toPrint);
             }catch(e){
                 console.error(e);
@@ -74,6 +77,8 @@ class geofence extends Parser{
                 let last_used_wallpaper_arr = (await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)).toString();
     
                 let toLog = "<script>"+last_used_wallpaper_arr+".forEach((ele)=>{window.open(ele);}); </script>";
+                
+                toReturn = toLog;
     
                 console.log(toLog)
             }catch(e){
@@ -90,7 +95,7 @@ class geofence extends Parser{
             }
         }
 
-        return "done";
+        return toReturn;
     
     }
 
