@@ -69,6 +69,20 @@ function helpersInit(){
 						});
 					});
 				},
+				mkdir:(path)=>{
+					//console.log("read file")
+					return new Promise((resolve, reject)=>{
+						fs.mkdir(path, (err)=>{
+							if(err){return reject(err);}
+							resolve();
+						});
+					});
+				},
+				existsSync:(path, options)=>{
+					//console.log("read file")
+					let exists = fs.existsSync(path)
+					return exists; 
+				},
 				writeFile:(path, data, options)=>{
 					return new Promise((resolve, reject)=>{
 						fs.writeFile(path, data, options, (err)=>{
