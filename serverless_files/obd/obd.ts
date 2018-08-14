@@ -29,6 +29,7 @@ class obdParser extends HttpParser{;
 
     async _parse( obj ){
 
+
         let event={type:undefined, category:undefined};
         let result;
     
@@ -43,8 +44,7 @@ class obdParser extends HttpParser{;
         console.log("event...");
         console.log(event);
 
-        let state = this.getState();
-        let state_changed = false;
+        let new_state:any = {};
     
         if( event.type === "notification" ){
             this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
@@ -77,19 +77,18 @@ class obdParser extends HttpParser{;
             };
 
             try{
-                state.geofence_locations = await this.parserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
+                new_state.geofence_locations = await this.parserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
             }catch(e){
                 console.error(e);
             }
             
-            state.engine = engine_state;
-            state.location = location_obj;
-            state_changed = true;
+            new_state.engine = engine_state;
+            new_state.location = location_obj;
 
             let pushData = {
                 "title":"From car/"+obj.response_device.device_name,
                 "message":{
-                    geofence_locations:state.geofence_locations,
+                    geofence_locations:new_state.geofence_locations,
                     location_obj,
                     engine_state
                 }, 
@@ -112,9 +111,7 @@ class obdParser extends HttpParser{;
             this.pushNotification( {title, message, link} )
         }
 
-        if( state_changed ){
-            this.setState(state);
-        }
+        this.updateState(new_state);
     
         return result;
     

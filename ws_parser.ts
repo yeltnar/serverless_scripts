@@ -15,106 +15,109 @@ import WeatherParser  from './serverless_files/weather/weather';
 import GeofenceParser  from './serverless_files/geofence/geofence';
 import slack from './serverless_files/slack/slack';
 
-let helpers =  helpersInit();
-parseInit(pushNotification, helpers, config);
+(async()=>{
 
-ParserContainer.addExposedParser(new ObdParser("obd", config.obd));
-ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
-ParserContainer.addExposedParser(new HueParser("hue", config.hue));
-ParserContainer.addExposedParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
-ParserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence));
+    let helpers =  helpersInit();
+    await parseInit(pushNotification, helpers, config);
 
-const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
+    ParserContainer.addExposedParser(new ObdParser("obd", config.obd));
+    ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
+    ParserContainer.addExposedParser(new HueParser("hue", config.hue));
+    ParserContainer.addExposedParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
+    ParserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence));
 
-let in_file_location = process.argv[2];
-let out_file_name = process.argv[3];
-let out_folder_location = process.argv[4];
+    const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
-if( in_file_location === undefined ){
-    throw "file_location not defined";
-}
+    let in_file_location = process.argv[2];
+    let out_file_name = process.argv[3];
+    let out_folder_location = process.argv[4];
 
-try{
-    let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
-    parseObj( obj );
-}catch(e){
-    console.error(e);
-}
-
-async function parseObj(obj) {
-    let pathName = obj.request._parsedUrl.pathname;
-    let query_body = {};
-    let result:any=[];
-
-    for(let k in obj.request.query){
-        query_body[k] = obj.request.query[k];
-    }
-    for(let k in obj.request.body){
-        query_body[k] = obj.request.body[k];
+    if( in_file_location === undefined ){
+        throw "file_location not defined";
     }
 
     try{
-        result = await ParserContainer.parseExposed(obj);
-
-        result = result.length===1 ? result[0] : result;
+        let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
+        parseObj( obj );
     }catch(e){
-        console.log(e);
-        result = e;
+        console.error(e);
     }
 
-    // leave at end of function 
-    if( !obj.result ){
+    async function parseObj(obj) {
+        let pathName = obj.request._parsedUrl.pathname;
+        let query_body = {};
+        let result:any=[];
+
+        for(let k in obj.request.query){
+            query_body[k] = obj.request.query[k];
+        }
+        for(let k in obj.request.body){
+            query_body[k] = obj.request.body[k];
+        }
+
+        try{
+            result = await ParserContainer.parseExposed(obj);
+
+            result = result.length===1 ? result[0] : result;
+        }catch(e){
+            console.log(e);
+            result = e;
+        }
+
+        // leave at end of function 
+        if( !obj.result ){
+        }
+
+
+        writeToOutFile(result);
     }
 
 
-    writeToOutFile(result);
-}
+    function runShell(toExec, options, params=""){
+        return new Promise((resolve, reject)=>{
 
+            toExec = toExec+" "+params;
+            console.log(toExec);
 
-function runShell(toExec, options, params=""){
-	return new Promise((resolve, reject)=>{
-
-		toExec = toExec+" "+params;
-        console.log(toExec);
-
-		exec(toExec, options, (err, stdout, stderr)=>{
-			if(err){
-				console.error("run shell err");
-				reject({err,stderr});
-			}if(stderr){
-				console.error("run shell stderr");
-				reject({err,stderr});
-			}else{
-				resolve(stdout);
-			}
-		});
-	});
-}
-
-function log(obj){
-    fs.writeFile("parse_log.txt", JSON.stringify(obj), (err)=>{
-        if(err){console.error(err);}
-        console.log("wrote file");
-    });
-}
-
-function writeToOutFile(out_data){
-
-    console.log("trying "+out_file_name+" "+out_folder_location)
-
-    if( out_file_name === undefined || out_folder_location === undefined ){return}
-
-    if (!fs.existsSync(out_folder_location)){
-        fs.mkdirSync(out_folder_location);
-        fs.writeFile(out_folder_location+"/.gitignore", "*", ()=>{})
+            exec(toExec, options, (err, stdout, stderr)=>{
+                if(err){
+                    console.error("run shell err");
+                    reject({err,stderr});
+                }if(stderr){
+                    console.error("run shell stderr");
+                    reject({err,stderr});
+                }else{
+                    resolve(stdout);
+                }
+            });
+        });
     }
 
-    //out_file_location
-    let out_str;
-    if( typeof out_data === "object" ){
-        out_str = JSON.stringify(out_data);
-    }else{ // assume string
-        out_str = out_data;
+    function log(obj){
+        fs.writeFile("parse_log.txt", JSON.stringify(obj), (err)=>{
+            if(err){console.error(err);}
+            console.log("wrote file");
+        });
     }
-    fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
-}
+
+    function writeToOutFile(out_data){
+
+        console.log("trying "+out_file_name+" "+out_folder_location)
+
+        if( out_file_name === undefined || out_folder_location === undefined ){return}
+
+        if (!fs.existsSync(out_folder_location)){
+            fs.mkdirSync(out_folder_location);
+            fs.writeFile(out_folder_location+"/.gitignore", "*", ()=>{})
+        }
+
+        //out_file_location
+        let out_str;
+        if( typeof out_data === "object" ){
+            out_str = JSON.stringify(out_data);
+        }else{ // assume string
+            out_str = out_data;
+        }
+        fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
+    }
+})()

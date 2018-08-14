@@ -1,10 +1,14 @@
 import State from './Redux';
 const schedule = require('node-schedule');
 const uuidv4 = require('uuid/v4');
+import {mongo_connector_init} from './mongo_connector/mongo_connector'
+
 
 let pushNotification, helpers, config;
 
 let state:State = new State();
+
+let updateState, makeGetState;
 
 abstract class AbstractParser{
 
@@ -15,7 +19,6 @@ abstract class AbstractParser{
         if( name===undefined || name==="" ){
             name = uuidv4();
         }
-
         this.pushNotification = pushNotification;
         this.helpers = helpers;
         this.config = init_config || {"error":"not_defined"};
@@ -24,6 +27,32 @@ abstract class AbstractParser{
 
         state.replaceParserState(this.name, parser_starting_state);
     }
+
+    async getState (){
+        return (await makeGetState(this.name)).state || {};
+    };
+
+    async makeGetState (){
+        return (await makeGetState(this.name)).state || {};
+    };
+    
+    async updateState(in_state_obj){
+
+        if( in_state_obj!=={} && in_state_obj!==undefined ){
+
+            let state_obj = await this.makeGetState();
+    
+            for(let k in in_state_obj){
+                state_obj[k] = in_state_obj[k];
+            }
+
+            state.replaceParserState(this.name, state_obj);
+            updateState(this.name, state_obj);
+
+        }else{
+            // no state obj or empty
+        }
+    };
 
     // this _should_ be overridden by any class that extends this one
     abstract _abstractTransformObj(obj): object;
@@ -53,9 +82,9 @@ abstract class AbstractParser{
 
     };
 
-    getState(){
-        return state.getParserState(this.name);
-    }
+    // getState(){
+    //     return state.getParserState(this.name);
+    // }
 
     setState( newState ){
         return state.replaceParserState(this.name, newState)
@@ -222,11 +251,19 @@ class ParserContainer{
     }
 }
 
-function parseInit(init_pushNotification, init_helpers, init_config){
+async function parseInit(init_pushNotification, init_helpers, init_config){
+
+
     pushNotification = init_pushNotification;
     helpers = init_helpers
     config = init_config
-    return {};
+
+    let mongo_connector =  await mongo_connector_init();
+
+    updateState = mongo_connector.updateState;
+    makeGetState = mongo_connector.makeGetState;
+
+    return {Parser, ParserContainer, AbstractParser};
 }
 
 export {Parser, ParserContainer, AbstractParser, parseInit}
