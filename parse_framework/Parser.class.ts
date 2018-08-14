@@ -29,10 +29,7 @@ abstract class AbstractParser{
 
         state.replaceParserState(this.name, parser_starting_state);
 
-        this.instance_loaded_promise = this.getInitState(this.init_state_file).then((state)=>{
-            console.log(this.name+" state is "+JSON.stringify(state))
-            this.setState(state);
-        });
+        this.instance_loaded_promise = this.getInitState(this.init_state_file)
     }
 
     // this _should_ be overridden by any class that extends this one
@@ -70,6 +67,7 @@ abstract class AbstractParser{
 
     async getInitState(init_state_file){
         let init_state = {};
+        let should_write=false;
 
         if( !this.helpers.fsPromise.existsSync(init_state_folder) ){
             this.helpers.fsPromise.mkdir(init_state_folder);
@@ -79,16 +77,23 @@ abstract class AbstractParser{
             let init_state_str = await this.helpers.fsPromise.readFile( init_state_file );
             init_state = JSON.parse(init_state_str);
         }else{
+            should_write = true;
         }
+
+        console.log(this.name+" state is "+JSON.stringify(init_state))
+        
+        this.setState(init_state, should_write);
 
         return init_state;
     }
 
-    setState( newState ){
+    setState( newState, should_write=true ){
 
-        try{
-            this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
-        }catch(e){console.error(e);}
+        if( should_write ){
+            try{
+                this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
+            }catch(e){console.error(e);}
+        }
 
         return state.replaceParserState(this.name, newState)
     }
