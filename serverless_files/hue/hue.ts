@@ -67,6 +67,10 @@ class geofence extends HttpParser{
 
     car_home_sun_down_lights_on= async(state)=>{
 
+        if( state.obd===undefined || state.obd.previousState===undefined ){
+            return;
+        }
+
         let at_home 
         if( state.obd.geofence_locations ){
             at_home = state.obd.geofence_locations.indexOf('home')>=0;
@@ -84,9 +88,10 @@ class geofence extends HttpParser{
         }
 
         // TODO remove when you can
+        state.weather = state.weather || {};
         state.weather.sun_up = sun_up;
 
-        if( state.obd.engine === 'off' && at_home && state.weather.sun_status !== 'up' ){
+        if( state.obd.engine === 'off' && state.obd.previousState.engine === 'on' && at_home && state.weather.sun_status !== 'up' ){
             let query_body = {
                 light_name:"living_room",
                 state:"on"

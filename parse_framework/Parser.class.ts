@@ -29,19 +29,19 @@ class StateLoader{
 
     setState( newState, should_write=true ){
 
+        let previousState = this.getState();
+
+        if( previousState !== undefined && previousState.previousState !== undefined ){
+            delete previousState.previousState;
+        }
+
+        newState.oldState = previousState;
+
         if( should_write ){
             try{
                 this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
             }catch(e){console.error(e);}
         }
-
-        let oldState = this.getState();
-
-        if( oldState !== undefined && oldState.oldState !== undefined ){
-            delete oldState.oldState;
-        }
-
-        newState.oldState = oldState;
 
         return StateLoader.state.replaceParserState(this.name, newState)
     }
@@ -97,13 +97,20 @@ abstract class AbstractParser extends StateLoader{
         return toReturn;
     }
 
-    parse( obj ){
+    async parse( obj ){
+
+        await this.instance_loaded_promise;
         
-        return this._parse( obj );
+        try{
+            return await this._parse( obj );
+        }catch(e){
+            console.error(e);
+        }
 
     };
 
     async getInitState(init_state_file){
+
         let init_state = {};
         let should_write=false;
 
@@ -118,6 +125,7 @@ abstract class AbstractParser extends StateLoader{
             should_write = true;
         }
 
+        console.log("getInitState");
         console.log(this.name+" state is "+JSON.stringify(init_state))
 
         this.setState(init_state, should_write);
