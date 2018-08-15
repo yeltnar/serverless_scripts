@@ -4,35 +4,75 @@ const uuidv4 = require('uuid/v4');
 
 let pushNotification, helpers, config;
 
-let state:State = new State();
+// this should be used sparingly 
+//let state:State = new State();
 
 let init_state_folder = "./state/";
 
-abstract class AbstractParser{
+class StateLoader{
 
-    helpers; config; name; pushNotification; master_config; init_state_file;
+    helpers; name; init_state_file;
+
+    constructor(name, init_state_file){
+        this.helpers = helpers;
+        this.init_state_file = init_state_file;
+        this.name = name;
+    }
+
+    // TODO this only allows for one state per app
+    private static state:State = new State();
+
+    getState(){
+        let state_obj = StateLoader.state.getParserState(this.name)||{};
+        return state_obj;
+    }
+
+    setState( newState, should_write=true ){
+
+        let previousState = this.getState();
+
+        if( previousState !== undefined && previousState.previousState !== undefined ){
+            delete previousState.previousState;
+        }
+
+        newState.previousState = previousState;
+
+        if( should_write ){
+            try{
+                this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
+            }catch(e){console.error(e);}
+        }
+
+        return StateLoader.state.replaceParserState(this.name, newState)
+    }
+
+    registerForStateChanges( funct ){
+        return StateLoader.state.registerForStateChanges( funct );
+    }
+
+}
+
+abstract class AbstractParser extends StateLoader{
+
+    config; name; pushNotification; master_config;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
     constructor( parser_starting_state:object, name:string, init_config:object ){
+        super(name, init_state_folder+name);
+
+        this.initStateFuncts()
 
         if( name===undefined || name==="" ){
             name = uuidv4();
         }
 
         this.pushNotification = pushNotification;
-        this.helpers = helpers;
         this.config = init_config || {"error":"not_defined"};
         this.name = name;
         this.master_config = config;
 
-        this.init_state_file = init_state_folder+name;
 
-        state.replaceParserState(this.name, parser_starting_state);
-
-        this.instance_loaded_promise = this.getInitState(this.init_state_file).then((state)=>{
-            console.log(this.name+" state is "+JSON.stringify(state))
-            this.setState(state);
-        });
+        this.instance_loaded_promise = this.getInitState(this.init_state_file)
     }
 
     // this _should_ be overridden by any class that extends this one
@@ -57,19 +97,22 @@ abstract class AbstractParser{
         return toReturn;
     }
 
-    parse( obj ){
+    async parse( obj ){
+
+        await this.instance_loaded_promise;
         
-        return this._parse( obj );
+        try{
+            return await this._parse( obj );
+        }catch(e){
+            console.error(e);
+        }
 
     };
 
-    getState(){
-        let state_obj = state.getParserState(this.name);
-        return state_obj;
-    }
-
     async getInitState(init_state_file){
+
         let init_state = {};
+        let should_write=false;
 
         if( !this.helpers.fsPromise.existsSync(init_state_folder) ){
             this.helpers.fsPromise.mkdir(init_state_folder);
@@ -79,27 +122,20 @@ abstract class AbstractParser{
             let init_state_str = await this.helpers.fsPromise.readFile( init_state_file );
             init_state = JSON.parse(init_state_str);
         }else{
+            should_write = true;
         }
+
+        this.setState(init_state, should_write);
 
         return init_state;
     }
 
-    setState( newState ){
+    // do I need this?
+    private initStateFuncts(){}
 
-        try{
-            this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
-        }catch(e){console.error(e);}
-
-        return state.replaceParserState(this.name, newState)
-    }
-
-    registerForStateChanges( funct ){
-        return state.registerForStateChanges( funct );
-    }
     _delete(){
         ParserContainer.removeParser(this.name);
     }
-
 }
 
 class Parser extends AbstractParser{
