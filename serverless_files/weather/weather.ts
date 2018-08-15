@@ -51,13 +51,14 @@ class weatherParser extends HttpParser {
             sunset.setSeconds(0);
             sunset.setMilliseconds(0);
     
-            toReturn = sunrise < now && sunset > now;
+            let sun_is_up = sunrise < now && sunset > now;
     
-            if( toReturn ){
+            if( sun_is_up ){
                 console.log("sun is up")
             }else{
                 console.log("sun is down")
             }
+            toReturn = sun_is_up;
         }
     
     
