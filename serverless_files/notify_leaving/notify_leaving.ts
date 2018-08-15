@@ -11,7 +11,7 @@ class NotifyLeaving extends HttpParser{
         
     }
     
-    stateChangeListener(state){
+    stateChangeListener=(state)=>{
 
         // check data is present
         if( state.obd===undefined || state.obd.previousState===undefined ){
@@ -23,6 +23,8 @@ class NotifyLeaving extends HttpParser{
         if( !shouldContinue ){
             return 
         }
+
+        console.log("Notify leaving state check good. Executing one time call")
 
         this.parse({pathName:"run"});
 
@@ -41,7 +43,7 @@ class NotifyLeaving extends HttpParser{
 
             let data = {leaving:true};
     
-            await this.helpers.fsPromise.writeFile(file_location,JSON.stringify(data));
+            this.setState(data);
     
             toReturn = data;
         }
@@ -50,7 +52,7 @@ class NotifyLeaving extends HttpParser{
 
             let data = {leaving:false};
     
-            await this.helpers.fsPromise.writeFile(file_location,JSON.stringify(data));
+            this.setState(data);
     
             toReturn = data;
         }
@@ -58,7 +60,7 @@ class NotifyLeaving extends HttpParser{
 
         if( /run/.test(obj.pathName) ){
 
-            let data = JSON.parse(await this.helpers.fsPromise.readFile(file_location));
+            let data = this.getState();
 
             if( data.leaving ){
                 toReturn = "true";

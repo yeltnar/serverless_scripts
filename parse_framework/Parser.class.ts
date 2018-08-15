@@ -58,7 +58,7 @@ abstract class AbstractParser extends StateLoader{
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
     constructor( parser_starting_state:object, name:string, init_config:object ){
-        super(name, init_state_folder+name);
+        super(name, init_state_folder+name+".json");
 
         this.initStateFuncts()
 
