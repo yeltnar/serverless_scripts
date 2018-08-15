@@ -35,7 +35,7 @@ class StateLoader{
             delete previousState.previousState;
         }
 
-        newState.oldState = previousState;
+        newState.previousState = previousState;
 
         if( should_write ){
             try{
@@ -124,9 +124,6 @@ abstract class AbstractParser extends StateLoader{
         }else{
             should_write = true;
         }
-
-        console.log("getInitState");
-        console.log(this.name+" state is "+JSON.stringify(init_state))
 
         this.setState(init_state, should_write);
 
