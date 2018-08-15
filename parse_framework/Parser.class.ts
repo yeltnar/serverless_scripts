@@ -23,7 +23,7 @@ class StateLoader{
     private static state:State = new State();
 
     getState(){
-        let state_obj = StateLoader.state.getParserState(this.name);
+        let state_obj = StateLoader.state.getParserState(this.name)||{};
         return state_obj;
     }
 
