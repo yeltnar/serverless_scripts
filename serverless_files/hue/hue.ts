@@ -100,12 +100,22 @@ class geofence extends HttpParser{
         state.weather = state.weather || {};
         state.weather.sun_up = sun_up;
 
-        if( state.weather.sun_status !== 'up' && at_home ){
+        if( state.weather.sun_status === 'down' && at_home ){
+
             let query_body = {
                 light_name:"living_room",
                 state:"on"
             }
+
             await this._parse( query_body );
+            
+            this.pushNotification({
+                title:"car off @ home -> lights on",
+                message:{
+                    weather:state.weather,
+                    obd:state.obd
+                }
+            })
             
         }
     }
