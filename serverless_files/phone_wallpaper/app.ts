@@ -1,7 +1,7 @@
 import {HttpParser} from '../../HttpParser.class';
 const requestP = require("request-promise-native");
 
-class geofence extends HttpParser{
+class PhoneWallpaper extends HttpParser{
     parseObj;
 
     constructor( name, config ){
@@ -182,4 +182,4 @@ class geofence extends HttpParser{
     }
 }
 
-export default geofence;
+export default PhoneWallpaper;

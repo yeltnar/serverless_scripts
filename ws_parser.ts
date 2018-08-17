@@ -19,12 +19,12 @@ import slack from './serverless_files/slack/slack';
 let helpers =  helpersInit();
 parseInit(pushNotification, helpers, config);
 
-ParserContainer.addExposedParser(new ObdParser("obd", config.obd));
-ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
-ParserContainer.addExposedParser(new HueParser("hue", config.hue));
-ParserContainer.addExposedParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
-ParserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence));
-ParserContainer.addExposedParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
+ParserContainer.addStaticParser(new ObdParser("obd", config.obd));
+ParserContainer.addStaticParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
+ParserContainer.addStaticParser(new HueParser("hue", config.hue));
+ParserContainer.addStaticParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
+ParserContainer.addStaticParser(new GeofenceParser("geofence", config.geofence));
+ParserContainer.addStaticParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 

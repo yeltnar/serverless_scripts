@@ -133,9 +133,13 @@ abstract class AbstractParser extends StateLoader{
     // do I need this?
     private initStateFuncts(){}
 
-    _delete(){
-        ParserContainer.removeParser(this.name);
-    }
+    // _delete(){
+    //     ParserContainer.removeParser(this.name);
+    // }
+}
+
+abstract class AbstractSubParser extends AbstractParser{
+    _abstractTransformObj(obj){return obj;}
 }
 
 class Parser extends AbstractParser{
@@ -169,15 +173,15 @@ class ParserContainer{
     
 
     private static exposedParsers:any = {};
-    private static privateParsers:any = {};
+    private privateParsers:any = {};
 
     // add parsers
 
-    static addExposedParser(parser:Parser, allowReplace=false ){
+    static addStaticParser(parser:Parser, allowReplace=false ){
 
         let name = parser.name || uuidv4();
 
-        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
             ParserContainer.exposedParsers[name] = parser;
@@ -188,24 +192,23 @@ class ParserContainer{
         return parser;
     }
 
-    static addPrivateParser(parser:Parser, allowReplace=false ){
+    addPrivateParser(parser:Parser, allowReplace=false ){
 
         const name = parser.name
 
-        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && this.privateParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
-            ParserContainer.privateParsers[name] = parser;
+            this.privateParsers[name] = parser;
         }else if( alreadyThere ){
             throw "ParserContainer.privateParsers["+name+"] is defined!";
         }
     }
 
     // call parsers
-    
     static async parse(name, parseObj):Promise<any>{
 
-        let parser = ParserContainer.exposedParsers[name] || ParserContainer.privateParsers[name];
+        let parser = ParserContainer.exposedParsers[name];
 
         let parseResult;
 
@@ -215,14 +218,14 @@ class ParserContainer{
         
         return parseResult;
     }
+    
+    async parsePrivate(obj, parserObj?):Promise<Array<any>>{
+        return await ParserContainer.parseListObj( this.privateParsers, obj, parserObj );
+    }
 
     static async parseExposed(obj, parserObj?):Promise<Array<any>>{
         
         return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
-    }
-    
-    static async parsePrivate(obj, parserObj?):Promise<Array<any>>{
-        return await ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
     }
 
     // function for parseExposed and parsePrivate to call
@@ -248,27 +251,6 @@ class ParserContainer{
 
     // remove parsers
 
-    //TODO do this...mebe
-    static removeParser(name:string){
-
-        let result = {
-            removeExposedParser_result:undefined,
-            removePrivateParser_result:undefined
-        };
-
-        try{
-            result.removeExposedParser_result = this.removeExposedParser(name);
-        }catch(e){}
-        
-        try{
-            result.removePrivateParser_result = this.removePrivateParser(name);
-        }catch(e){}
-
-        return result;
-        
-
-    }
-
     static removeExposedParser(name:string){
         if( ParserContainer.exposedParsers[name]!==undefined ){
             delete ParserContainer.exposedParsers[name];
@@ -277,16 +259,12 @@ class ParserContainer{
         }
     }
 
-    static removePrivateParser(name:string){
-        if( ParserContainer.privateParsers[name]!==undefined ){
-            delete ParserContainer.privateParsers[name];
-        }else if( ParserContainer.privateParsers[name]!==undefined ){
-            throw "ParserContainer.privateParsers["+name+"] is not defined!";
+    removePrivateParser(name:string){
+        if( this.privateParsers[name]!==undefined ){
+            delete this.privateParsers[name];
+        }else if( this.privateParsers[name]!==undefined ){
+            throw "this.privateParsers["+name+"] is not defined!";
         }
-    }
-
-    notify(){
-
     }
 }
 
@@ -297,4 +275,4 @@ function parseInit(init_pushNotification, init_helpers, init_config){
     return {};
 }
 
-export {Parser, ParserContainer, AbstractParser, parseInit}
+export {Parser, ParserContainer, AbstractParser, parseInit, AbstractSubParser}

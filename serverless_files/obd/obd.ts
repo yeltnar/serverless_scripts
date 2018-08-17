@@ -77,7 +77,14 @@ class obdParser extends HttpParser{;
             };
 
             try{
-                state.geofence_locations = await this.parserContainer.parse("geofence",{query_body:{lat:location_obj.lat,lon:location_obj.lon},pathName:null});
+                let geofence_obj = {
+                    query_body:{
+                        lat:location_obj.lat,
+                        lon:location_obj.lon
+                    },
+                    pathName:"geofence/get_close_locations"
+                }
+                state.geofence_locations = await this.parserContainer.parse("geofence",geofence_obj);
             }catch(e){
                 console.error(e);
             }
