@@ -11,8 +11,8 @@ class geofence extends HttpParser{
     user = "EByeQOPuSZvgsiSgKGYpOTqKwYJnpVo6TqkxZ5Gh"; // TODO move this to config
     baseAddress = "http://192.168.1.111/api"
 
-    constructor( name, config ){
-        super( {}, name, config );
+    constructor( name, config, parserContainer ){
+        super( {}, name, config, parserContainer );
 
         this.registerForStateChanges(this.car_home_sun_down_lights_on);
     }

@@ -1,13 +1,11 @@
-import {Parser,ParserContainer,AbstractParser} from './parse_framework/Parser.class'
+import {AbstractParser} from './parse_framework/Parser.class'
 
 abstract class HttpParser extends AbstractParser {
 
     parserContainer;
 
-    constructor(parser_starting_state, name, config){
-        super( parser_starting_state, name, config );
-
-        this.parserContainer = ParserContainer;
+    constructor(parser_starting_state, name, config, parserContainer){
+        super( parser_starting_state, name, config, parserContainer );
     }
 
     _abstractTransformObj( obj ){
