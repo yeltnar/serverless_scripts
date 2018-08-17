@@ -138,6 +138,10 @@ abstract class AbstractParser extends StateLoader{
     // }
 }
 
+abstract class AbstractSubParser extends AbstractParser{
+    _abstractTransformObj(obj){return obj;}
+}
+
 class Parser extends AbstractParser{
 
     constructor( parser_starting_state, name, config={} ){
@@ -271,4 +275,4 @@ function parseInit(init_pushNotification, init_helpers, init_config){
     return {};
 }
 
-export {Parser, ParserContainer, AbstractParser, parseInit}
+export {Parser, ParserContainer, AbstractParser, parseInit, AbstractSubParser}
