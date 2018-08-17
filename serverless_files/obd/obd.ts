@@ -4,7 +4,7 @@ let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO mov
 
 class obdParser extends HttpParser{;
 
-    constructor( name, config ){
+    constructor( name, config, parserContainer ){
 
         // TODO replace this with mongo 
         let parser_starting_state  = {
@@ -16,7 +16,7 @@ class obdParser extends HttpParser{;
         };
 
         // TODO keep track of state so we can just use this one to modify making reading from file easier 
-        super( parser_starting_state, name, config );
+        super( parser_starting_state, name, config, parserContainer );
     }
 
     _shouldParse( parserObj ){

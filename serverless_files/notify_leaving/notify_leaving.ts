@@ -1,11 +1,10 @@
-import {AbstractParser,ParserContainer} from '../../parse_framework/Parser.class';
 import {HttpParser} from '../../HttpParser.class';
 
 let file_location = "serverless_files/notify_leaving/leaving_state.json";
 
 class NotifyLeaving extends HttpParser{
-    constructor( name, config ){
-        super( {}, name, config );
+    constructor( name, config, parserContainer ){
+        super( {}, name, config, parserContainer );
 
         this.registerForStateChanges(this.stateChangeListener);
         
