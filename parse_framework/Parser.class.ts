@@ -54,10 +54,10 @@ class StateLoader{
 
 abstract class AbstractParser extends StateLoader{
 
-    config; name; pushNotification; master_config; parserContainer;
+    config; name; pushNotification; master_config;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
-    constructor( parser_starting_state:object, name:string, init_config:object, parserContainer:ParserContainer ){
+    constructor( parser_starting_state:object, name:string, init_config:object ){
         super(name, init_state_folder+name+".json");
 
         this.initStateFuncts()
@@ -70,7 +70,6 @@ abstract class AbstractParser extends StateLoader{
         this.config = init_config || {"error":"not_defined"};
         this.name = name;
         this.master_config = config;
-        this.parserContainer = parserContainer;
 
 
         this.instance_loaded_promise = this.getInitState(this.init_state_file)
@@ -135,54 +134,78 @@ abstract class AbstractParser extends StateLoader{
     private initStateFuncts(){}
 
     _delete(){
-        if( this.parserContainer!==undefined && this.parserContainer!==null ){
-            this.parserContainer.removeParser(this.name);
-        }
+        ParserContainer.removeParser(this.name);
     }
 }
 
+class Parser extends AbstractParser{
+
+    constructor( parser_starting_state, name, config={} ){
+        super( parser_starting_state, name, config );
+    }
+    
+    // this should be overwritten by any class that extends this one
+    _abstractTransformObj(obj):object{
+        return obj;
+    };
+    
+    // this should be overwritten by any class that extends this one
+    _shouldParse(parserObj):boolean{
+        return true;
+    };
+    
+    // this should be overwritten by any class that extends this one
+    _transformObj(parserObj):boolean{
+        return parserObj;
+    };
+    
+    async _parse(doParseObj):Promise<any>{
+
+    };
+
+}
 
 class ParserContainer{
     
 
-    private exposedParsers:any = {};
-    private privateParsers:any = {};
+    private static exposedParsers:any = {};
+    private static privateParsers:any = {};
 
     // add parsers
 
-    addExposedParser(parser:AbstractParser, allowReplace=false ){
+    static addExposedParser(parser:Parser, allowReplace=false ){
 
         let name = parser.name || uuidv4();
 
-        let alreadyThere = !(this.exposedParsers[name]===undefined && this.privateParsers[name]===undefined);
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
-            this.exposedParsers[name] = parser;
+            ParserContainer.exposedParsers[name] = parser;
         }else if( alreadyThere ){
-            throw "this.exposedParsers["+name+"] is defined!";
+            throw "ParserContainer.exposedParsers["+name+"] is defined!";
         }
 
         return parser;
     }
 
-    addPrivateParser(parser:AbstractParser, allowReplace=false ){
+    static addPrivateParser(parser:Parser, allowReplace=false ){
 
         const name = parser.name
 
-        let alreadyThere = !(this.exposedParsers[name]===undefined && this.privateParsers[name]===undefined);
+        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && ParserContainer.privateParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
-            this.privateParsers[name] = parser;
+            ParserContainer.privateParsers[name] = parser;
         }else if( alreadyThere ){
-            throw "this.privateParsers["+name+"] is defined!";
+            throw "ParserContainer.privateParsers["+name+"] is defined!";
         }
     }
 
     // call parsers
     
-    async parse(name, parseObj):Promise<any>{
+    static async parse(name, parseObj):Promise<any>{
 
-        let parser = this.exposedParsers[name] || this.privateParsers[name];
+        let parser = ParserContainer.exposedParsers[name] || ParserContainer.privateParsers[name];
 
         let parseResult;
 
@@ -193,17 +216,17 @@ class ParserContainer{
         return parseResult;
     }
 
-    async parseExposed(obj, parserObj?):Promise<Array<any>>{
+    static async parseExposed(obj, parserObj?):Promise<Array<any>>{
         
-        return await this.parseListObj( this.exposedParsers, obj, parserObj );
+        return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
     }
     
-    async parsePrivate(obj, parserObj?):Promise<Array<any>>{
-        return await this.parseListObj( this.privateParsers, obj, parserObj );
+    static async parsePrivate(obj, parserObj?):Promise<Array<any>>{
+        return await ParserContainer.parseListObj( ParserContainer.privateParsers, obj, parserObj );
     }
 
     // function for parseExposed and parsePrivate to call
-    private async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
+    private static async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
 
         //parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
 
@@ -226,7 +249,7 @@ class ParserContainer{
     // remove parsers
 
     //TODO do this...mebe
-    removeParser(name:string){
+    static removeParser(name:string){
 
         let result = {
             removeExposedParser_result:undefined,
@@ -246,19 +269,19 @@ class ParserContainer{
 
     }
 
-    removeExposedParser(name:string){
-        if( this.exposedParsers[name]!==undefined ){
-            delete this.exposedParsers[name];
-        }else if( this.exposedParsers[name]!==undefined ){
-            throw "this.exposedParsers["+name+"] is not defined!";
+    static removeExposedParser(name:string){
+        if( ParserContainer.exposedParsers[name]!==undefined ){
+            delete ParserContainer.exposedParsers[name];
+        }else if( ParserContainer.exposedParsers[name]!==undefined ){
+            throw "ParserContainer.exposedParsers["+name+"] is not defined!";
         }
     }
 
-    removePrivateParser(name:string){
-        if( this.privateParsers[name]!==undefined ){
-            delete this.privateParsers[name];
-        }else if( this.privateParsers[name]!==undefined ){
-            throw "this.privateParsers["+name+"] is not defined!";
+    static removePrivateParser(name:string){
+        if( ParserContainer.privateParsers[name]!==undefined ){
+            delete ParserContainer.privateParsers[name];
+        }else if( ParserContainer.privateParsers[name]!==undefined ){
+            throw "ParserContainer.privateParsers["+name+"] is not defined!";
         }
     }
 
@@ -274,32 +297,4 @@ function parseInit(init_pushNotification, init_helpers, init_config){
     return {};
 }
 
-export {/*Parser,*/ ParserContainer, AbstractParser, parseInit}
-
-
-// class Parser extends AbstractParser{
-
-//     constructor( parser_starting_state, name, config={} ){
-//         super( parser_starting_state, name, config );
-//     }
-    
-//     // this should be overwritten by any class that extends this one
-//     _abstractTransformObj(obj):object{
-//         return obj;
-//     };
-    
-//     // this should be overwritten by any class that extends this one
-//     _shouldParse(parserObj):boolean{
-//         return true;
-//     };
-    
-//     // this should be overwritten by any class that extends this one
-//     _transformObj(parserObj):boolean{
-//         return parserObj;
-//     };
-    
-//     async _parse(doParseObj):Promise<any>{
-
-//     };
-
-// }
+export {Parser, ParserContainer, AbstractParser, parseInit}
