@@ -4,8 +4,8 @@ const requestP = require("request-promise-native");
 class geofence extends HttpParser{
     parseObj;
 
-    constructor( name, config, parserContainer ){
-        super( {}, name, config, parserContainer );
+    constructor( name, config ){
+        super( {}, name, config );
     }
     _shouldParse(parserObj){
         return /wallpaper/.test(parserObj.pathName);

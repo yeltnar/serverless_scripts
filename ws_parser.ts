@@ -19,14 +19,12 @@ import slack from './serverless_files/slack/slack';
 let helpers =  helpersInit();
 parseInit(pushNotification, helpers, config);
 
-let parserContainer = new ParserContainer();
-
-parserContainer.addExposedParser(new ObdParser("obd", config.obd, parserContainer));
-parserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper, parserContainer));
-parserContainer.addExposedParser(new HueParser("hue", config.hue, parserContainer));
-parserContainer.addExposedParser(new WeatherParser("weather", config.weather, parserContainer)); // TODO these names seem so brok)en
-parserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence, parserContainer));
-parserContainer.addExposedParser(new NotifyLeaving("notify_leaving", config.notify_leaving, parserContainer));
+ParserContainer.addExposedParser(new ObdParser("obd", config.obd));
+ParserContainer.addExposedParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
+ParserContainer.addExposedParser(new HueParser("hue", config.hue));
+ParserContainer.addExposedParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
+ParserContainer.addExposedParser(new GeofenceParser("geofence", config.geofence));
+ParserContainer.addExposedParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
@@ -58,7 +56,7 @@ async function parseObj(obj) {
     }
 
     try{
-        result = await parserContainer.parseExposed(obj);
+        result = await ParserContainer.parseExposed(obj);
 
         result = result.length===1 ? result[0] : result;
     }catch(e){
