@@ -9,68 +9,85 @@ class geofence extends HttpParser{
 
         super( {}, name, config );
 
-        this.parserContainer = new ParserContainer();
-
-        this.parserContainer.addPrivateParser(new check_geofence_parser("check_geofence_parser", config));
-
     }
     _shouldParse(parserObj){
         return /geofence/.test(parserObj.pathName);
     }
     _transformObj(parserObj){return parserObj;}
-    async _parse( parserObj ){
-        let toReturn;
-        toReturn = await this.parserContainer.parsePrivate(parserObj);
 
-        if( typeof toReturn!=='string' && toReturn.length===1 ){
-            toReturn = toReturn[0]
-        }
-    
-        return toReturn;
-    }
-}
-
-class check_geofence_parser extends AbstractSubParser{
-    
-    constructor(name, config){
-        super({}, name, config);
-    }
-
-    _transformObj(obj){return obj;}
-
-    _shouldParse(parserObj){
-        return /get_close_locations/.test(parserObj.pathName);
-    }
 
     async _parse(parserObj){
         let toReturn;
-    
-        toReturn = this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
+
+        if( /get_close_locations/.test(parserObj.pathName) ){
+            toReturn = this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
+        }
+
+        if( /add/.test(parserObj.pathName) ){
+            toReturn = this.add_location(parserObj)
+        }
     
         return toReturn;
     }
 
-   private  _check_geofence( in_lat, in_lon ){
+    private  _check_geofence( in_lat, in_lon ){
+ 
+         let matched_locations = [];
 
-        let matched_locations = [];
+         let location_arr = this.getState().points;
 
-        for(let k in this.config.points){
-            let c_lat = this.config.points[k].lat;
-            let c_lon = this.config.points[k].lon;
+         console.log("location_arr")
+         console.log(location_arr.length)
+         console.log(location_arr)
+ 
+         for(let k in location_arr){
+             let c_lat = location_arr[k].lat;
+             let c_lon = location_arr[k].lon;
+ 
+             let lat_distance = c_lat - in_lat;
+             let lon_distance = c_lon - in_lon;
+ 
+             let distance = Math.sqrt( Math.pow(lat_distance,2)+Math.pow(lon_distance,2) );
+ 
+             if( distance <= location_arr[k].threashold ){
+                 matched_locations.push(location_arr[k].name);
+             }
+         }
+ 
+         return matched_locations;
+ 
+    }
 
-            let lat_distance = c_lat - in_lat;
-            let lon_distance = c_lon - in_lon;
+    private add_location(parserObj){
 
-            let distance = Math.sqrt( Math.pow(lat_distance,2)+Math.pow(lon_distance,2) );
+        let toReturn="";
 
-            if( distance <= this.config.points[k].threashold ){
-                matched_locations.push(this.config.points[k].name);
+        if( parserObj.query_body.name!==undefined && parserObj.query_body.lat!==undefined && parserObj.query_body.lon!==undefined && parserObj.query_body.threashold!==undefined ){
+
+            let points = this.getState().points;
+
+            if( points === undefined ){
+                points = this.config.points;
+                console.log("setting up state points for geofence")
             }
+
+            let name = parserObj.query_body.name;
+            let lat = parserObj.query_body.lat;
+            let lon = parserObj.query_body.lon;
+            let threashold = parserObj.query_body.threashold;
+
+            points.push({name,lat,lon,threashold});
+
+            this.setState( {points} );
+
+            return this.getState();
+
+        }else{
+            toReturn = "parserObj.name && parserObj.lat && parserObj.lon && parserObj.threashold";
         }
 
-        return matched_locations;
-
-    }
+        return toReturn;
+     }
 }
 
 export default geofence;
