@@ -8,12 +8,6 @@ class geofence extends HttpParser{
     constructor(name, config ){
 
         super( {}, name, config );
-        let state = this.getState();
-
-        if( state.points === undefined ){
-            state.points = config.points;
-            this.setState(state);
-        }
 
     }
     _shouldParse(parserObj){
@@ -39,18 +33,24 @@ class geofence extends HttpParser{
     private  _check_geofence( in_lat, in_lon ){
  
          let matched_locations = [];
+
+         let location_arr = this.getState().points;
+
+         console.log("location_arr")
+         console.log(location_arr.length)
+         console.log(location_arr)
  
-         for(let k in this.config.points){
-             let c_lat = this.config.points[k].lat;
-             let c_lon = this.config.points[k].lon;
+         for(let k in location_arr){
+             let c_lat = location_arr[k].lat;
+             let c_lon = location_arr[k].lon;
  
              let lat_distance = c_lat - in_lat;
              let lon_distance = c_lon - in_lon;
  
              let distance = Math.sqrt( Math.pow(lat_distance,2)+Math.pow(lon_distance,2) );
  
-             if( distance <= this.config.points[k].threashold ){
-                 matched_locations.push(this.config.points[k].name);
+             if( distance <= location_arr[k].threashold ){
+                 matched_locations.push(location_arr[k].name);
              }
          }
  
@@ -65,6 +65,11 @@ class geofence extends HttpParser{
         if( parserObj.query_body.name!==undefined && parserObj.query_body.lat!==undefined && parserObj.query_body.lon!==undefined && parserObj.query_body.threashold!==undefined ){
 
             let points = this.getState().points;
+
+            if( points === undefined ){
+                points = this.config.points;
+                console.log("setting up state points for geofence")
+            }
 
             let name = parserObj.query_body.name;
             let lat = parserObj.query_body.lat;
