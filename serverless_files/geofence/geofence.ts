@@ -34,7 +34,7 @@ class geofence extends HttpParser{
  
          let matched_locations = [];
 
-         let location_arr = this.getState().points;
+         let location_arr = this.getState().points || this.config.points;
 
          console.log("location_arr")
          console.log(location_arr.length)
