@@ -1,0 +1,53 @@
+<HTML>
+<script>
+    async function submit() {
+
+        let body = {
+            "name": "Hales",
+            "lat": 33.005310,
+            "lon": -96.702372,
+            "threashold": 0.001
+        }
+
+        let url = "https://ws-expose.mybluemix.net/v1/geofence/add/result_only?token=hello";
+
+        // let res = await fetch(url, {
+        //     body,
+        //     "method":"post",
+        //     "mode":"no-cors"
+        // }).then(response => response.json()); // parses response to JSON
+        // debugger
+
+        // Example POST method implementation:
+
+        for( let k in body ){
+            url += "&"+k+"="+body[k];
+        }
+
+        console.log({
+            url
+        })
+
+        fetch(url,{mode:"no-cors"})
+        // .then((resp)=>{
+        //     return resp.json();
+        // })
+        .then((resp)=>{
+            return resp.text();
+        })
+        .then((data)=>{debugger})
+        .catch((data)=>{debugger})
+    }
+</script>
+name
+<input type="text" name="name" placeholder="name">
+<br> lat
+<input type="text" name="lat" placeholder="lat">
+<br> lon
+<input type="text" name="lon" placeholder="lon">
+<br> threashold
+<input type="text" name="threashold" placeholder="threashold">
+<br>
+<input type="button" value="Submit" onclick="submit()">
+
+</HTML>
