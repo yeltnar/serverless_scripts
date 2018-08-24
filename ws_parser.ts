@@ -14,6 +14,7 @@ import HueParser  from './serverless_files/hue/hue';
 import WeatherParser  from './serverless_files/weather/weather';
 import GeofenceParser  from './serverless_files/geofence/geofence';
 import {NotifyLeaving}  from './serverless_files/notify_leaving/notify_leaving';
+import Ping  from './serverless_files/ping/ping';
 import slack from './serverless_files/slack/slack';
 
 parseInit(pushNotification, helpers);
@@ -24,6 +25,7 @@ ParserContainer.addStaticParser(new HueParser("hue", config.hue));
 ParserContainer.addStaticParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
 ParserContainer.addStaticParser(new GeofenceParser("geofence", config.geofence));
 ParserContainer.addStaticParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
+ParserContainer.addStaticParser(new Ping("ping", config.ping));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
