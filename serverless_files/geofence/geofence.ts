@@ -1,5 +1,5 @@
 import {HttpParser} from '../../HttpParser.class';
-import { ParserContainer, AbstractSubParser } from '../../parse_framework/Parser.class';
+import { ParserContainer } from '../../parse_framework/Parser.class';
 
 class geofence extends HttpParser{
 
@@ -7,7 +7,7 @@ class geofence extends HttpParser{
 
     constructor(name, config ){
 
-        super( {}, name, config );
+        super( name, config );
 
     }
     _shouldParse(parserObj){
@@ -20,21 +20,21 @@ class geofence extends HttpParser{
         let toReturn;
 
         if( /get_close_locations/.test(parserObj.pathName) ){
-            toReturn = this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
+            toReturn = await this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
         }
 
         if( /add/.test(parserObj.pathName) ){
-            toReturn = this.add_location(parserObj)
+            toReturn = await this.add_location(parserObj)
         }
     
         return toReturn;
     }
 
-    private  _check_geofence( in_lat, in_lon ){
+    private  async _check_geofence( in_lat, in_lon ){
  
          let matched_locations = [];
 
-         let location_arr = this.getState().points || this.config.points;
+         let location_arr = (await this.state.getState()).points || this.config.points;
 
          console.log("location_arr")
          console.log(location_arr.length)
@@ -58,13 +58,13 @@ class geofence extends HttpParser{
  
     }
 
-    private add_location(parserObj){
+    private async add_location(parserObj){
 
         let toReturn="";
 
         if( parserObj.query_body.name!==undefined && parserObj.query_body.lat!==undefined && parserObj.query_body.lon!==undefined && parserObj.query_body.threashold!==undefined ){
 
-            let points = this.getState().points;
+            let points = (await this.state.getState()).points;
 
             if( points === undefined ){
                 points = this.config.points;
@@ -78,9 +78,9 @@ class geofence extends HttpParser{
 
             points.push({name,lat,lon,threashold});
 
-            this.setState( {points} );
+            this.state.setState( {points} );
 
-            return this.getState();
+            return await this.state.getState();
 
         }else{
             toReturn = "parserObj.name && parserObj.lat && parserObj.lon && parserObj.threashold";

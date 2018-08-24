@@ -5,7 +5,7 @@ class PhoneWallpaper extends HttpParser{
     parseObj;
 
     constructor( name, config ){
-        super( {}, name, config );
+        super( name, config );
     }
     _shouldParse(parserObj){
         return /wallpaper/.test(parserObj.pathName);

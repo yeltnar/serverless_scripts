@@ -12,9 +12,9 @@ class geofence extends HttpParser{
     baseAddress = "http://192.168.1.111/api"
 
     constructor( name, config ){
-        super( {}, name, config );
+        super( name, config );
 
-        this.registerForStateChanges(this.car_home_sun_down_lights_on);
+        this.state.registerForStateChanges(this.car_home_sun_down_lights_on);
     }
     _shouldParse(parserObj){
         return /hue/.test(parserObj.pathName);

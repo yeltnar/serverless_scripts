@@ -1,64 +1,29 @@
-import State from './Redux';
+import helpers from '../helpers/helper'
+import StateLoader from './StateLoader.class'
+
 const schedule = require('node-schedule');
 const uuidv4 = require('uuid/v4');
 
-let pushNotification, helpers, config;
+let pushNotification, config;
 
 // this should be used sparingly 
 //let state:State = new State();
 
 let init_state_folder = "./state/";
-
-class StateLoader{
-
-    helpers; name; init_state_file;
-
-    constructor(name, init_state_file){
-        this.helpers = helpers;
-        this.init_state_file = init_state_file;
-        this.name = name;
-    }
-
-    // TODO this only allows for one state per app
-    private static state:State = new State();
-
-    getState(){
-        let state_obj = StateLoader.state.getParserState(this.name)||{};
-        return state_obj;
-    }
-
-    setState( newState, should_write=true ){
-
-        let previousState = this.getState();
-
-        if( previousState !== undefined && previousState.previousState !== undefined ){
-            delete previousState.previousState;
-        }
-
-        newState.previousState = previousState;
-
-        if( should_write ){
-            try{
-                this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
-            }catch(e){console.error(e);}
-        }
-
-        return StateLoader.state.replaceParserState(this.name, newState)
-    }
-
-    registerForStateChanges( funct ){
-        return StateLoader.state.registerForStateChanges( funct );
-    }
-
+const getFileName = (name)=>{
+    init_state_folder+name+".json"
 }
 
-abstract class AbstractParser extends StateLoader{
 
-    config; name; pushNotification; master_config;
+abstract class AbstractParser{
+
+    config; name; pushNotification; master_config; state; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
-    constructor( parser_starting_state:object, name:string, init_config:object ){
-        super(name, init_state_folder+name+".json");
+    constructor( local_config:object, name:string, state:StateLoader){
+        //super(name, init_state_folder+name+".json");
+
+        this.helpers = helpers;
 
         this.initStateFuncts()
 
@@ -67,12 +32,13 @@ abstract class AbstractParser extends StateLoader{
         }
 
         this.pushNotification = pushNotification;
-        this.config = init_config || {"error":"not_defined"};
+        this.config = local_config || {"error":"not_defined"};
         this.name = name;
         this.master_config = config;
+        this.state = state;
 
 
-        this.instance_loaded_promise = this.getInitState(this.init_state_file)
+        //this.instance_loaded_promise = this.getInitState(this.init_state_file)
     }
 
     // this _should_ be overridden by any class that extends this one
@@ -109,7 +75,7 @@ abstract class AbstractParser extends StateLoader{
 
     };
 
-    async getInitState(init_state_file){
+    async toRemove_getInitState(init_state_file){
 
         let init_state = {};
         let should_write=false;
@@ -125,7 +91,7 @@ abstract class AbstractParser extends StateLoader{
             should_write = true;
         }
 
-        this.setState(init_state, should_write);
+        this.state.setState(init_state, should_write);
 
         return init_state;
     }
@@ -144,8 +110,8 @@ abstract class AbstractSubParser extends AbstractParser{
 
 class Parser extends AbstractParser{
 
-    constructor( parser_starting_state, name, config={} ){
-        super( parser_starting_state, name, config );
+    constructor( parser_starting_state, name){
+        super( parser_starting_state, name, new StateLoader(name, getFileName(name)));
     }
     
     // this should be overwritten by any class that extends this one
@@ -268,11 +234,10 @@ class ParserContainer{
     }
 }
 
-function parseInit(init_pushNotification, init_helpers, init_config){
+function parseInit(init_pushNotification, init_config){
     pushNotification = init_pushNotification;
-    helpers = init_helpers
-    config = init_config
+    config = init_config;
     return {};
 }
 
-export {Parser, ParserContainer, AbstractParser, parseInit, AbstractSubParser}
+export {Parser, ParserContainer, AbstractParser, parseInit}

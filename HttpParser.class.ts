@@ -1,11 +1,18 @@
 import {Parser,ParserContainer,AbstractParser} from './parse_framework/Parser.class'
+import State from './parse_framework/Redux';
+import StateLoader from './parse_framework/StateLoader.class'
+
+let init_state_folder = "./state/";
+const getFileName = (name)=>{
+    init_state_folder+name+".json"
+}
 
 abstract class HttpParser extends AbstractParser {
 
     parserContainer;
 
-    constructor(parser_starting_state, name, config){
-        super( parser_starting_state, name, config );
+    constructor(name, config){
+        super( config, name, new StateLoader( name, getFileName(name) ) );
 
         this.parserContainer = ParserContainer;
     }

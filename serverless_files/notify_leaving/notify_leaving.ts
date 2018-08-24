@@ -5,9 +5,9 @@ let file_location = "serverless_files/notify_leaving/leaving_state.json";
 
 class NotifyLeaving extends HttpParser{
     constructor( name, config ){
-        super( {}, name, config );
+        super( name, config );
 
-        this.registerForStateChanges(this.stateChangeListener);
+        this.state.registerForStateChanges(this.stateChangeListener);
         
     }
     
@@ -43,7 +43,7 @@ class NotifyLeaving extends HttpParser{
 
             let data = {leaving:true};
     
-            this.setState(data);
+            this.state.setState(data);
     
             toReturn = data;
         }
@@ -52,7 +52,7 @@ class NotifyLeaving extends HttpParser{
 
             let data = {leaving:false};
     
-            this.setState(data);
+            this.state.setState(data);
     
             toReturn = data;
         }
@@ -60,7 +60,7 @@ class NotifyLeaving extends HttpParser{
 
         if( /run/.test(obj.pathName) ){
 
-            let data = this.getState();
+            let data = await this.state.getState();
 
             if( data.leaving ){
                 toReturn = "true";
