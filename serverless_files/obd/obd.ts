@@ -57,7 +57,7 @@ class obdParser extends HttpParser{;
             }else{
                 this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
             }
-            
+
         }
     
         if( event.type==="vehicle" ){ 
@@ -118,12 +118,12 @@ class obdParser extends HttpParser{;
     
         if( event.type==="trip" ){  
     
-            let title = "Trip";
+            let title = "Trip "+event.category;
             let message;
     
             if( event.category === "finished" ){
-                // currently do nothing... is just a report 
-                message = "finished";
+                //message = "finished";
+                message = JSON.stringify(event);
             }
     
             this.pushNotification( {title, message, link} )
