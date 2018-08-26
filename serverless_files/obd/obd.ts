@@ -16,7 +16,7 @@ class obdParser extends HttpParser{;
         };
 
         // TODO keep track of state so we can just use this one to modify making reading from file easier 
-        super( parser_starting_state, name, config );
+        super( name, config );
     }
 
     _shouldParse( parserObj ){
@@ -43,7 +43,7 @@ class obdParser extends HttpParser{;
         console.log("event...");
         console.log(event);
 
-        let state = this.getState();
+        let state = await this.state.getState();
         let state_changed = false;
     
         if( event.type === "notification" ){
@@ -120,7 +120,7 @@ class obdParser extends HttpParser{;
         }
 
         if( state_changed ){
-            this.setState(state);
+            this.state.setState(state);
         }
     
         return result;

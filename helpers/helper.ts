@@ -98,4 +98,4 @@ function helpersInit(){
 	return helpers;
 }
 
-export {helpersInit}
+export default helpersInit()

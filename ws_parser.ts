@@ -4,7 +4,7 @@ const fs = require("fs")
 
 //my files
 import {ParserContainer,parseInit} from './parse_framework/Parser.class';
-import {helpersInit} from './helpers/helper'
+import helpers from './helpers/helper'
 import {pushNotification} from './helpers/ifttt' 
 //import lights from './serverless_files/lights/lights';
 
@@ -17,8 +17,7 @@ import {NotifyLeaving}  from './serverless_files/notify_leaving/notify_leaving';
 import Ping  from './serverless_files/ping/ping';
 import slack from './serverless_files/slack/slack';
 
-let helpers =  helpersInit();
-parseInit(pushNotification, helpers, config);
+parseInit(pushNotification, helpers);
 
 ParserContainer.addStaticParser(new ObdParser("obd", config.obd));
 ParserContainer.addStaticParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
