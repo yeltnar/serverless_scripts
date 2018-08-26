@@ -47,7 +47,7 @@ class Ping extends HttpParser{
 class PingSubParser extends Parser{
     
     _shouldParse(parserObj){
-        return /sup_parser/.test(parserObj.pathName);
+        return /sub_parser/.test(parserObj.pathName);
     }
 
     async _parse(parserObj){
