@@ -1,5 +1,7 @@
 import helpers from '../helpers/helper'
 import StateLoader from './StateLoader.class'
+import State from './Redux';
+import ParserObj from './ResponseObj.interface'
 
 const schedule = require('node-schedule');
 const uuidv4 = require('uuid/v4');
@@ -20,7 +22,7 @@ abstract class AbstractParser{
     config; name; pushNotification; master_config; state; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
-    constructor( local_config:object, name:string, state:StateLoader){
+    constructor( name:string, local_config:object, state:StateLoader){
         //super(name, init_state_folder+name+".json");
 
         this.helpers = helpers;
@@ -45,8 +47,13 @@ abstract class AbstractParser{
     abstract _abstractTransformObj(obj): object;
 
     abstract _shouldParse(parserObj): boolean;
-    abstract _transformObj(parserObj): boolean;
     abstract _parse(doParseObj): Promise<any>;
+    
+    _transformObj(parserObj:ParserObj):ParserObj {
+        return parserObj;
+    }
+
+    
 
     async checkAndParse(parserObj){
 
@@ -104,35 +111,16 @@ abstract class AbstractParser{
     // }
 }
 
-abstract class AbstractSubParser extends AbstractParser{
+abstract class remove_AbstractSubParser extends AbstractParser{
     _abstractTransformObj(obj){return obj;}
 }
 
-class Parser extends AbstractParser{
-
-    constructor( parser_starting_state, name){
-        super( parser_starting_state, name, new StateLoader(name, getFileName(name)));
-    }
+abstract class Parser extends AbstractParser{
     
     // this should be overwritten by any class that extends this one
     _abstractTransformObj(obj):object{
         return obj;
     };
-    
-    // this should be overwritten by any class that extends this one
-    _shouldParse(parserObj):boolean{
-        return true;
-    };
-    
-    // this should be overwritten by any class that extends this one
-    _transformObj(parserObj):boolean{
-        return parserObj;
-    };
-    
-    async _parse(doParseObj):Promise<any>{
-
-    };
-
 }
 
 class ParserContainer{
@@ -143,7 +131,7 @@ class ParserContainer{
 
     // add parsers
 
-    static addStaticParser(parser:Parser, allowReplace=false ){
+    static addStaticParser(parser:AbstractParser, allowReplace=false ){
 
         let name = parser.name || uuidv4();
 
@@ -158,7 +146,7 @@ class ParserContainer{
         return parser;
     }
 
-    addPrivateParser(parser:Parser, allowReplace=false ){
+    addPrivateParser(parser:AbstractParser, allowReplace=false ){
 
         const name = parser.name
 
@@ -171,7 +159,7 @@ class ParserContainer{
         }
     }
 
-    // call parsers
+    // call parsers // TODO rename this to be parse public or something like that 
     static async parse(name, parseObj):Promise<any>{
 
         let parser = ParserContainer.exposedParsers[name];

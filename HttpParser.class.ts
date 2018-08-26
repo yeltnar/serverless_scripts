@@ -12,7 +12,7 @@ abstract class HttpParser extends AbstractParser {
     parserContainer;
 
     constructor(name, config){
-        super( config, name, new StateLoader( name, getFileName(name) ) );
+        super( name, config, new StateLoader( name, getFileName(name) ) );
 
         this.parserContainer = ParserContainer;
     }
