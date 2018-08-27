@@ -49,6 +49,7 @@ if( in_file_location === undefined ){
 }
 
 async function parseObj(obj) {
+    console.log('\n\n\n\n\n-----------\n\n\n\n\n')
     let pathName = obj.request._parsedUrl.pathname;
     let query_body = {};
     let result:any=[];
