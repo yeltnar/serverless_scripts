@@ -34,14 +34,18 @@ let out_file_name = process.argv[3];
 let out_folder_location = process.argv[4];
 
 if( in_file_location === undefined ){
-    throw "file_location not defined";
-}
+    // prob importing 
+    console.log("module.parent");
+    console.log(module.parent);
+    //throw "file_location not defined";
+}else{
 
-try{
-    let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
-    parseObj( obj );
-}catch(e){
-    console.error(e);
+    try{
+        let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
+        parseObj( obj );
+    }catch(e){
+        console.error(e);
+    }
 }
 
 async function parseObj(obj) {
@@ -121,3 +125,5 @@ function writeToOutFile(out_data){
     }
     fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
 }
+
+export default parseObj;
