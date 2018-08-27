@@ -52,7 +52,7 @@ class obdParser extends HttpParser{;
 
             }else if( event.category === "speeding" ){
 
-            }else if( event.category === "hard_break" ){
+            }else if( event.category === "hard_brake" ){
 
             }else{
                 this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
