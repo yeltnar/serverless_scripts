@@ -2,17 +2,13 @@ import {HttpParser} from '../../HttpParser.class';
 const requestP = require("request-promise-native");
 
 class PhoneWallpaper extends HttpParser{
-    parseObj;
+
+    testRegex = /wallpaper/;
 
     constructor( name, config ){
         super( name, config );
     }
-    _shouldParse(parserObj){
-        return /wallpaper/.test(parserObj.pathName);
-    }
-    _transformObj(parserObj){
-        return parserObj.query_body;
-    }
+
     async _parse( query_body ){
 
         //console.log(JSON.stringify(obj));

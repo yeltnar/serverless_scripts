@@ -16,8 +16,9 @@ const getFileName = (name)=>{
     init_state_folder+name+".json"
 }
 
-
 abstract class AbstractParser{
+
+    parserContainer=new ParserContainer();
 
     config; name; pushNotification; master_config; state; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
@@ -39,21 +40,22 @@ abstract class AbstractParser{
         this.master_config = config;
         this.state = state;
 
-
         //this.instance_loaded_promise = this.getInitState(this.init_state_file)
     }
+
+    abstract testRegex:RegExp;
 
     // this _should_ be overridden by any class that extends this one
     abstract _abstractTransformObj(obj): object;
 
-    abstract _shouldParse(parserObj): boolean;
+    _shouldParse(parserObj): boolean{
+        return this.testRegex.test(parserObj.pathName);
+    };
     abstract _parse(doParseObj): Promise<any>;
     
     _transformObj(parserObj:ParserObj):ParserObj {
         return parserObj;
     }
-
-    
 
     async checkAndParse(parserObj){
 
@@ -109,6 +111,22 @@ abstract class AbstractParser{
     // _delete(){
     //     ParserContainer.removeParser(this.name);
     // }
+
+    toJSON(){
+
+        let childrenJSON = this.parserContainer.toPrivateJSON();
+
+        // remove if have empty result
+        if( childrenJSON.length === 0 ){
+            childrenJSON = undefined;
+        }
+
+        return {
+            name:this.name,
+            testRegex: this.testRegex.toString(),
+            childrenJSON
+        }
+    }
 }
 
 abstract class remove_AbstractSubParser extends AbstractParser{
@@ -126,7 +144,7 @@ abstract class Parser extends AbstractParser{
 class ParserContainer{
     
 
-    private static exposedParsers:any = {};
+    private static exposedParsers:any = {};  // these all should be AbstractParser s
     private privateParsers:any = {};
 
     // add parsers
@@ -219,6 +237,29 @@ class ParserContainer{
         }else if( this.privateParsers[name]!==undefined ){
             throw "this.privateParsers["+name+"] is not defined!";
         }
+    }
+
+    toPrivateJSON(){
+
+        let privateParsers = [];
+
+        for(let k in this.privateParsers){
+            privateParsers.push( this.privateParsers[k].toJSON() )
+        }
+
+        return (privateParsers);
+
+    }
+
+    static toJSON(){
+
+        let staticParsers = [];
+
+        for(let k in ParserContainer.exposedParsers){
+            staticParsers.push( ParserContainer.exposedParsers[k].toJSON() )
+        }
+
+        return (staticParsers);
     }
 }
 

@@ -2,6 +2,8 @@ import {HttpParser} from '../../HttpParser.class';
 const requestP = require('request-promise-native');
 class geofence extends HttpParser{
 
+    testRegex = /hue/;
+
     light_lookup_table = {
         "living_room":"1",
         "bedroom":"2"
@@ -15,13 +17,6 @@ class geofence extends HttpParser{
         super( name, config );
 
         this.state.registerForStateChanges(this.car_home_sun_down_lights_on);
-    }
-    _shouldParse(parserObj){
-        return /hue/.test(parserObj.pathName);
-    }
-
-    _transformObj(parserObj){
-        return parserObj.query_body;
     }
 
     async _parse( query_body ){
