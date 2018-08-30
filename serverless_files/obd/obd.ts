@@ -2,25 +2,23 @@ import {HttpParser} from '../../HttpParser.class';
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
-class obdParser extends HttpParser{;
+class obdParser extends HttpParser{
+
+    testRegex = /obd/;
 
     constructor( name, config ){
 
         // TODO replace this with mongo 
-        let parser_starting_state  = {
-            "engine":"off",
-            "location":{
-                "lat":0,
-                "lon":0
-            }
-        };
+        // let parser_starting_state  = {
+        //     "engine":"off",
+        //     "location":{
+        //         "lat":0,
+        //         "lon":0
+        //     }
+        // };
 
         // TODO keep track of state so we can just use this one to modify making reading from file easier 
         super( name, config );
-    }
-
-    _shouldParse( parserObj ){
-        return /obd/.test(parserObj.pathName);;
     }
 
     _transformObj(parserObj){

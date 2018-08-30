@@ -3,16 +3,10 @@ const requestP = require('request-promise-native');
 
 class weatherParser extends HttpParser {
 
+    testRegex = /weather/
+
     constructor( name, config ){
         super( name, config );
-    }
-
-    _shouldParse( parserObj ):boolean{
-        return /weather/.test(parserObj.pathName);
-    }
-
-    _transformObj(parserObj){
-        return parserObj;
     }
 
     async _parse( parserObj ){

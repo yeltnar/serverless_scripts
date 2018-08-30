@@ -1,6 +1,6 @@
 const config = require('config');
-const {exec} = require("child_process")
-const fs = require("fs")
+const {exec} = require("child_process");
+const fs = require("fs");
 
 //my files
 import {ParserContainer,parseInit} from './parse_framework/Parser.class';
@@ -14,6 +14,7 @@ import HueParser  from './serverless_files/hue/hue';
 import WeatherParser  from './serverless_files/weather/weather';
 import GeofenceParser  from './serverless_files/geofence/geofence';
 import {NotifyLeaving}  from './serverless_files/notify_leaving/notify_leaving';
+import GetParsers  from './serverless_files/get_parsers/get_parsers';
 import Ping  from './serverless_files/ping/ping';
 import slack from './serverless_files/slack/slack';
 
@@ -26,6 +27,7 @@ ParserContainer.addStaticParser(new WeatherParser("weather", config.weather)); /
 ParserContainer.addStaticParser(new GeofenceParser("geofence", config.geofence));
 ParserContainer.addStaticParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
 ParserContainer.addStaticParser(new Ping("ping", config.ping));
+ParserContainer.addStaticParser(new GetParsers("get_parsers", config.get_parsers));
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
