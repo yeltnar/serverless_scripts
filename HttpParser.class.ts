@@ -9,12 +9,8 @@ const getFileName = (name)=>{
 
 abstract class HttpParser extends AbstractParser {
 
-    parserContainer;
-
     constructor(name, config){
         super( name, config, new StateLoader( name, getFileName(name) ) );
-
-        this.parserContainer = ParserContainer;
     }
 
     _abstractTransformObj( obj ){
@@ -46,8 +42,9 @@ abstract class HttpParser extends AbstractParser {
 
     };
 
-    abstract _shouldParse(parserObj): boolean;
-    abstract _transformObj(parserObj);
+    _transformObj(parserObj){
+        return parserObj;
+    };
     abstract _parse(doParseObj): Promise<any>;
 
 

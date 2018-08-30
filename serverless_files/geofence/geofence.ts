@@ -3,6 +3,8 @@ import { ParserContainer } from '../../parse_framework/Parser.class';
 
 class geofence extends HttpParser{
 
+    testRegex=/geofence/;
+
     parserContainer:ParserContainer;
 
     constructor(name, config ){
@@ -10,11 +12,6 @@ class geofence extends HttpParser{
         super( name, config );
 
     }
-    _shouldParse(parserObj){
-        return /geofence/.test(parserObj.pathName);
-    }
-    _transformObj(parserObj){return parserObj;}
-
 
     async _parse(parserObj){
         let toReturn;

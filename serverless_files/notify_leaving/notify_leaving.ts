@@ -4,6 +4,9 @@ import {HttpParser} from '../../HttpParser.class';
 let file_location = "serverless_files/notify_leaving/leaving_state.json";
 
 class NotifyLeaving extends HttpParser{
+
+    testRegex=/notify_leaving/;
+
     constructor( name, config ){
         super( name, config );
 
@@ -29,11 +32,6 @@ class NotifyLeaving extends HttpParser{
         this.parse({pathName:"run"});
 
     }
-
-    _shouldParse(parserObj){
-        return /notify_leaving/.test(parserObj.pathName);
-    }
-    _transformObj(parserObj){return parserObj;}
     
     async _parse(obj){
 
