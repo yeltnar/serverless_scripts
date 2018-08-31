@@ -9,30 +9,32 @@ class PhoneWallpaper extends HttpParser{
         super( name, config );
     }
 
-    async _parse( query_body ){
+    async _parse( parseObj ){
+
+        let query_body = parseObj.query_body;
 
         let toReturn = "done";
     
         if( (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined){
             
             await this.setPreselectedWallpaper(query_body)
-            
+
         }else if( (query_body.newWallpaper===true||query_body.newWallpaper==="true") ){
             
             await this.newWallpaper()
-            
+
         }else if( (query_body.getLastWallpaper===true||query_body.getLastWallpaper==="true") ){
             
             await this.getLastWallpaper();
-            
+
         }else if( (query_body.saveLastWallpaper===true||query_body.saveLastWallpaper==="true") ){
             
             await this.saveLastWallpaper();
-            
+
         }else if( query_body.openSavedWallpapers===true||query_body.openSavedWallpapers==="true" ){
             
             toReturn = await this.openSavedWallpapers();
-            
+
         }else{
             
             await this.topWallpaper();
@@ -63,7 +65,8 @@ class PhoneWallpaper extends HttpParser{
 
     }
 
-    private async getLastWallpaper(){
+    private async getLastWallpaper():Promise<string>{
+        let toReturn;
         try{
             let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
             toPrint = JSON.parse(toPrint);
@@ -73,6 +76,7 @@ class PhoneWallpaper extends HttpParser{
         }catch(e){
             console.error(e);
         }
+        return toReturn;
     }
 
     private async newWallpaper(){
@@ -110,7 +114,7 @@ class PhoneWallpaper extends HttpParser{
         }
     }
 
-    private async openSavedWallpapers(){
+    private async openSavedWallpapers():Promise<string>{
         let toReturn="";
         try{
             let last_used_wallpaper_arr = (await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)).toString();
