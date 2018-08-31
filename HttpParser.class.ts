@@ -45,9 +45,6 @@ abstract class HttpParser extends AbstractParser {
     _transformObj(parserObj){
         return parserObj;
     };
-    abstract _parse(doParseObj): Promise<any>;
-
-
 }
 
 export {HttpParser}
