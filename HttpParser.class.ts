@@ -4,7 +4,7 @@ import StateLoader from './parse_framework/StateLoader.class'
 
 let init_state_folder = "./state/";
 const getFileName = (name)=>{
-    init_state_folder+name+".json"
+    return init_state_folder+name+".json"
 }
 
 abstract class HttpParser extends AbstractParser {
@@ -45,9 +45,6 @@ abstract class HttpParser extends AbstractParser {
     _transformObj(parserObj){
         return parserObj;
     };
-    abstract _parse(doParseObj): Promise<any>;
-
-
 }
 
 export {HttpParser}

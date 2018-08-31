@@ -20,7 +20,7 @@ abstract class AbstractParser{
 
     parserContainer=new ParserContainer();
 
-    config; name; pushNotification; master_config; state; helpers;
+    config; name; pushNotification; master_config; state:StateLoader; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
     constructor( name:string, local_config:object, state:StateLoader){
@@ -44,14 +44,26 @@ abstract class AbstractParser{
     }
 
     abstract testRegex:RegExp;
-
-    // this _should_ be overridden by any class that extends this one
     abstract _abstractTransformObj(obj): object;
+
+    async _parse( parseObj ){
+
+        let toReturn = await this.parserContainer.parsePrivate( parseObj );
+
+        if( Array.isArray(toReturn) && toReturn.length===1 ){
+            toReturn = toReturn[0];
+        }
+
+        console.log('toReturn')
+        console.log(toReturn)
+
+        return toReturn
+    
+    }
 
     _shouldParse(parserObj): boolean{
         return this.testRegex.test(parserObj.pathName);
     };
-    abstract _parse(doParseObj): Promise<any>;
     
     _transformObj(parserObj:ParserObj):ParserObj {
         return parserObj;
@@ -84,27 +96,6 @@ abstract class AbstractParser{
 
     };
 
-    async toRemove_getInitState(init_state_file){
-
-        let init_state = {};
-        let should_write=false;
-
-        if( !this.helpers.fsPromise.existsSync(init_state_folder) ){
-            this.helpers.fsPromise.mkdir(init_state_folder);
-        }
-
-        if( this.helpers.fsPromise.existsSync(init_state_file) ){
-            let init_state_str = await this.helpers.fsPromise.readFile( init_state_file );
-            init_state = JSON.parse(init_state_str);
-        }else{
-            should_write = true;
-        }
-
-        this.state.setState(init_state, should_write);
-
-        return init_state;
-    }
-
     // do I need this?
     private initStateFuncts(){}
 
@@ -124,7 +115,8 @@ abstract class AbstractParser{
         return {
             name:this.name,
             testRegex: this.testRegex.toString(),
-            childrenJSON
+            childrenJSON,
+            state:this.state.getState()
         }
     }
 }
@@ -135,10 +127,49 @@ abstract class remove_AbstractSubParser extends AbstractParser{
 
 abstract class Parser extends AbstractParser{
     
-    // this should be overwritten by any class that extends this one
     _abstractTransformObj(obj):object{
         return obj;
     };
+}
+
+class FunctionalParser extends AbstractParser{
+
+    testRegex:RegExp;
+
+    constructor(name, local_config, state, parseFunction, testRegex, functionalShouldParse?){
+        super(name, local_config, state);
+
+        this.parseFunction = parseFunction;
+        this.testRegex = testRegex;
+
+        if( functionalShouldParse!== undefined && functionalShouldParse!==null ){
+            this.functionalShouldParse = functionalShouldParse;
+        }
+    }
+    _abstractTransformObj(obj):object{
+        return obj;
+    };
+
+    _shouldParse(parseObj):boolean{
+        let shouldParse:boolean = super._shouldParse(parseObj) || this.functionalShouldParse(parseObj);
+        if(shouldParse){
+            console.log("going to parse "+this.name)
+        }
+        return shouldParse;
+    }
+
+    private functionalShouldParse(parseObj):boolean{
+        return false;
+    }
+
+    // stub to be over written 
+    private async parseFunction(parseObj:ParserObj):Promise<any>{
+        return parseObj;
+    }
+
+    async _parse(parseObj){
+        return await this.parseFunction(parseObj);
+    }
 }
 
 class ParserContainer{
@@ -178,7 +209,7 @@ class ParserContainer{
     }
 
     // call parsers // TODO rename this to be parse public or something like that 
-    static async parse(name, parseObj):Promise<any>{
+    static async parse(name, parseObj:ParserObj):Promise<any>{
 
         let parser = ParserContainer.exposedParsers[name];
 
@@ -269,4 +300,4 @@ function parseInit(init_pushNotification, init_config){
     return {};
 }
 
-export {Parser, ParserContainer, AbstractParser, parseInit}
+export {Parser, ParserContainer, AbstractParser, parseInit, FunctionalParser}

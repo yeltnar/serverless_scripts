@@ -1,5 +1,11 @@
 let requestP = require("request-promise-native");
 
+interface PushMsgObj{
+	title: String,
+	message: String,
+	link?: String
+};
+
 const iftttConfig={
     "first":"https://maker.ifttt.com/trigger/",
     "second":"/with/key/bXrf4Mm5tIy0Bjis08SiYC",
@@ -7,7 +13,7 @@ const iftttConfig={
 }
 
 // title, message, link
-function pushNotification(msgObj){
+function pushNotification(msgObj:PushMsgObj){
 
 	console.log("msgObj...");
 	console.log(msgObj);

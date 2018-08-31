@@ -1,8 +1,8 @@
 interface ParserObj{
     pathName:String,
-    query_body:Object,
-    obj:Object,
-    response_device:Object
+    query_body:any,
+    obj:any,
+    response_device:any
 }
 
 export default ParserObj;
