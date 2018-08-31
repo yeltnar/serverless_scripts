@@ -1,7 +1,7 @@
 {
     "request": {
         "_parsedUrl": {
-            "pathname": "/v1/wallpaper"
+            "pathname": "/v1/wallpaper/set_top"
         },
         "body":{}
     }
