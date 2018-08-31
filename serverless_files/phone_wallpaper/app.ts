@@ -13,7 +13,7 @@ class PhoneWallpaper extends HttpParser{
 
         let query_body = parseObj.query_body;
 
-        let toReturn = "done";
+        let toReturn:any = "done";
     
         if( (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined){
             
@@ -35,6 +35,10 @@ class PhoneWallpaper extends HttpParser{
             
             toReturn = await this.openSavedWallpapers();
 
+        }else if( query_body.getSaved===true||query_body.getSaved==="true" ){
+            
+            toReturn = await this.getSavedWallpapers();
+
         }else{
             
             await this.topWallpaper();
@@ -51,6 +55,19 @@ class PhoneWallpaper extends HttpParser{
         }catch(e){
             console.error(e);
         }
+    }
+
+    private async getSavedWallpapers():Promise<Array<string>>{
+        let toReturn;
+        try{
+            let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
+            toPrint = JSON.parse(toPrint);
+            toReturn = toPrint;
+            console.log(toPrint);
+        }catch(e){
+            console.error(e);
+        }
+        return toReturn;
     }
 
     private async topWallpaper(){
