@@ -20,7 +20,7 @@ abstract class AbstractParser{
 
     parserContainer=new ParserContainer();
 
-    config; name; pushNotification; master_config; state; helpers;
+    config; name; pushNotification; master_config; state:StateLoader; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
     constructor( name:string, local_config:object, state:StateLoader){
@@ -84,27 +84,6 @@ abstract class AbstractParser{
 
     };
 
-    async toRemove_getInitState(init_state_file){
-
-        let init_state = {};
-        let should_write=false;
-
-        if( !this.helpers.fsPromise.existsSync(init_state_folder) ){
-            this.helpers.fsPromise.mkdir(init_state_folder);
-        }
-
-        if( this.helpers.fsPromise.existsSync(init_state_file) ){
-            let init_state_str = await this.helpers.fsPromise.readFile( init_state_file );
-            init_state = JSON.parse(init_state_str);
-        }else{
-            should_write = true;
-        }
-
-        this.state.setState(init_state, should_write);
-
-        return init_state;
-    }
-
     // do I need this?
     private initStateFuncts(){}
 
@@ -124,7 +103,8 @@ abstract class AbstractParser{
         return {
             name:this.name,
             testRegex: this.testRegex.toString(),
-            childrenJSON
+            childrenJSON,
+            state:this.state.getState()
         }
     }
 }
@@ -178,7 +158,7 @@ class ParserContainer{
     }
 
     // call parsers // TODO rename this to be parse public or something like that 
-    static async parse(name, parseObj):Promise<any>{
+    static async parse(name, parseObj:ParserObj):Promise<any>{
 
         let parser = ParserContainer.exposedParsers[name];
 

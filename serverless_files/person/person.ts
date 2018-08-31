@@ -1,71 +1,109 @@
 import {HttpParser} from '../../HttpParser.class';
 import { Parser, ParserContainer, AbstractParser } from '../../parse_framework/Parser.class';
+import ResponseObj from '../../parse_framework/ResponseObj.interface'
 const requestP = require('request-promise-native');
 
 class Person extends HttpParser{
 
-    parserContainer:ParserContainer;
-
+    testRegex = /person/;
 
     constructor( name, config ){
         super( name, config );
         
         this.parserContainer = new ParserContainer();
-        this.parserContainer.addPrivateParser(  );
-    }
-    _shouldParse(parserObj){
-        return /ping/.test(parserObj.pathName);
-    }
 
-    _transformObj(parserObj){
-        return parserObj;
+        this.parserContainer.addPrivateParser( new AddParser("set_"+name, config, this.state) );
+        this.parserContainer.addPrivateParser( new GetParser("get_"+name, config, this.state) );
+
+        this.state.registerForStateChanges( this.stateChangeCallback );
     }
 
-    async _parse( parserObj ){
+    async _parse( parserObj:ResponseObj ){
 
-        let supParseResult = await this.parserContainer.parsePrivate( parserObj );
-        if( supParseResult.length !== 0 ){
-            return supParseResult;
+        let result = await this.parserContainer.parsePrivate( parserObj );
+
+        if( result.length === 1 ){
+            result = result[0];
         }
 
-        let now = new Date();
+        return result;
+    }
 
-        let start = new Date(parserObj.obj.date);
+    stateChangeCallback=async ( master_state )=>{
 
-        return {
-            'time_at_ping_parse':now.toString(),
-            'time_at_ping_parse_ms':now.getTime(),
+        let state = await this.state.getState();
 
-            'start':start.toString(),
-            'start_ms':start.getTime(),
+        let title = "t";
+        let message = JSON.stringify(master_state.obd);
 
-            'ms_to_parse':now.getTime()-start.getTime()
-        };
+        //if( master_state.obd  ){
+            let res = await this.pushNotification({title, message});
+            console.log(res);
+            console.log(master_state);
+        //}
+
     }
 }
 
-class PingSubParser extends Parser{
+class AddParser extends Parser{
     
-    _shouldParse(parserObj){
-        return /sub_parser/.test(parserObj.pathName);
+    testRegex=/set/;
+
+    constructor(name, local_config, state){
+        super(name, local_config, state);
     }
 
-    async _parse(parserObj){
+    async _parse(parserObj:ResponseObj){
 
-        let now = new Date();
+        let person = parserObj.query_body.person;
+        let person_state = parserObj.query_body.state;
+        let state;
+        
+        if( typeof person_state === 'string' ){
+            try{
+                person_state = JSON.parse(person_state);
+            }catch(e){}
+        }
 
-        let start = new Date(parserObj.obj.date);
+        if( person && person_state ){
 
-        return {
-            'msg':'made it to PingSubParser',
-            'time_at_ping_parse':now.toString(),
-            'time_at_ping_parse_ms':now.getTime(),
+            state = await this.state.getState();
+            state[person] = person_state;
+            this.state.setState(state);
 
-            'start':start.toString(),
-            'start_ms':start.getTime(),
+            console.log("set "+person+" to ")
+            console.log(state)
 
-            'ms_to_parse':now.getTime()-start.getTime()
-        };
+        }
+        return state;
+    }
+}
+
+class GetParser extends Parser{
+    
+    testRegex=/get/;
+
+    constructor(name, local_config, state){
+        super(name, local_config, state);
+    }
+
+    async _parse(parserObj:ResponseObj){
+
+        //return "pkay"
+
+        let person = parserObj.query_body.person;
+        let person_state = parserObj.query_body.state;
+        let state;
+
+        if( person ){
+
+            state = this.state.getState();
+            state[person] = person_state;
+            await this.state.setState(state);
+
+        }
+        return state;
+        
     }
 }
 

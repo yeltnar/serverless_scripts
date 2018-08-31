@@ -10,6 +10,7 @@ class StateLoader{
     helpers; name; init_state_file;
 
     constructor(name, init_state_file){
+        
         this.helpers = helpers;
         //this.init_state_file = init_state_file===undefined ? init_state_file : init_state_folder+name+".json";
         this.init_state_file = init_state_file;
@@ -38,21 +39,26 @@ class StateLoader{
 
     async setState( newState, should_write=true ){
 
-        let previousState = await this.getState();
+        try{
 
-        if( previousState !== undefined && previousState.previousState !== undefined ){
-            delete previousState.previousState;
+            let previousState = await this.getState();
+
+            if( previousState !== undefined && previousState.previousState !== undefined ){
+                delete previousState.previousState;
+            }
+
+            newState.previousState = previousState;
+
+            if( should_write ){
+                try{
+                    this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
+                }catch(e){console.error(e);}
+            }
+
+            return StateLoader.state.replaceParserState(this.name, newState)
+        }catch(e){
+            console.error(e);
         }
-
-        newState.previousState = previousState;
-
-        if( should_write ){
-            try{
-                this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
-            }catch(e){console.error(e);}
-        }
-
-        return StateLoader.state.replaceParserState(this.name, newState)
     }
 
     registerForStateChanges( funct ){
