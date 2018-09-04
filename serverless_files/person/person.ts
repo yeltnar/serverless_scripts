@@ -31,6 +31,8 @@ class Person extends HttpParser{
 
     stateChangeCallback=async ( master_state )=>{
 
+        return;
+
         let state = await this.state.getState();
 
         let title = "t";
