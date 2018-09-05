@@ -2,7 +2,7 @@
     
     const fs = require('fs');
 
-    const path = "./state";
+    const path = "./state/";
 
     let obj = {};
 
@@ -17,7 +17,7 @@
                 continue;
             }
 
-            let file_contents = fs.readFileSync(file).toString()
+            let file_contents = fs.readFileSync(path+file).toString()
             obj[cur] = JSON.parse(file_contents);
 
             // console.log(file);
@@ -26,7 +26,7 @@
         }
 
         console.log(obj);
-        fs.writeFileSync('master_state.json',JSON.stringify(obj));
+        fs.writeFileSync(path+'master_state.json',JSON.stringify(obj));
     });
 
 
