@@ -227,8 +227,14 @@ class ParserContainer{
     }
 
     static async parseExposed(obj, parserObj?):Promise<Array<any>>{
+
+        let toReturn = await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
+
+        if( Array.isArray(toReturn) && toReturn.length === 1 ){
+            toReturn = toReturn[0];
+        }
         
-        return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
+        return toReturn;
     }
 
     // function for parseExposed and parsePrivate to call
