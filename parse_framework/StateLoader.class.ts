@@ -17,31 +17,43 @@ class StateLoader{
         this.name = name;
     }
 
-    async getStateBreakReference(){
-        let state_obj = StateLoader.state.getParserState(this.name);
-        return JSON.parse(JSON.stringify(state_obj));
-    }
-
     async getState(){
-        let state_obj = StateLoader.state.getParserState(this.name);
+        let state_obj = StateLoader.state.getParserState(this.name) || this.getStateFromFs();
         return state_obj;
     }
 
-    async setState( newState ){
+    async getStateFromFs(){
+        let stateFromFs = {};
+
+        try{
+            
+            if( this.helpers.fsPromise.existsSync(this.init_state_file) ){
+                let init_state_str = await this.helpers.fsPromise.readFile( this.init_state_file );
+                stateFromFs = JSON.parse(init_state_str);
+            }
+
+        }catch(e){}
+
+        return stateFromFs;
+    }
+
+    async setState( newState, should_write=true ){
 
         try{
 
-            let lastState = await this.getStateBreakReference();
+            let previousState = await this.getState();
 
-            if( newState && newState.previousState ){
-                delete newState.previousState;
+            if( previousState !== undefined && previousState.previousState !== undefined ){
+                delete previousState.previousState;
             }
 
-            if( lastState && lastState.previousState ){
-                delete lastState.previousState;
-            }
+            newState.previousState = previousState;
 
-            newState.previousState = lastState;
+            if( should_write ){
+                try{
+                    this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
+                }catch(e){console.error(e);}
+            }
 
             return StateLoader.state.replaceParserState(this.name, newState)
         }catch(e){

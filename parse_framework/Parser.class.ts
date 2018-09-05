@@ -46,7 +46,7 @@ abstract class AbstractParser{
     abstract testRegex:RegExp;
     abstract _abstractTransformObj(obj): object;
 
-    async _parse( parseObj ):Promise<any>{
+    async _parse( parseObj ){
 
         let toReturn = await this.parserContainer.parsePrivate( parseObj );
 
@@ -227,14 +227,8 @@ class ParserContainer{
     }
 
     static async parseExposed(obj, parserObj?):Promise<Array<any>>{
-
-        let toReturn = await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
-
-        if( Array.isArray(toReturn) && toReturn.length === 1 ){
-            toReturn = toReturn[0];
-        }
         
-        return toReturn;
+        return await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
     }
 
     // function for parseExposed and parsePrivate to call
