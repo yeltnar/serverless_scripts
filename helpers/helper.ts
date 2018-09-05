@@ -21,7 +21,7 @@ function helpersInit(){
 							console.error(command+" failed exec err")
 							return reject(err);
 						}else if(stderr){
-							console.log(command+" failed stderr "+stderr)
+							console.error(command+" failed stderr "+stderr)
 							return resolve(stderr);
 						}else{
 							console.log(command+" success "+stdout)

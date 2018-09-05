@@ -17,43 +17,31 @@ class StateLoader{
         this.name = name;
     }
 
+    async getStateBreakReference(){
+        let state_obj = StateLoader.state.getParserState(this.name);
+        return JSON.parse(JSON.stringify(state_obj));
+    }
+
     async getState(){
-        let state_obj = StateLoader.state.getParserState(this.name) || this.getStateFromFs();
+        let state_obj = StateLoader.state.getParserState(this.name);
         return state_obj;
     }
 
-    async getStateFromFs(){
-        let stateFromFs = {};
-
-        try{
-            
-            if( this.helpers.fsPromise.existsSync(this.init_state_file) ){
-                let init_state_str = await this.helpers.fsPromise.readFile( this.init_state_file );
-                stateFromFs = JSON.parse(init_state_str);
-            }
-
-        }catch(e){}
-
-        return stateFromFs;
-    }
-
-    async setState( newState, should_write=true ){
+    async setState( newState ){
 
         try{
 
-            let previousState = await this.getState();
+            let lastState = await this.getStateBreakReference();
 
-            if( previousState !== undefined && previousState.previousState !== undefined ){
-                delete previousState.previousState;
+            if( newState && newState.previousState ){
+                delete newState.previousState;
             }
 
-            newState.previousState = previousState;
-
-            if( should_write ){
-                try{
-                    this.helpers.fsPromise.writeFile( this.init_state_file, JSON.stringify(newState) );
-                }catch(e){console.error(e);}
+            if( lastState && lastState.previousState ){
+                delete lastState.previousState;
             }
+
+            newState.previousState = lastState;
 
             return StateLoader.state.replaceParserState(this.name, newState)
         }catch(e){
