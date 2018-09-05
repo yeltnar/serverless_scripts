@@ -1,4 +1,7 @@
 import {createStore, Store} from 'redux'
+const fs = require('fs');
+
+const state_obj_path:string = "state/master_state.json";
 
 class State{
     private stateObj:any={};
@@ -6,8 +9,17 @@ class State{
     private store:Store;
 
     constructor(){
+
+        // init state if it was there
+        if( fs.existsSync(state_obj_path) ){
+            const stateObj_str:string = fs.readFileSync(state_obj_path);
+            this.stateObj = JSON.parse(stateObj_str);
+        }
+
         this.store = createStore( this.reduxParse, this.stateObj );
-        //this.store.subscribe(this.stateChanged)
+        this.replaceState(this.stateObj);
+
+        this.registerForStateChanges(this.stateChanged);
     }
 
     private reduxParse=(state, action)=>{
@@ -29,9 +41,7 @@ class State{
             newState = this.stateObj;
         }
 
-        //newState = newState ? newState : {};
-
-        return JSON.parse(JSON.stringify(newState)); // make sure new refrence 
+        return JSON.parse(JSON.stringify(newState)); // make sure new reference  
     }
 
     // replaceState(newState){
@@ -40,6 +50,13 @@ class State{
     //         newState
     //     });
     // }
+
+    private replaceState(newState){
+        this.store.dispatch({
+            type:"REPLACE",
+            newState
+        });
+    }
 
     replaceParserState(name, newState){
         this.store.dispatch({
@@ -71,8 +88,14 @@ class State{
         });
     }
 
-    private stateChanged=()=>{
-        console.log( Object.keys(this.store.getState()) )
+    private stateChanged=(changed_state)=>{
+        
+        console.log( "state changed->writing "+ JSON.stringify(Object.keys( changed_state )) )
+        try{
+            fs.writeFileSync(state_obj_path, JSON.stringify(changed_state) );
+        }catch(e){
+            console.error(e)
+        }
     }
 
     // dispatch( dispatchObj ){
