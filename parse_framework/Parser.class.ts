@@ -46,7 +46,7 @@ abstract class AbstractParser{
     abstract testRegex:RegExp;
     abstract _abstractTransformObj(obj): object;
 
-    async _parse( parseObj ){
+    async _parse( parseObj ):Promise<any>{
 
         let toReturn = await this.parserContainer.parsePrivate( parseObj );
 
