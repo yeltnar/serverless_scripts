@@ -33,6 +33,9 @@ class geofence extends HttpParser{
 
          let location_arr = (await this.state.getState()).points || this.config.points;
 
+         console.log("location_arr")
+         console.log(location_arr.length)
+         console.log(location_arr)
  
          for(let k in location_arr){
              let c_lat = location_arr[k].lat;

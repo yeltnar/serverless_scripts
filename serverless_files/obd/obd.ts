@@ -1,5 +1,4 @@
 import {HttpParser} from '../../HttpParser.class';
-import {ParserContainer} from '../../parse_framework/Parser.class'
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
@@ -93,7 +92,7 @@ class obdParser extends HttpParser{
                     },
                     pathName:"geofence/get_close_locations"
                 }
-                state.geofence_locations = await ParserContainer.parseExposed("geofence",geofence_obj);
+                state.geofence_locations = await this.parserContainer.parse("geofence",geofence_obj);
             }catch(e){
                 console.error(e);
             }
