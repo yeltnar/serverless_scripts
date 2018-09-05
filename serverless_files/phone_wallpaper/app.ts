@@ -99,7 +99,7 @@ class PhoneWallpaper extends HttpParser{
     private setPreselectedWallpaper=async (query_body)=>{
         console.log("using preselected: "+query_body.imgUrl);
         try{
-            this.setPhoneWallpaper({"wallpaper_url":query_body.imgUrl});
+            this.sendSetPhoneWallpaperRequest({"wallpaper_url":query_body.imgUrl});
         }catch(e){
             console.error(e);
         }
@@ -125,8 +125,8 @@ class PhoneWallpaper extends HttpParser{
 
         console.log("running top wallpaper");
         try{
-            let wallpaper_info = await this.getPhoneWallpaper();
-            this.setPhoneWallpaper(wallpaper_info);
+            let wallpaper_info = await this.getPhoneWallpaperFromInternet();
+            this.sendSetPhoneWallpaperRequest(wallpaper_info);
             toReturn = {};
             if( wallpaper_info.wallpaper_url === undefined ){
                 wallpaper_info.wallpaper_url = "undefined";
@@ -158,8 +158,8 @@ class PhoneWallpaper extends HttpParser{
 
         console.log("setting new wallpaper");
         try{
-            let walpaper_info = await this.getPhoneWallpaper( true )
-            this.setPhoneWallpaper(walpaper_info);
+            let walpaper_info = await this.getPhoneWallpaperFromInternet( true )
+            this.sendSetPhoneWallpaperRequest(walpaper_info);
         }catch(e){
             console.error(e);
         }
@@ -205,7 +205,7 @@ class PhoneWallpaper extends HttpParser{
         return toReturn;
     }
 
-    async setPhoneWallpaper(walpaper_info) {
+    async sendSetPhoneWallpaperRequest(walpaper_info) {
     
         let {wallpaper_url, used_wallpaper} = walpaper_info;
     
@@ -239,7 +239,7 @@ class PhoneWallpaper extends HttpParser{
         }
     }
 
-    async getPhoneWallpaper( force_new=false ) {
+    async getPhoneWallpaperFromInternet( force_new=false ) {
     
         let wallpaper_url="";
         let used_wallpapers:any=[];
