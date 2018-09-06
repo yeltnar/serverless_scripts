@@ -16,83 +16,88 @@ class SlackParser extends HttpParser{
     constructor( name, config ){
         super( name, config );
 
-        //constructor(name, local_config, state, parseFunction, testRegex, functionalShouldParse?)
-        this.parserContainer.addPrivateParser( new FunctionalParser("send", this.config, this.state, this.sendParser.funct, this.sendParser.testRegex ) );
-        this.parserContainer.addPrivateParser( new FunctionalParser("time", this.config, this.state, this.timeParser.funct, this.timeParser.testRegex ) );
-        this.parserContainer.addPrivateParser( new FunctionalParser("on_my_way", this.config, this.state, this.onMyWayParser.funct, this.onMyWayParser.testRegex ) );
-        console.log(this.config);
+        for( let k in this.functionalParsers ){
+            let current_parser = this.functionalParsers[k];
+            this.parserContainer.addPrivateParser( new FunctionalParser(current_parser.name, this.config, this.state, current_parser.funct, current_parser.testRegex ) );
+        }
     };
 
-    sendParser:FunctionalParserObj = {
-        name:"send",
-        funct:async (parserObj):Promise<object>=>{
+    
 
-            let query_body = parserObj.query_body
-
-            //return query_body
-
-            let {channel_name, text} = query_body;
-
-            if( channel_name === undefined || text===undefined ){
-                return {"err":"channel_name, text"};
-            }
-
-            try{
-                return await this.message(channel_name, text);
-            }catch(e){
-                return e;
-            }
-
-            //return {"success":true};
+    functionalParsers:object = {
+        sendParser:{
+            name:"send",
+            funct:async (parserObj):Promise<object>=>{
+    
+                let query_body = parserObj.query_body
+    
+                //return query_body
+    
+                let {channel_name, text} = query_body;
+    
+                if( channel_name === undefined || text===undefined ){
+                    return {"err":"channel_name, text"};
+                }
+    
+                try{
+                    return await this.message(channel_name, text);
+                }catch(e){
+                    return e;
+                }
+    
+                //return {"success":true};
+            },
+            testRegex:/send/,
         },
-        testRegex:/send/,
+        timeParser:{
+            name:"time",
+            funct:async (parserObj):Promise<object>=>{
+    
+                let channel_name = "Drew"
+                let text = (new Date()).toISOString();
+    
+                try{
+                    return await this.message(channel_name, text);
+                }catch(e){
+                    return e;
+                }
+    
+                //return {"success":true};
+            },
+            testRegex:/time/,
+        },
+        onMyWayParser:{
+            name:"on_my_way",
+            funct:async (parserObj):Promise<object>=>{
+    
+                let query_body = parserObj.query_body
+    
+                //return query_body
+    
+                let {channel_name} = query_body;
+                let text = "I'm on my way!";
+    
+                if( channel_name === undefined){
+                    return {"err":"channel_name"};
+                }
+    
+                try{
+                    return await this.message(channel_name, text);
+                }catch(e){
+                    return e;
+                }
+    
+                //return {"success":true};
+            },
+            testRegex:/on_my_way/,
+        }
     }
 
 
-    timeParser:FunctionalParserObj = {
-        name:"time",
-        funct:async (parserObj):Promise<object>=>{
-
-            let channel_name = "Drew"
-            let text = (new Date()).toISOString();
-
-            try{
-                return await this.message(channel_name, text);
-            }catch(e){
-                return e;
-            }
-
-            //return {"success":true};
-        },
-        testRegex:/time/,
-    }
+    
 
 
-    onMyWayParser:FunctionalParserObj = {
-        name:"on_my_way",
-        funct:async (parserObj):Promise<object>=>{
-
-            let query_body = parserObj.query_body
-
-            //return query_body
-
-            let {channel_name} = query_body;
-            let text = "I'm on my way!";
-
-            if( channel_name === undefined){
-                return {"err":"channel_name"};
-            }
-
-            try{
-                return await this.message(channel_name, text);
-            }catch(e){
-                return e;
-            }
-
-            //return {"success":true};
-        },
-        testRegex:/on_my_way/,
-    }
+    
 
     message=async (channel_name, text):Promise<any>=>{
 
