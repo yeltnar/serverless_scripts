@@ -5,7 +5,7 @@ const fs = require("fs");
 //my files
 import {ParserContainer,parseInit} from './parse_framework/Parser.class';
 import helpers from './helpers/helper'
-import {pushNotification} from './helpers/ifttt' 
+import {pushNotification, init_pushNotification} from './helpers/ifttt' 
 //import lights from './serverless_files/lights/lights';
 
 import ObdParser from './serverless_files/obd/obd';
@@ -46,16 +46,23 @@ if( in_file_location === undefined ){
 
     try{
         let obj = JSON.parse(fs.readFileSync( in_file_location ).toString());
-        parseObj( obj );
+        doParseObj( obj );
     }catch(e){
         console.error(e);
     }
 }
 
-async function parseObj(obj) {
+async function doParseObj(obj) {
+
     let pathName = obj.request._parsedUrl.pathname;
     let query_body = {};
     let result:any=[];
+
+    // TODO put this in a better spot
+    if( obj.response_device && obj.response_device.device_name ){
+        init_pushNotification(obj.response_device.device_name);
+        console.log(Object.keys(obj));
+    }
 
     for(let k in obj.request.query){
         query_body[k] = obj.request.query[k];
@@ -130,4 +137,4 @@ function writeToOutFile(out_data){
     fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
 }
 
-export default parseObj;
+export default doParseObj;

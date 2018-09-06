@@ -6,6 +6,8 @@ interface PushMsgObj{
 	link?: String
 };
 
+let device_name:string="fallback_name";
+
 const iftttConfig={
     "first":"https://maker.ifttt.com/trigger/",
     "second":"/with/key/bXrf4Mm5tIy0Bjis08SiYC",
@@ -30,6 +32,8 @@ function pushNotification(msgObj:PushMsgObj){
 		throw "msgObj must be an object";
 	}
 
+	title = title+"/"+device_name
+
 	let url = iftttConfig.first+iftttConfig.push_notification+iftttConfig.second
 
 	let options = { 
@@ -53,4 +57,8 @@ function pushNotification(msgObj:PushMsgObj){
 
 }
 
-export {pushNotification}
+function init_pushNotification(init_device_name){
+	device_name = init_device_name;
+}
+
+export {pushNotification, init_pushNotification}
