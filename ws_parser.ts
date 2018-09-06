@@ -17,10 +17,11 @@ import {NotifyLeaving}  from './serverless_files/notify_leaving/notify_leaving';
 import GetParsers  from './serverless_files/get_parsers/get_parsers';
 import Ping  from './serverless_files/ping/ping';
 import Person  from './serverless_files/person/person';
-import slack from './serverless_files/slack/slack';
+import SlackParser from './serverless_files/slack/slack';
 
 parseInit(pushNotification, helpers);
 
+ParserContainer.addStaticParser(new SlackParser("SlackParser", config.slackParser||{}));
 ParserContainer.addStaticParser(new ObdParser("obd", config.obd));
 ParserContainer.addStaticParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
 ParserContainer.addStaticParser(new HueParser("hue", config.hue));

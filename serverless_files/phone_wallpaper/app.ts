@@ -1,14 +1,7 @@
 import {HttpParser} from '../../HttpParser.class';
-import { Parser, FunctionalParser, ParserContainer } from '../../parse_framework/Parser.class';
+import { Parser, FunctionalParser, ParserContainer, FunctionalParserObj } from '../../parse_framework/Parser.class';
 import ResponseObj from '../../parse_framework/ResponseObj.interface';
 const requestP = require("request-promise-native");
-
-interface FunctionalParserObj{
-    name:string,
-    funct:Function,
-    testRegex:RegExp,
-    functionalShouldParse:Function
-}
 
 class PhoneWallpaper extends HttpParser{
 

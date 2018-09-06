@@ -15,5 +15,8 @@
             }
         ]
     },
-    "persons":{}
+    "persons":{},
+    "slackParser":{
+        "channel_table": {}
+    }
 }
