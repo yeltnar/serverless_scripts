@@ -103,7 +103,7 @@ class obdParser extends HttpParser{
             state_changed = true;
 
             let pushData = {
-                "title":"From car/"+obj.response_device.device_name,
+                "title":"From car",
                 "message":{
                     geofence_locations:state.geofence_locations,
                     location_obj,
