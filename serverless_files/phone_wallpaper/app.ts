@@ -5,7 +5,7 @@ const requestP = require("request-promise-native");
 
 interface FunctionalParserObj{
     name:string,
-    funct_name:string,
+    funct:Function,
     testRegex:RegExp,
     functionalShouldParse:Function
 }
@@ -19,7 +19,7 @@ class PhoneWallpaper extends HttpParser{
 
         for( let k in this.functionalParsersObj ){
             let cur:FunctionalParserObj = this.functionalParsersObj[k];
-            let parseFunction = this[cur.funct_name];
+            let parseFunction = cur.funct;
 
             this.parserContainer.addPrivateParser( 
                 new FunctionalParser(
@@ -35,71 +35,12 @@ class PhoneWallpaper extends HttpParser{
 
     }
 
-    functionalParsersObj:Array<FunctionalParserObj>=[
-        {
-            "name":"setPreselectedWallpaper",
-            "funct_name":"setPreselectedWallpaper",
-            "testRegex":/set\//,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined
-            }
-        },{
-            "name":"getSavedWallpapers",
-            "funct_name":"getSavedWallpapers",
-            "testRegex":/get_saved/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return query_body.getSaved===true||query_body.getSaved==="true"
-            }
-        },{
-            "name":"topWallpaper",
-            "funct_name":"topWallpaper",
-            "testRegex":/set_top/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined
-            }
-        },{
-            "name":"getLastWallpaper",
-            "funct_name":"getLastWallpaper",
-            "testRegex":/get_last/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return (query_body.getLastWallpaper===true||query_body.getLastWallpaper==="true")
-            }
-        },{
-            "name":"newWallpaper",
-            "funct_name":"newWallpaper",
-            "testRegex":/force_new/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return (query_body.newWallpaper===true||query_body.newWallpaper==="true")
-            }
-        },{
-            "name":"saveLastWallpaper",
-            "funct_name":"saveLastWallpaper",
-            "testRegex":/save_last/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return (query_body.saveLastWallpaper===true||query_body.saveLastWallpaper==="true")
-            }
-        },{
-            "name":"openSavedWallpapers",
-            "funct_name":"openSavedWallpapers",
-            "testRegex":/open_saved/,
-            functionalShouldParse:(parseObj)=>{
-                let query_body = parseObj.query_body;
-                return query_body.openSavedWallpapers===true||query_body.openSavedWallpapers==="true"
-            }
-        }
-    ]
+    private setPreselectedWallpaper=async (reqObj)=>{
 
-
-    private setPreselectedWallpaper=async (query_body)=>{
+        let query_body = reqObj.query_body
         console.log("using preselected: "+query_body.imgUrl);
         try{
-            this.setPhoneWallpaper({"wallpaper_url":query_body.imgUrl});
+            this.sendSetPhoneWallpaperRequest({"wallpaper_url":query_body.imgUrl});
         }catch(e){
             console.error(e);
         }
@@ -107,12 +48,10 @@ class PhoneWallpaper extends HttpParser{
 
     private getSavedWallpapers=async ():Promise<Array<string>>=>{
         let toReturn;
-        console.log('asdfasfdasdfasdfasdfasdfasdfasdfasdfasdfasdfsafd')
         try{
-            let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
-            toPrint = JSON.parse(toPrint);
+            let toPrint = await this.getUsedWallpapers();
             toReturn = toPrint;
-            console.log(JSON.stringify(toPrint));
+            console.log("getSavedWallpapers");
         }catch(e){
             console.error(e);
         }
@@ -125,8 +64,8 @@ class PhoneWallpaper extends HttpParser{
 
         console.log("running top wallpaper");
         try{
-            let wallpaper_info = await this.getPhoneWallpaper();
-            this.setPhoneWallpaper(wallpaper_info);
+            let wallpaper_info = await this.getPhoneWallpaperFromInternet();
+            this.sendSetPhoneWallpaperRequest(wallpaper_info);
             toReturn = {};
             if( wallpaper_info.wallpaper_url === undefined ){
                 wallpaper_info.wallpaper_url = "undefined";
@@ -143,11 +82,9 @@ class PhoneWallpaper extends HttpParser{
     private getLastWallpaper=async ():Promise<string>=>{
         let toReturn;
         try{
-            let toPrint = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
-            toPrint = JSON.parse(toPrint);
-            toPrint = toPrint.pop();
-            toReturn = toPrint;
-            console.log(toPrint);
+            let toPrint = await this.getUsedWallpapers();
+            toReturn = toPrint.pop();
+            console.log("getLastWallpaper");
         }catch(e){
             console.error(e);
         }
@@ -158,8 +95,8 @@ class PhoneWallpaper extends HttpParser{
 
         console.log("setting new wallpaper");
         try{
-            let walpaper_info = await this.getPhoneWallpaper( true )
-            this.setPhoneWallpaper(walpaper_info);
+            let walpaper_info = await this.getPhoneWallpaperFromInternet( true )
+            this.sendSetPhoneWallpaperRequest(walpaper_info);
         }catch(e){
             console.error(e);
         }
@@ -167,11 +104,10 @@ class PhoneWallpaper extends HttpParser{
 
     private saveLastWallpaper=async ()=>{
         try{
-            let last_used_wallpaper_url = (await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file)).toString();
-            last_used_wallpaper_url = JSON.parse(last_used_wallpaper_url);
-            last_used_wallpaper_url = last_used_wallpaper_url[last_used_wallpaper_url.length-1];
+            let last_used_wallpaper_url_arr = await this.getUsedWallpapers();
+            let last_used_wallpaper_url = last_used_wallpaper_url_arr[last_used_wallpaper_url_arr.length-1];
 
-            let savedWallpaperArr = ( await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file) ).toString();
+            let savedWallpaperArr = ( await this.getSavedWallpapaers() ).toString();
             try{
                 savedWallpaperArr = JSON.parse(savedWallpaperArr);
             }catch(e){
@@ -181,7 +117,7 @@ class PhoneWallpaper extends HttpParser{
             if(savedWallpaperArr.indexOf(last_used_wallpaper_url)<0){
                 savedWallpaperArr.push(last_used_wallpaper_url);
             }
-            await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr));
+            await this.saveWallpapers(savedWallpaperArr);
 
             console.log(JSON.stringify(savedWallpaperArr));
         }catch(e){
@@ -192,7 +128,7 @@ class PhoneWallpaper extends HttpParser{
     private openSavedWallpapers=async ():Promise<string>=>{
         let toReturn="";
         try{
-            let last_used_wallpaper_arr = (await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)).toString();
+            let last_used_wallpaper_arr = (await this.getSavedWallpapaers()).toString();
 
             let toLog = "<script>"+last_used_wallpaper_arr+".forEach((ele)=>{window.open(ele);}); </script>";
             
@@ -205,14 +141,14 @@ class PhoneWallpaper extends HttpParser{
         return toReturn;
     }
 
-    async setPhoneWallpaper(walpaper_info) {
+    async sendSetPhoneWallpaperRequest(walpaper_info) {
     
         let {wallpaper_url, used_wallpaper} = walpaper_info;
     
         if(used_wallpaper===undefined){
+            console.log("getting used wallpaper");
             try{
-                used_wallpaper = await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file);
-                used_wallpaper = JSON.parse(used_wallpaper);
+                used_wallpaper = await this.getUsedWallpapers();
             }catch(e){
                 used_wallpaper=[];
             }
@@ -233,13 +169,13 @@ class PhoneWallpaper extends HttpParser{
             await requestP(options);
             used_wallpaper.push(wallpaper_url);
             used_wallpaper=used_wallpaper.slice(-10);
-            this.helpers.fsPromise.writeFile(this.config.used_wallpaper_file, JSON.stringify(used_wallpaper));
+            this.saveUsedWallpapers(used_wallpaper)
         }else{
             console.log("not setting walpaper to " + wallpaper_url);
         }
     }
 
-    async getPhoneWallpaper( force_new=false ) {
+    async getPhoneWallpaperFromInternet( force_new=false ) {
     
         let wallpaper_url="";
         let used_wallpapers:any=[];
@@ -260,7 +196,7 @@ class PhoneWallpaper extends HttpParser{
                 return toReturn;
             });
     
-            used_wallpapers = JSON.parse( await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file) );
+            used_wallpapers = await this.getUsedWallpapers();
     
             if( force_new ){
     
@@ -286,6 +222,92 @@ class PhoneWallpaper extends HttpParser{
         }
         return {wallpaper_url,used_wallpapers};
     }
+
+    // start of local functions
+
+    private saveWallpapers=async ( savedWallpaperArr )=>{
+        //return await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr))
+        let state = await this.state.getState();
+        console.log("savedWallpaperArr "+JSON.stringify(savedWallpaperArr))
+        state.savedWallpaperArr = savedWallpaperArr;
+        await this.state.setState(state);
+    }
+
+    private saveUsedWallpapers=async( used_wallpaper_arr:[string] )=>{
+        //return await this.helpers.fsPromise.writeFile(this.config.used_wallpaper_file, JSON.stringify(used_wallpaper));
+        let state = await this.state.getState();
+        state.usedWallpaperArr = used_wallpaper_arr;
+        await this.state.setState(state);
+    }
+
+    private getUsedWallpapers=async ():Promise<[string]>=>{
+        //return await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file)
+        //state.usedWallpaperArr
+        return (await this.state.getState()).usedWallpaperArr || [];
+    }
+
+    private getSavedWallpapaers=async ()=>{
+        //return await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)
+        return (await this.state.getState()).savedWallpaperArr || [];
+    }
+
+    functionalParsersObj:Array<FunctionalParserObj>=[
+        {
+            "name":"setPreselectedWallpaper",
+            "funct":this.setPreselectedWallpaper,
+            "testRegex":/set\//,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return (query_body.preSelected===true||query_body.preSelected==="true") && query_body.imgUrl!==undefined
+            }
+        },{
+            "name":"getSavedWallpapers",
+            "funct":this.getSavedWallpapers,
+            "testRegex":/get_saved/,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return query_body.getSaved===true||query_body.getSaved==="true"
+            }
+        },{
+            "name":"topWallpaper",
+            "funct":this.topWallpaper,
+            "testRegex":/set_top/,
+            functionalShouldParse:(parseObj)=>{return false}
+        },{
+            "name":"getLastWallpaper",
+            "funct":this.getLastWallpaper,
+            "testRegex":/get_last/,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return (query_body.getLastWallpaper===true||query_body.getLastWallpaper==="true")
+            }
+        },{
+            "name":"newWallpaper",
+            "funct":this.newWallpaper,
+            "testRegex":/force_new/,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return (query_body.newWallpaper===true||query_body.newWallpaper==="true")
+            }
+        },{
+            "name":"saveLastWallpaper",
+            "funct":this.saveLastWallpaper,
+            "testRegex":/save_last/,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return (query_body.saveLastWallpaper===true||query_body.saveLastWallpaper==="true")
+            }
+        },{
+            "name":"openSavedWallpapers",
+            "funct":this.openSavedWallpapers,
+            "testRegex":/open_saved/,
+            functionalShouldParse:(parseObj)=>{
+                let query_body = parseObj.query_body;
+                return query_body.openSavedWallpapers===true||query_body.openSavedWallpapers==="true"
+            }
+        }
+    ]
+
 }
 
 export default PhoneWallpaper;
