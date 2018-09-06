@@ -27,7 +27,7 @@ abstract class AbstractParser{
 
     parserContainer=new ParserContainer();
 
-    config; name; pushNotification; master_config; state:StateLoader; helpers;
+    config; name; pushNotification;/*title, message, link*/ master_config; state:StateLoader; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
 
     constructor( name:string, local_config:object, state:StateLoader){

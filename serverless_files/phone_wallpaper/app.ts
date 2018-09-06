@@ -160,6 +160,7 @@ class PhoneWallpaper extends HttpParser{
                 "json":true
             };
             await requestP(options);
+            this.pushNotification({title:"set_wallpaper", message:wallpaper_url, link:wallpaper_url});
             used_wallpaper.push(wallpaper_url);
             used_wallpaper=used_wallpaper.slice(-10);
             this.saveUsedWallpapers(used_wallpaper)
