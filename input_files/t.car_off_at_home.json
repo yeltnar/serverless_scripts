@@ -131,5 +131,11 @@
     "send_to_device": {
         "uuid": "296eac9c-111b-4d2c-91c4-0a0edfc630be",
         "index": 1
+    },
+    "response_device": {
+        "device_name": "TEST",
+        "device_group": "test_group",
+        "token": "hello",
+        "token_type": "regex"
     }
 }
