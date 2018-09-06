@@ -38,8 +38,6 @@ class PhoneWallpaper extends HttpParser{
     private setPreselectedWallpaper=async (reqObj)=>{
 
         let query_body = reqObj.query_body
-
-        console.log("query_body: "+JSON.stringify(query_body));
         console.log("using preselected: "+query_body.imgUrl);
         try{
             this.sendSetPhoneWallpaperRequest({"wallpaper_url":query_body.imgUrl});
@@ -53,7 +51,7 @@ class PhoneWallpaper extends HttpParser{
         try{
             let toPrint = await this.getUsedWallpapers();
             toReturn = toPrint;
-            console.log(toReturn);
+            console.log("getSavedWallpapers");
         }catch(e){
             console.error(e);
         }
@@ -86,7 +84,7 @@ class PhoneWallpaper extends HttpParser{
         try{
             let toPrint = await this.getUsedWallpapers();
             toReturn = toPrint.pop();
-            console.log(toReturn);
+            console.log("getLastWallpaper");
         }catch(e){
             console.error(e);
         }
@@ -230,8 +228,7 @@ class PhoneWallpaper extends HttpParser{
     private saveWallpapers=async ( savedWallpaperArr )=>{
         //return await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr))
         let state = await this.state.getState();
-        console.log("savedWallpaperArr")
-        console.log(savedWallpaperArr)
+        console.log("savedWallpaperArr "+JSON.stringify(savedWallpaperArr))
         state.savedWallpaperArr = savedWallpaperArr;
         await this.state.setState(state);
     }
@@ -246,8 +243,6 @@ class PhoneWallpaper extends HttpParser{
     private getUsedWallpapers=async ():Promise<[string]>=>{
         //return await this.helpers.fsPromise.readFile(this.config.used_wallpaper_file)
         //state.usedWallpaperArr
-        console.log("(await this.state.getState()).usedWallpaperArr")
-        console.log((await this.state.getState()).usedWallpaperArr)
         return (await this.state.getState()).usedWallpaperArr || [];
     }
 
