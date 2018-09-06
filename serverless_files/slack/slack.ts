@@ -17,11 +17,13 @@ class SlackParser extends HttpParser{
         super( name, config );
 
         //constructor(name, local_config, state, parseFunction, testRegex, functionalShouldParse?)
-        this.parserContainer.addPrivateParser( new FunctionalParser(name, this.config, this.state, this.functionalParserObj.funct, this.functionalParserObj.testRegex ) );
+        this.parserContainer.addPrivateParser( new FunctionalParser("send", this.config, this.state, this.sendParser.funct, this.sendParser.testRegex ) );
+        this.parserContainer.addPrivateParser( new FunctionalParser("time", this.config, this.state, this.timeParser.funct, this.timeParser.testRegex ) );
+        this.parserContainer.addPrivateParser( new FunctionalParser("on_my_way", this.config, this.state, this.onMyWayParser.funct, this.onMyWayParser.testRegex ) );
         console.log(this.config);
     };
 
-    functionalParserObj:FunctionalParserObj = {
+    sendParser:FunctionalParserObj = {
         name:"send",
         funct:async (parserObj):Promise<object>=>{
 
@@ -44,6 +46,52 @@ class SlackParser extends HttpParser{
             //return {"success":true};
         },
         testRegex:/send/,
+    }
+
+
+    timeParser:FunctionalParserObj = {
+        name:"time",
+        funct:async (parserObj):Promise<object>=>{
+
+            let channel_name = "Drew"
+            let text = (new Date()).toISOString();
+
+            try{
+                return await this.message(channel_name, text);
+            }catch(e){
+                return e;
+            }
+
+            //return {"success":true};
+        },
+        testRegex:/time/,
+    }
+
+
+    onMyWayParser:FunctionalParserObj = {
+        name:"on_my_way",
+        funct:async (parserObj):Promise<object>=>{
+
+            let query_body = parserObj.query_body
+
+            //return query_body
+
+            let {channel_name} = query_body;
+            let text = "I'm on my way!";
+
+            if( channel_name === undefined){
+                return {"err":"channel_name"};
+            }
+
+            try{
+                return await this.message(channel_name, text);
+            }catch(e){
+                return e;
+            }
+
+            //return {"success":true};
+        },
+        testRegex:/on_my_way/,
     }
 
     message=async (channel_name, text):Promise<any>=>{
