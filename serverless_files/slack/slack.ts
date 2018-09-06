@@ -90,6 +90,31 @@ class SlackParser extends HttpParser{
                 //return {"success":true};
             },
             testRegex:/on_my_way/,
+        },
+        imThereParser:{
+            name:"im_there",
+            funct:async (parserObj):Promise<object>=>{
+    
+                let query_body = parserObj.query_body
+    
+                //return query_body
+    
+                let {channel_name} = query_body;
+                let text = "I'm there";
+    
+                if( channel_name === undefined){
+                    return {"err":"channel_name"};
+                }
+    
+                try{
+                    return await this.message(channel_name, text);
+                }catch(e){
+                    return e;
+                }
+    
+                //return {"success":true};
+            },
+            testRegex:/im_there/,
         }
     }
 
