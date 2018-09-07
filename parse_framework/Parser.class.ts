@@ -11,6 +11,13 @@ let pushNotification, config;
 // this should be used sparingly 
 //let state:State = new State();
 
+interface FunctionalParserObj{
+    name:string,
+    funct:Function,
+    testRegex:RegExp,
+    functionalShouldParse:Function
+}
+
 let init_state_folder = "./state/";
 const getFileName = (name)=>{
     init_state_folder+name+".json"
@@ -306,4 +313,4 @@ function parseInit(init_pushNotification, init_config){
     return {};
 }
 
-export {Parser, ParserContainer, AbstractParser, parseInit, FunctionalParser}
+export {Parser, ParserContainer, AbstractParser, parseInit, FunctionalParser, FunctionalParserObj}
