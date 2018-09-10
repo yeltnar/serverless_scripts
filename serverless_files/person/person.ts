@@ -20,15 +20,14 @@ class Person extends HttpParser{
         this.state.registerForStateChanges( this.stateChangeCallback );
     }
 
-    subParsers:object = {
-        add:{
-            name:"add",
-            testRegex:/set/,
+    subParsers = {
+        set:{
+            name:"set",
+            testRegex:/set\//,
             funct:async (parserObj:ResponseObj)=>{
 
                 let person = parserObj.query_body.person;
                 let person_state = parserObj.query_body.state;
-                let state;
                 
                 if( typeof person_state === 'string' ){
                     try{
@@ -37,16 +36,14 @@ class Person extends HttpParser{
                 }
         
                 if( person && person_state ){
-        
-                    state = await this.state.getState();
-                    state[person] = person_state;
-                    this.state.setState(state);
+
+                    person_state = await this.setPersonState(person, person_state);
         
                 }else{
-                    return "person & state"
+                    console.log("person & state");
                 }
 
-                return state;
+                return person_state;
             }
         },
         get:{
@@ -55,31 +52,60 @@ class Person extends HttpParser{
             funct:async (parserObj:ResponseObj)=>{
         
                 let person = parserObj.query_body.person;
-                let person_state = parserObj.query_body.state;
-                let state;
+                let person_state;
         
                 if( person ){
+
+                    person_state = await this.getPersonState(person);
         
-                    state = this.state.getState();
-                    state[person] = person_state;
-                    await this.state.setState(state);
-        
+                }else{
+                    console.error("person is required");
                 }
-                return state;
+
+                return person_state;
+                
+            }
+        },
+        set_location:{
+            name:"set_location",
+            testRegex:/set_location/,
+            funct: async ( parserObj:ResponseObj)=>{
+
+                const person = parserObj.query_body.person;
+                const location = parserObj.query_body.location;
+                let location_result;
+
+                if( person && location ){
+                    location_result = this.set_location( person, location );
+                }else{
+                    console.log("person && location");
+                }
+
+                return location_result;
+
                 
             }
         }
     }
 
-    async _parse( parserObj:ResponseObj ){
+    set_location=async ( person:string, location:string )=>{
 
-        let result = await this.parserContainer.parsePrivate( parserObj );
+        const personState = await this.getPersonState( person );
+        personState.location = location;
+        return await this.setPersonState(person, personState);
+    }
 
-        if( result.length === 1 ){
-            result = result[0];
-        }
+    setPersonState=async ( person:string, personState:object )=>{
+        
+        let state = this.state.getState();
+        state[person] = personState;
+        await this.state.setState(state);
+        return await this.getPersonState(person);
+    }
 
-        return result;
+    getPersonState=async ( person:string )=>{
+
+        return (await this.state.getState())[person];
     }
 
     stateChangeCallback=async ( master_state )=>{
