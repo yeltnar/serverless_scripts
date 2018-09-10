@@ -5,8 +5,8 @@ class weatherParser extends HttpParser {
 
     testRegex = /weather/
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
     }
 
     async _parse( parserObj ){

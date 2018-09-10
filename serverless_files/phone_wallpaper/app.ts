@@ -7,8 +7,8 @@ class PhoneWallpaper extends HttpParser{
 
     testRegex = /wallpaper/;
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
 
         for( let k in this.functionalParsersObj ){
             let cur:FunctionalParserObj = this.functionalParsersObj[k];
@@ -21,6 +21,7 @@ class PhoneWallpaper extends HttpParser{
                     this.state, 
                     parseFunction, 
                     cur.testRegex, 
+                    this.mainParserContainer,
                     cur.functionalShouldParse
                 )
             );

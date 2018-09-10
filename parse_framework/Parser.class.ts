@@ -6,7 +6,8 @@ import ParserObj from './ResponseObj.interface'
 const schedule = require('node-schedule');
 const uuidv4 = require('uuid/v4');
 
-let pushNotification, config;
+let pushNotification;
+let config;
 
 // this should be used sparingly 
 //let state:State = new State();
@@ -29,8 +30,9 @@ abstract class AbstractParser{
 
     config; name; pushNotification;/*title, message, link*/ master_config; state:StateLoader; helpers;
     instance_loaded_promise:Promise<any> = new Promise((res)=>{res()});
+    mainParserContainer;
 
-    constructor( name:string, local_config:object, state:StateLoader){
+    constructor( name:string, local_config:object, state:StateLoader, mainParserContainer){
         //super(name, init_state_folder+name+".json");
 
         this.helpers = helpers;
@@ -46,6 +48,8 @@ abstract class AbstractParser{
         this.name = name;
         this.master_config = config;
         this.state = state;
+
+        this.mainParserContainer = mainParserContainer;
 
         //this.instance_loaded_promise = this.getInitState(this.init_state_file)
     }
@@ -112,7 +116,7 @@ abstract class AbstractParser{
 
     toJSON(){
 
-        let childrenJSON = this.parserContainer.toPrivateJSON();
+        let childrenJSON = this.parserContainer.privateToJSON();
 
         // remove if have empty result
         if( childrenJSON.length === 0 ){
@@ -143,8 +147,8 @@ class FunctionalParser extends AbstractParser{
 
     testRegex:RegExp;
 
-    constructor(name, local_config, state, parseFunction, testRegex, functionalShouldParse?){
-        super(name, local_config, state);
+    constructor(name, local_config, state, parseFunction, testRegex, mainParserContainer, functionalShouldParse?){
+        super(name, local_config, state, mainParserContainer);
 
         this.parseFunction = parseFunction;
         this.testRegex = testRegex;
@@ -180,23 +184,22 @@ class FunctionalParser extends AbstractParser{
 }
 
 class ParserContainer{
-    
 
-    private static exposedParsers:any = {};  // these all should be AbstractParser s
+    private exposedParsers:any = {};  // these all should be AbstractParser s
     private privateParsers:any = {};
 
     // add parsers
 
-    static addStaticParser(parser:AbstractParser, allowReplace=false ){
+    addPublicParser(parser:AbstractParser, allowReplace=false ){
 
         let name = parser.name || uuidv4();
 
-        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined);
+        let alreadyThere = !(this.exposedParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
-            ParserContainer.exposedParsers[name] = parser;
+            this.exposedParsers[name] = parser;
         }else if( alreadyThere ){
-            throw "ParserContainer.exposedParsers["+name+"] is defined!";
+            throw "this.exposedParsers["+name+"] is defined!";
         }
 
         return parser;
@@ -206,19 +209,19 @@ class ParserContainer{
 
         const name = parser.name
 
-        let alreadyThere = !(ParserContainer.exposedParsers[name]===undefined && this.privateParsers[name]===undefined);
+        let alreadyThere = !(this.exposedParsers[name]===undefined && this.privateParsers[name]===undefined);
 
         if( allowReplace===true || !alreadyThere ){
             this.privateParsers[name] = parser;
         }else if( alreadyThere ){
-            throw "ParserContainer.privateParsers["+name+"] is defined!";
+            throw "this.privateParsers["+name+"] is defined!";
         }
     }
 
     // call parsers // TODO rename this to be parse public or something like that 
-    static async parse(name, parseObj:ParserObj):Promise<any>{
+    async parse(name, parseObj:ParserObj):Promise<any>{
 
-        let parser = ParserContainer.exposedParsers[name];
+        let parser = this.exposedParsers[name];
 
         let parseResult;
 
@@ -230,12 +233,12 @@ class ParserContainer{
     }
     
     async parsePrivate(obj, parserObj?):Promise<Array<any>>{
-        return await ParserContainer.parseListObj( this.privateParsers, obj, parserObj );
+        return await this.parseListObj( this.privateParsers, obj, parserObj );
     }
 
-    static async parseExposed(obj, parserObj?):Promise<Array<any>>{
+    async parseExposed(obj, parserObj?):Promise<Array<any>>{
 
-        let toReturn = await ParserContainer.parseListObj( ParserContainer.exposedParsers, obj, parserObj );
+        let toReturn = await this.parseListObj( this.exposedParsers, obj, parserObj );
 
         if( Array.isArray(toReturn) && toReturn.length === 1 ){
             toReturn = toReturn[0];
@@ -245,7 +248,7 @@ class ParserContainer{
     }
 
     // function for parseExposed and parsePrivate to call
-    private static async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
+    private async parseListObj(listObj, obj, parserObj):Promise<Array<any>>{
 
         //parserObj = parserObj!==undefined ? parserObj : Parser._abstractTransformObj(obj);
 
@@ -267,10 +270,10 @@ class ParserContainer{
 
     // remove parsers
 
-    static removeExposedParser(name:string){
-        if( ParserContainer.exposedParsers[name]!==undefined ){
-            delete ParserContainer.exposedParsers[name];
-        }else if( ParserContainer.exposedParsers[name]!==undefined ){
+    removeExposedParser(name:string){
+        if( this.exposedParsers[name]!==undefined ){
+            delete this.exposedParsers[name];
+        }else if( this.exposedParsers[name]!==undefined ){
             throw "ParserContainer.exposedParsers["+name+"] is not defined!";
         }
     }
@@ -283,7 +286,7 @@ class ParserContainer{
         }
     }
 
-    toPrivateJSON(){
+    privateToJSON(){
 
         let privateParsers = [];
 
@@ -295,12 +298,12 @@ class ParserContainer{
 
     }
 
-    static toJSON(){
+    exposedToJSON(){
 
         let staticParsers = [];
 
-        for(let k in ParserContainer.exposedParsers){
-            staticParsers.push( ParserContainer.exposedParsers[k].toJSON() )
+        for(let k in this.exposedParsers){
+            staticParsers.push( this.exposedParsers[k].toJSON() )
         }
 
         return (staticParsers);

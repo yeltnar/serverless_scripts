@@ -9,9 +9,11 @@ const getFileName = (name)=>{
 
 abstract class HttpParser extends AbstractParser {
 
-    constructor(name, config){
-        super( name, config, new StateLoader( name, getFileName(name) ) );
+    constructor(name, config, mainParserContainer){
+        super( name, config, new StateLoader( name, getFileName(name) ), mainParserContainer );
     }
+
+    //this.par
 
     _abstractTransformObj( obj ){
 

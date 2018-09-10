@@ -7,13 +7,13 @@ class Person extends HttpParser{
 
     testRegex = /person/;
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
         
         this.parserContainer = new ParserContainer();
 
-        this.parserContainer.addPrivateParser( new AddParser("set_"+name, config, this.state) );
-        this.parserContainer.addPrivateParser( new GetParser("get_"+name, config, this.state) );
+        this.parserContainer.addPrivateParser( new AddParser("set_"+name, config, this.state, mainParserContainer) );
+        this.parserContainer.addPrivateParser( new GetParser("get_"+name, config, this.state, mainParserContainer) );
 
         this.state.registerForStateChanges( this.stateChangeCallback );
     }
@@ -51,8 +51,8 @@ class AddParser extends Parser{
     
     testRegex=/set/;
 
-    constructor(name, local_config, state){
-        super(name, local_config, state);
+    constructor(name, local_config, state, mainParserContainer){
+        super(name, local_config, state, mainParserContainer);
     }
 
     async _parse(parserObj:ResponseObj){
@@ -85,8 +85,8 @@ class GetParser extends Parser{
     
     testRegex=/get/;
 
-    constructor(name, local_config, state){
-        super(name, local_config, state);
+    constructor(name, local_config, state, mainParserContainer){
+        super(name, local_config, state, mainParserContainer);
     }
 
     async _parse(parserObj:ResponseObj){

@@ -13,12 +13,12 @@ class SlackParser extends HttpParser{
 
     testRegex = /slack/;
     
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
 
         for( let k in this.functionalParsers ){
             let current_parser = this.functionalParsers[k];
-            this.parserContainer.addPrivateParser( new FunctionalParser(current_parser.name, this.config, this.state, current_parser.funct, current_parser.testRegex ) );
+            this.parserContainer.addPrivateParser( new FunctionalParser(current_parser.name, this.config, this.state, current_parser.funct, current_parser.testRegex, mainParserContainer ) );
         }
     };
 
