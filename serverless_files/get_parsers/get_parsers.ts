@@ -5,12 +5,12 @@ class get_parsers extends HttpParser{
 
     testRegex = /get_parsers/;
 
-    constructor(name, config){
-        super(name, config);
+    constructor(name, config, mainParserContainer){
+        super(name, config, mainParserContainer);
     }
 
     async _parse(){
-        return ParserContainer.toJSON();
+        return this.mainParserContainer.exposedToJSON();
     }
 
 }

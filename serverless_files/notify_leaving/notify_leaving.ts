@@ -7,8 +7,8 @@ class NotifyLeaving extends HttpParser{
 
     testRegex=/notify_leaving/;
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
 
         this.state.registerForStateChanges(this.stateChangeListener);
         

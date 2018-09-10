@@ -14,8 +14,8 @@ class geofence extends HttpParser{
     user = "EByeQOPuSZvgsiSgKGYpOTqKwYJnpVo6TqkxZ5Gh"; // TODO move this to config
     baseAddress = "http://192.168.1.111/api"
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
 
         this.state.registerForStateChanges(this.car_home_sun_down_lights_on);
     }
@@ -84,7 +84,7 @@ class geofence extends HttpParser{
         if( state.obd.location && state.obd.location.lat!==0 && state.obd.location.lon!==0 ){
 
             try{
-                sun_up = await ParserContainer.parseExposed("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
+                sun_up = await this.mainParserContainer.parseExposed("weather",{query_body:state.obd.location,pathName:"/sun_up/"});
             }catch(e){
                 console.error(e);
                 sun_up=null;

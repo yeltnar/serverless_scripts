@@ -7,9 +7,9 @@ class geofence extends HttpParser{
 
     parserContainer:ParserContainer;
 
-    constructor(name, config ){
+    constructor(name, config, mainParserContainer ){
 
-        super( name, config );
+        super( name, config, mainParserContainer );
 
     }
 
@@ -17,7 +17,7 @@ class geofence extends HttpParser{
         let toReturn;
 
         if( /get_close_locations/.test(parserObj.pathName) ){
-            toReturn = await this._check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
+            toReturn = await this.check_geofence( parserObj.query_body.lat, parserObj.query_body.lon );
         }
 
         if( /add/.test(parserObj.pathName) ){
@@ -27,7 +27,7 @@ class geofence extends HttpParser{
         return toReturn;
     }
 
-    private  async _check_geofence( in_lat, in_lon ){
+    async check_geofence( in_lat, in_lon ){
  
          let matched_locations = [];
 
@@ -52,7 +52,7 @@ class geofence extends HttpParser{
  
     }
 
-    private async add_location(parserObj){
+    async add_location(parserObj){
 
         let toReturn="";
 

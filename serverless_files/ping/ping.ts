@@ -6,10 +6,10 @@ class Ping extends HttpParser{
 
     testRegex = /ping/;
 
-    constructor( name, config ){
-        super( name, config );
+    constructor( name, config, mainParserContainer ){
+        super( name, config, mainParserContainer );
 
-        this.parserContainer.addPrivateParser( new PingSubParser(name, config, this.state) );
+        this.parserContainer.addPrivateParser( new PingSubParser(name, config, this.state, mainParserContainer) );
     }
 
     _transformObj(parserObj){

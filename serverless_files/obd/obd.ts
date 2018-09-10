@@ -7,7 +7,8 @@ class obdParser extends HttpParser{
 
     testRegex = /obd/;
 
-    constructor( name, config ){
+    constructor( name, config, mainParserContainer ){
+        
 
         // TODO replace this with mongo 
         // let parser_starting_state  = {
@@ -19,7 +20,7 @@ class obdParser extends HttpParser{
         // };
 
         // TODO keep track of state so we can just use this one to modify making reading from file easier 
-        super( name, config );
+        super( name, config, mainParserContainer );
     }
 
     _transformObj(parserObj){
@@ -93,7 +94,7 @@ class obdParser extends HttpParser{
                     },
                     pathName:"geofence/get_close_locations"
                 }
-                state.geofence_locations = await ParserContainer.parseExposed("geofence",geofence_obj);
+                state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
             }catch(e){
                 console.error(e);
             }

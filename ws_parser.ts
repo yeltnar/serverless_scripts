@@ -3,7 +3,7 @@ const {exec} = require("child_process");
 const fs = require("fs");
 
 //my files
-import {ParserContainer,parseInit} from './parse_framework/Parser.class';
+import {ParserContainer,parseInit, AbstractParser} from './parse_framework/Parser.class';
 import helpers from './helpers/helper'
 import {pushNotification, init_pushNotification} from './helpers/ifttt' 
 //import lights from './serverless_files/lights/lights';
@@ -19,18 +19,40 @@ import Ping  from './serverless_files/ping/ping';
 import Person  from './serverless_files/person/person';
 import SlackParser from './serverless_files/slack/slack';
 
+let mainParserContainer;
 parseInit(pushNotification, helpers);
 
-ParserContainer.addStaticParser(new SlackParser("SlackParser", config.slackParser||{}));
-ParserContainer.addStaticParser(new ObdParser("obd", config.obd));
-ParserContainer.addStaticParser(new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper));
-ParserContainer.addStaticParser(new HueParser("hue", config.hue));
-ParserContainer.addStaticParser(new WeatherParser("weather", config.weather)); // TODO these names seem so brok)en
-ParserContainer.addStaticParser(new GeofenceParser("geofence", config.geofence));
-ParserContainer.addStaticParser(new NotifyLeaving("notify_leaving", config.notify_leaving));
-ParserContainer.addStaticParser(new Ping("ping", config.ping));
-ParserContainer.addStaticParser(new GetParsers("get_parsers", config.get_parsers));
-ParserContainer.addStaticParser(new Person("person", config.persons.drew));
+class MyParserContainer extends ParserContainer{
+
+    httpParsers = {  
+        slackParser: new SlackParser("SlackParser", config.slackParser||{}, this),
+        obd: new ObdParser("obd", config.obd, this),
+        phoneWallpaper: new PhoneWallpaperParser("phoneWallpaper", config.phone_wallpaper, this),
+        hue: new HueParser("hue", config.hue, this),
+        weather: new WeatherParser("weather", config.weather, this), // TODO these names seem so brok)en
+        geofence: new GeofenceParser("geofence", config.geofence, this),
+        notify_leaving: new NotifyLeaving("notify_leaving", config.notify_leaving, this),
+        ping: new Ping("ping", config.ping, this),
+        get_parsers: new GetParsers("get_parsers", config.get_parsers, this),
+        person: new Person("person", config.persons.drew, this)    
+    }
+
+    constructor(){
+
+        super();
+
+        for( let k in this.httpParsers ){
+            const cur:AbstractParser = this.httpParsers[k];
+            this.addPublicParser(cur);
+        }
+    }
+}
+
+mainParserContainer = new MyParserContainer();
+
+// console.log(mainParserContainer.parseExposed)
+// process.exit()
+
 
 const serverless_folder = config.serverless_folder; // serverless_folder has the `/` at the end
 
@@ -62,7 +84,6 @@ async function doParseObj(obj) {
     // TODO put this in a better spot
     if( obj.response_device && obj.response_device.device_name ){
         init_pushNotification(obj.response_device.device_name);
-        console.log(Object.keys(obj));
     }
 
     for(let k in obj.request.query){
@@ -73,7 +94,7 @@ async function doParseObj(obj) {
     }
 
     try{
-        result = await ParserContainer.parseExposed(obj);
+        result = await mainParserContainer.parseExposed(obj);
 
         result = result.length===1 ? result[0] : result;
     }catch(e){
