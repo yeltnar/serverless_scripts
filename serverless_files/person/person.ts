@@ -1,5 +1,5 @@
 import {HttpParser} from '../../HttpParser.class';
-import { Parser, ParserContainer, AbstractParser } from '../../parse_framework/Parser.class';
+import { Parser, ParserContainer, AbstractParser, FunctionalParser, FunctionalParserObj } from '../../parse_framework/Parser.class';
 import ResponseObj from '../../parse_framework/ResponseObj.interface'
 const requestP = require('request-promise-native');
 
@@ -9,13 +9,66 @@ class Person extends HttpParser{
 
     constructor( name, config, mainParserContainer ){
         super( name, config, mainParserContainer );
-        
-        this.parserContainer = new ParserContainer();
 
-        this.parserContainer.addPrivateParser( new AddParser("set_"+name, config, this.state, mainParserContainer) );
-        this.parserContainer.addPrivateParser( new GetParser("get_"+name, config, this.state, mainParserContainer) );
+
+        for( let k in this.subParsers ){
+            const cur:FunctionalParserObj = this.subParsers[k];
+
+            this.parserContainer.addPrivateParser( new FunctionalParser(cur.name, this.config, this.state, cur.funct, cur.testRegex, this.mainParserContainer) )
+        }
 
         this.state.registerForStateChanges( this.stateChangeCallback );
+    }
+
+    subParsers:object = {
+        add:{
+            name:"add",
+            testRegex:/set/,
+            funct:async (parserObj:ResponseObj)=>{
+
+                let person = parserObj.query_body.person;
+                let person_state = parserObj.query_body.state;
+                let state;
+                
+                if( typeof person_state === 'string' ){
+                    try{
+                        person_state = JSON.parse(person_state);
+                    }catch(e){}
+                }
+        
+                if( person && person_state ){
+        
+                    state = await this.state.getState();
+                    state[person] = person_state;
+                    this.state.setState(state);
+        
+                }else{
+                    return "person & state"
+                }
+
+                return state;
+            }
+        },
+        get:{
+            name:"get",
+            testRegex:/get/,
+            funct:async (parserObj:ResponseObj)=>{
+        
+                let person = parserObj.query_body.person;
+                let person_state = parserObj.query_body.state;
+                let state;
+        
+                if( person ){
+        
+                    state = this.state.getState();
+                    state[person] = person_state;
+                    await this.state.setState(state);
+        
+                }
+                return state;
+                
+            }
+        }
     }
 
     async _parse( parserObj:ResponseObj ){
@@ -44,68 +97,6 @@ class Person extends HttpParser{
             console.log(master_state);
         //}
 
-    }
-}
-
-class AddParser extends Parser{
-    
-    testRegex=/set/;
-
-    constructor(name, local_config, state, mainParserContainer){
-        super(name, local_config, state, mainParserContainer);
-    }
-
-    async _parse(parserObj:ResponseObj){
-
-        let person = parserObj.query_body.person;
-        let person_state = parserObj.query_body.state;
-        let state;
-        
-        if( typeof person_state === 'string' ){
-            try{
-                person_state = JSON.parse(person_state);
-            }catch(e){}
-        }
-
-        if( person && person_state ){
-
-            state = await this.state.getState();
-            state[person] = person_state;
-            this.state.setState(state);
-
-            console.log("set "+person+" to ")
-            console.log(state)
-
-        }
-        return state;
-    }
-}
-
-class GetParser extends Parser{
-    
-    testRegex=/get/;
-
-    constructor(name, local_config, state, mainParserContainer){
-        super(name, local_config, state, mainParserContainer);
-    }
-
-    async _parse(parserObj:ResponseObj){
-
-        //return "pkay"
-
-        let person = parserObj.query_body.person;
-        let person_state = parserObj.query_body.state;
-        let state;
-
-        if( person ){
-
-            state = this.state.getState();
-            state[person] = person_state;
-            await this.state.setState(state);
-
-        }
-        return state;
-        
     }
 }
 
