@@ -152,7 +152,14 @@ class weatherParser extends HttpParser {
     }
 
     getCurrentLocalAstronomyCache=async (lat, lon)=>{
-        return (await this.state.getState())[`${lat},${lon}`].astronomy;
+
+        let lat_lon_weather_obj = (await this.state.getState())[`${lat},${lon}`];
+
+        if( lat_lon_weather_obj===undefined ){
+            return await this.getCurrentLocalAstronomy(lat, lon);
+        }else{
+            return (await this.state.getState())[`${lat},${lon}`].astronomy;
+        }
     }
 }
 
