@@ -2,6 +2,8 @@ import {HttpParser} from '../../HttpParser.class';
 import {ParserContainer, FunctionalParserObj, FunctionalParser} from '../../parse_framework/Parser.class'
 import ResponseObj from '../../parse_framework/ResponseObj.interface'
 
+import MyParserContainer from '../../MyParserContainer.class';
+
 interface ObdEvent {
     type:string,
     category:string
@@ -14,6 +16,8 @@ interface ObdResponseObj extends ResponseObj{
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
 class obdParser extends HttpParser{
+
+    mainParserContainer:MyParserContainer;
 
     testRegex = /obd/;
 
@@ -129,6 +133,8 @@ class obdParser extends HttpParser{
                     }, 
                     link
                 };
+
+                this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
 
                 this.state.setState(state);
                 this.pushNotification( pushData );
