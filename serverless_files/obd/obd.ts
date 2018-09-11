@@ -1,5 +1,15 @@
 import {HttpParser} from '../../HttpParser.class';
-import {ParserContainer} from '../../parse_framework/Parser.class'
+import {ParserContainer, FunctionalParserObj, FunctionalParser} from '../../parse_framework/Parser.class'
+import ResponseObj from '../../parse_framework/ResponseObj.interface'
+
+interface ObdEvent {
+    type:string,
+    category:string
+}
+
+interface ObdResponseObj extends ResponseObj{
+    event:ObdEvent
+}
 
 let link = "https://ws-expose.mybluemix.net/v1/get-log?token=hello"; // TODO move this somewhere else
 
@@ -21,15 +31,144 @@ class obdParser extends HttpParser{
 
         // TODO keep track of state so we can just use this one to modify making reading from file easier 
         super( name, config, mainParserContainer );
+
+        this.subParsers.forEach((cur:FunctionalParserObj, index, arr) => {
+            this.parserContainer.addPrivateParser( new FunctionalParser(cur.name, this.config, this.state, cur.funct, cur.testRegex, this.mainParserContainer, cur.functionalShouldParse) ); 
+        });
     }
 
-    _transformObj(parserObj){
-        return parserObj.obj;
-    }
+    subParsers:Array<FunctionalParserObj>=[
+        {
+            name:"notification",
+            testRegex:/notification/,
+            funct:async ( parserObj:ObdResponseObj )=>{
 
-    async _parse( obj ){
+                const event = parserObj.event
 
-        let event={type:undefined, category:undefined};
+                if( event.category === "hard_accel" ){
+
+                }else if( event.category === "speeding" ){
+    
+                }else if( event.category === "hard_brake" ){
+    
+                }else{
+                    this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
+                }
+            },
+            functionalShouldParse:( parserObj:ObdResponseObj )=>{
+
+                return parserObj.event.type === "notification";
+
+            }
+        },{
+            name:"vehicle",
+            testRegex:/vehicle/,
+            funct:async ( parserObj:ObdResponseObj )=>{
+
+                const event = parserObj.event
+
+                if( event.category === "status_report" ){
+                    // currently do nothing... is just a report 
+                }
+            },
+            functionalShouldParse:( parserObj:ObdResponseObj )=>{
+
+                return parserObj.event.type==="vehicle";
+
+            }
+        },{
+            name:"ignition",
+            testRegex:/ignition/,
+            funct:async ( parserObj:ObdResponseObj )=>{   
+
+                const {obj} = parserObj;
+                let state = await this.state.getState();
+
+                const event = parserObj.event;
+    
+                let title = "Car ignition";
+                let engine_state;
+        
+                if( event.category === "off" ){
+        
+                    engine_state = "off";
+        
+                }else if( event.category === "on" ){
+        
+                    engine_state = "on";
+        
+                }
+        
+                let location_obj = {
+                    lat:obj.request.body.location.lat, 
+                    lon:obj.request.body.location.lon
+                };
+    
+                try{
+                    let geofence_obj = {
+                        query_body:{
+                            lat:location_obj.lat,
+                            lon:location_obj.lon
+                        },
+                        pathName:"geofence/get_close_locations"
+                    }
+                    state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
+                }catch(e){
+                    console.error(e);
+                }
+                
+                state.engine = engine_state;
+                state.location = location_obj;
+    
+                let pushData = {
+                    "title":"From car",
+                    "message":{
+                        geofence_locations:state.geofence_locations,
+                        location_obj,
+                        engine_state
+                    }, 
+                    link
+                };
+
+                this.state.setState(state);
+                this.pushNotification( pushData );
+                console.log( pushData.message );
+            },
+            functionalShouldParse:( parserObj:ObdResponseObj )=>{
+
+                return parserObj.event.type==="ignition";
+
+            }
+        },{
+            name:"trip",
+            testRegex:/trip/,
+            funct:async ( parserObj:ObdResponseObj )=>{
+
+                const event = parserObj.event
+
+                let title = "Trip "+event.category;
+                let message;
+        
+                if( event.category === "finished" ){
+                    //message = "finished";
+                    message = JSON.stringify(event);
+                }
+        
+                this.pushNotification( {title, message, link} )
+            },
+            functionalShouldParse:( parserObj:ObdResponseObj )=>{
+
+                return parserObj.event.type==="trip";
+
+            }
+        }
+    ]
+
+    async _parse( parseObj:ResponseObj ){
+
+        const obj = parseObj.obj;
+
+        let event:ObdEvent = {type:undefined, category:undefined};
         let result;
     
         try{
@@ -43,97 +182,20 @@ class obdParser extends HttpParser{
         console.log("event...");
         console.log(event);
 
-        let state = await this.state.getState();
-        let state_changed = false;
-    
-        if( event.type === "notification" ){
+        const obdParseObj:ObdResponseObj = { ...parseObj, event };
 
-            if( event.category === "hard_accel" ){
+        let toReturn = await this.parserContainer.parsePrivate( obdParseObj );
+        
+        toReturn = ["200"];// TODO remove
 
-            }else if( event.category === "speeding" ){
-
-            }else if( event.category === "hard_brake" ){
-
-            }else{
-                this.pushNotification( {"title":"From car","message":JSON.stringify(event), "link":link} )
-            }
-
-        }
-    
-        if( event.type==="vehicle" ){ 
-            if( event.category === "status_report" ){
-                // currently do nothing... is just a report 
-            }
-        }
-    
-        if( event.type==="ignition" ){   
-    
-            let title = "Car ignition";
-            let engine_state;
-    
-            if( event.category === "off" ){
-    
-                engine_state = "off";
-    
-            }else if( event.category === "on" ){
-    
-                engine_state = "on";
-    
-            }
-    
-            let location_obj = {
-                lat:obj.request.body.location.lat, 
-                lon:obj.request.body.location.lon
-            };
-
-            try{
-                let geofence_obj = {
-                    query_body:{
-                        lat:location_obj.lat,
-                        lon:location_obj.lon
-                    },
-                    pathName:"geofence/get_close_locations"
-                }
-                state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
-            }catch(e){
-                console.error(e);
-            }
-            
-            state.engine = engine_state;
-            state.location = location_obj;
-            state_changed = true;
-
-            let pushData = {
-                "title":"From car",
-                "message":{
-                    geofence_locations:state.geofence_locations,
-                    location_obj,
-                    engine_state
-                }, 
-                link
-            };
-            this.pushNotification( pushData );
-            console.log( pushData.message );
-        }
-    
-        if( event.type==="trip" ){  
-    
-            let title = "Trip "+event.category;
-            let message;
-    
-            if( event.category === "finished" ){
-                //message = "finished";
-                message = JSON.stringify(event);
-            }
-    
-            this.pushNotification( {title, message, link} )
+        if( Array.isArray(toReturn) && toReturn.length===1 ){
+            toReturn = toReturn[0];
         }
 
-        if( state_changed ){
-            this.state.setState(state);
-        }
-    
-        return result;
+        console.log('toReturn')
+        console.log(toReturn)
+
+        return toReturn;
     
     }
 
