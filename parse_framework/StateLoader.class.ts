@@ -18,7 +18,7 @@ class StateLoader{
     }
 
     async getStateBreakReference(){
-        let state_obj = StateLoader.state.getParserState(this.name);
+        let state_obj = StateLoader.state.getParserState(this.name) || {};
         return JSON.parse(JSON.stringify(state_obj));
     }
 

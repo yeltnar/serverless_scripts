@@ -106,10 +106,14 @@ class Person extends HttpParser{
             console.log({title, message});
 
         }else{
-            console.log('location didnt change location:'+location+"  old_state.location:"+old_state.location);
+            if( old_state && old_state.location  ){
+                console.log('location didnt change location:'+location+"  old_state.location:"+old_state.location);
+            }
         }
 
-        const personState = await this.getPersonState( person );
+
+        const personState = (await this.getPersonState( person )) || {};
+
         personState.location = location;
         return await this.setPersonState(person, personState);
     }
@@ -123,8 +127,7 @@ class Person extends HttpParser{
     }
 
     getPersonState=async ( person:string )=>{
-
-        return (await this.state.getState())[person];
+        return (await this.state.getState()||{})[person];
     }
 
     stateChangeCallback=async ( master_state )=>{
