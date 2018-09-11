@@ -1,6 +1,7 @@
 import {HttpParser} from '../../HttpParser.class';
 import {FunctionalParser, FunctionalParserObj} from '../../parse_framework/Parser.class'
 import ParseObj from '../../parse_framework/ResponseObj.interface'
+import { stringify } from 'querystring';
 
 const requestP = require('request-promise-native');
 
@@ -26,15 +27,25 @@ class weatherParser extends HttpParser {
 
                 let {lat, lon} = parseObj.query_body;
 
+                let toReturn:any = "default";
+
                 if( lat!==undefined && lon!==undefined ){
-                    let  stateObj = {
-                        getCurrentLocalWeather: await this.getCurrentLocalWeather( lat, lon ),
-                        getCurrentLocalAstronomy: await this.getCurrentLocalAstronomy( lat, lon )
+                    let  new_stateObj = {
+                        weather: await this.getCurrentLocalWeather( lat, lon ),
+                        astronomy: await this.getCurrentLocalAstronomy( lat, lon )
                     }
+
+                    let stateObj = this.state.getState();
+
+                    stateObj[`${lat},${lon}`] = new_stateObj; // TODO make different so it doesn't save every weather location forever
+
                     this.state.setState( stateObj );
+                    toReturn = stateObj;
                 }else{
                     console.log("lat, lon");
                 }
+
+                return toReturn;
                 
             },
             functionalShouldParse:(parseObj)=>{return false;}
@@ -45,7 +56,7 @@ class weatherParser extends HttpParser {
 
                 let toReturn:any={};
 
-                const results = await this.getCurrentLocalAstronomy( parserObj.query_body.lat, parserObj.query_body.lon );
+                const results = await this.getCurrentLocalAstronomyCache( parserObj.query_body.lat, parserObj.query_body.lon );
     
                 toReturn.sunrise = results.moon_phase.sunrise;
                 toReturn.sunset = results.moon_phase.sunset;
@@ -117,7 +128,7 @@ class weatherParser extends HttpParser {
 
         const url = `http://api.wunderground.com/api/${this.config.token}/conditions/q/${lat},${lon}.json`
 
-        return await requestP(url);
+        return JSON.parse( await requestP(url) );
     }
 
     async getCurrentLocalAstronomy(lat, lon){
@@ -138,6 +149,10 @@ class weatherParser extends HttpParser {
 
             return res_parsed;
         });
+    }
+
+    getCurrentLocalAstronomyCache=async (lat, lon)=>{
+        return (await this.state.getState())[`${lat},${lon}`].astronomy;
     }
 }
 
