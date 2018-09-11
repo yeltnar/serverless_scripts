@@ -88,7 +88,26 @@ class Person extends HttpParser{
         }
     }
 
-    set_location=async ( person:string, location:string )=>{
+    set_location=async ( person:string, location:Array<string> )=>{
+
+        let old_state = await this.getPersonState(person);
+
+        let location_changed = old_state 
+                               && old_state.location 
+                               && !old_state.location.includes('home') 
+                               && location.indexOf('home')>-1;
+                               
+        if( location_changed  ){
+
+            const title = "You're at "+location;
+            const message = "Glad you made it";
+    
+            this.pushNotification({title, message});
+            console.log({title, message});
+
+        }else{
+            console.log('location didnt change location:'+location+"  old_state.location:"+old_state.location);
+        }
 
         const personState = await this.getPersonState( person );
         personState.location = location;
