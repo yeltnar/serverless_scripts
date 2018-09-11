@@ -90,7 +90,7 @@ class State{
 
     private stateChanged=(changed_state)=>{
         
-        console.log( "state changed->writing "+ JSON.stringify(Object.keys( changed_state )) )
+        console.log( "state changed->writing "/*+ JSON.stringify(Object.keys( changed_state ))*/ )
         try{
             fs.writeFileSync(state_obj_path, JSON.stringify(changed_state) );
         }catch(e){
