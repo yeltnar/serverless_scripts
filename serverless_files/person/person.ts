@@ -92,25 +92,27 @@ class Person extends HttpParser{
 
         let old_state = await this.getPersonState(person);
 
-        let location_changed = old_state 
-                               && old_state.location 
-                               && !old_state.location.includes('home') 
-                               && location.indexOf('home')>-1;
-                               
-        if( location_changed  ){
-
-            const title = "You're at "+location;
-            const message = "Glad you made it";
-    
-            this.pushNotification({title, message});
-            console.log({title, message});
-
-        }else{
+        if( !old_state || !old_state.location ){
             if( old_state && old_state.location  ){
                 console.log('location didnt change location:'+location+"  old_state.location:"+old_state.location);
             }
         }
 
+        let new_locations = [];
+        location.forEach(( cur, i, arr )=>{
+            if( !old_state.location.includes(cur) ){
+                new_locations.push( cur );
+            }
+        });
+
+        if( new_locations.length > 0 ){ 
+
+            const title = "Location Changed";
+            const message = new_locations.join(",");
+
+            this.pushNotification({title, message});
+            console.log({title, message});
+        }
 
         const personState = (await this.getPersonState( person )) || {};
 
