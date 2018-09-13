@@ -40,18 +40,6 @@ class PhoneWallpaper extends HttpParser{
         }
     }
 
-    private getSavedWallpapers=async ():Promise<Array<string>>=>{
-        let toReturn;
-        try{
-            let toPrint = await this.getUsedWallpapers();
-            toReturn = toPrint;
-            console.log("getSavedWallpapers");
-        }catch(e){
-            console.error(e);
-        }
-        return toReturn;
-    }
-
     private topWallpaper=async ()=>{
 
         let toReturn;
@@ -101,7 +89,7 @@ class PhoneWallpaper extends HttpParser{
             let last_used_wallpaper_url_arr = await this.getUsedWallpapers();
             let last_used_wallpaper_url = last_used_wallpaper_url_arr[last_used_wallpaper_url_arr.length-1];
 
-            let savedWallpaperArr = ( await this.getSavedWallpapaers() );
+            let savedWallpaperArr = ( await this.getSavedWallpapers() );
 
             if(savedWallpaperArr.indexOf(last_used_wallpaper_url)<0){
                 savedWallpaperArr.push(last_used_wallpaper_url);
@@ -117,7 +105,7 @@ class PhoneWallpaper extends HttpParser{
     private openSavedWallpapers=async ():Promise<string>=>{
         let toReturn="";
         try{
-            let last_used_wallpaper_arr = (await this.getSavedWallpapaers());
+            let last_used_wallpaper_arr = (await this.getSavedWallpapers());
 
             let toLog = "<script>"+JSON.stringify(last_used_wallpaper_arr)+".forEach((ele)=>{window.open(ele);}); </script>";
             
@@ -236,7 +224,7 @@ class PhoneWallpaper extends HttpParser{
         return (await this.state.getState()).usedWallpaperArr || [];
     }
 
-    private getSavedWallpapaers=async ():Promise<Array<string>>=>{
+    private getSavedWallpapers=async ():Promise<Array<string>>=>{
         //return await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)
         return (await this.state.getState()).savedWallpaperArr || [];
     }
