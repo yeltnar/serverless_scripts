@@ -9,6 +9,7 @@ const fs = require("fs");
 
 let mainParserContainer = new MyParserContainer();
 
+// default values 
 let in_file_location = process.argv[2];
 let out_file_name = process.argv[3];
 let out_folder_location = process.argv[4];
@@ -21,8 +22,16 @@ process.on("exit", (m)=>{
 
 process.on("message", async(obj)=>{
 
-    if( obj.response_device && obj.response_device.device_name ){
-        deviceName = obj.response_device.device_name;
+    if( obj.response_device ){
+        if( obj.response_device.device_name ){
+            deviceName = obj.response_device.device_name;
+        }
+        if( obj.response_device.file_name!==undefined ){
+            out_file_name = obj.response_device.file_name;
+        }
+        if( obj.response_device.out_file_folder!==undefined ){
+            out_folder_location = obj.response_device.out_file_folder;
+        }
     }
 
     //console.log(m)
