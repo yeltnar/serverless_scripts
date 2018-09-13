@@ -22,9 +22,19 @@ let out_file_name = process.argv[3];
 let out_folder_location = process.argv[4];
 
 if( in_file_location === undefined ){
-    // prob importing 
-    console.log("module.parent");
-    console.log(module.parent);
+
+    process.on("exit", (m)=>{
+        //console.log("exiting");
+    });
+
+    process.on("message", async(m)=>{
+
+        //console.log(m)
+        const result = await doParseObj( m );
+        process.send( result );
+        process.exit();
+    });
+
     //throw "file_location not defined";
 }else{
 
@@ -56,7 +66,6 @@ async function doParseObj(obj) {
 
     try{
         result = await mainParserContainer.parseExposed(obj);
-
         result = result.length===1 ? result[0] : result;
     }catch(e){
         console.log(e);
@@ -69,6 +78,7 @@ async function doParseObj(obj) {
 
 
     writeToOutFile(result);
+    return result;
 }
 
 
