@@ -122,9 +122,9 @@ class PhoneWallpaper extends HttpParser{
     private openSavedWallpapers=async ():Promise<string>=>{
         let toReturn="";
         try{
-            let last_used_wallpaper_arr = (await this.getSavedWallpapaers()).toString();
+            let last_used_wallpaper_arr = (await this.getSavedWallpapaers());
 
-            let toLog = "<script>"+last_used_wallpaper_arr+".forEach((ele)=>{window.open(ele);}); </script>";
+            let toLog = "<script>"+JSON.stringify(last_used_wallpaper_arr)+".forEach((ele)=>{window.open(ele);}); </script>";
             
             toReturn = toLog;
 
@@ -241,7 +241,7 @@ class PhoneWallpaper extends HttpParser{
         return (await this.state.getState()).usedWallpaperArr || [];
     }
 
-    private getSavedWallpapaers=async ()=>{
+    private getSavedWallpapaers=async ():Promise<Array<string>>=>{
         //return await this.helpers.fsPromise.readFile(this.config.saved_wallpaper_file)
         return (await this.state.getState()).savedWallpaperArr || [];
     }
