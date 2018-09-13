@@ -101,12 +101,7 @@ class PhoneWallpaper extends HttpParser{
             let last_used_wallpaper_url_arr = await this.getUsedWallpapers();
             let last_used_wallpaper_url = last_used_wallpaper_url_arr[last_used_wallpaper_url_arr.length-1];
 
-            let savedWallpaperArr = ( await this.getSavedWallpapaers() ).toString();
-            try{
-                savedWallpaperArr = JSON.parse(savedWallpaperArr);
-            }catch(e){
-                savedWallpaperArr = [];
-            }
+            let savedWallpaperArr = ( await this.getSavedWallpapaers() );
 
             if(savedWallpaperArr.indexOf(last_used_wallpaper_url)<0){
                 savedWallpaperArr.push(last_used_wallpaper_url);
