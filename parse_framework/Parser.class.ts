@@ -95,7 +95,7 @@ abstract class AbstractParser{
         return toReturn;
     }
 
-    async parse( obj ){
+    parse=async ( obj )=>{
 
         await this.instance_loaded_promise;
         
