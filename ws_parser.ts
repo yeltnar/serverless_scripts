@@ -15,6 +15,19 @@ let out_folder_location = process.argv[4];
 
 let deviceName = "";
 
+    process.on("exit", (m)=>{
+        //console.log("exiting");
+    });
+
+    process.on("message", async(m)=>{
+
+        //console.log(m)
+        const result = await doParseObj( m );
+        process.send( result );
+        process.exit();
+    });
+
+
 class MasterParser extends AbstractParser{
 
     testRegex=/.*/;
@@ -57,6 +70,7 @@ class MasterParser extends AbstractParser{
 
 
         writeToOutFile(result);
+    return result;
     }
 }
 
