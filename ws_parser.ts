@@ -9,23 +9,36 @@ const fs = require("fs");
 
 let mainParserContainer = new MyParserContainer();
 
+// default values 
 let in_file_location = process.argv[2];
 let out_file_name = process.argv[3];
 let out_folder_location = process.argv[4];
 
 let deviceName = "";
 
-    process.on("exit", (m)=>{
-        //console.log("exiting");
-    });
+process.on("exit", (m)=>{
+    //console.log("exiting");
+});
 
-    process.on("message", async(m)=>{
+process.on("message", async(obj)=>{
 
-        //console.log(m)
-        const result = await doParseObj( m );
-        process.send( result );
-        process.exit();
-    });
+    if( obj.response_device ){
+        if( obj.response_device.device_name ){
+            deviceName = obj.response_device.device_name;
+        }
+        if( obj.response_device.file_name!==undefined ){
+            out_file_name = obj.response_device.file_name;
+        }
+        if( obj.response_device.out_file_folder!==undefined ){
+            out_folder_location = obj.response_device.out_file_folder;
+        }
+    }
+
+    //console.log(m)
+    const result = await masterParser.parse( obj );
+    process.send( result );
+    process.exit();
+});
 
 
 class MasterParser extends AbstractParser{
@@ -75,17 +88,8 @@ class MasterParser extends AbstractParser{
 }
 
 let masterParser = new MasterParser();
-let doParseObj = masterParser.parse;
 
-if( in_file_location === undefined ){
-    // prob importing 
-    console.log("module.parent");
-    console.log(module.parent);
-    //throw "file_location not defined";
-
-    deviceName = "not_provided";
-
-}else{
+if( in_file_location !== undefined ){
     let obj:any;
 
     try{
@@ -149,5 +153,3 @@ function writeToOutFile(out_data){
     }
     fs.writeFileSync(out_folder_location+"/"+out_file_name, out_str);
 }
-
-export default doParseObj;
