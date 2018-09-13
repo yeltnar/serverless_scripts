@@ -16,7 +16,7 @@ interface FunctionalParserObj{
     name:string,
     funct:Function,
     testRegex:RegExp,
-    functionalShouldParse:Function
+    functionalShouldParse?:Function
 }
 
 let init_state_folder = "./state/";
