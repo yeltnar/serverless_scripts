@@ -257,7 +257,9 @@ class ParserContainer{
         for(let k in listObj ){
             parserObj = parserObj!==undefined ? parserObj : listObj[k]._abstractTransformObj(obj);
 
-            let parseResult = await listObj[k].checkAndParse(parserObj);
+            const cur:AbstractParser = listObj[k];
+
+            let parseResult = await cur.checkAndParse(parserObj);
 
             if( parseResult!==undefined ){
                 results.push( parseResult );

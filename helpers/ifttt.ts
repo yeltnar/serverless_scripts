@@ -15,7 +15,7 @@ const iftttConfig={
 }
 
 // title, message, link
-function pushNotification(msgObj:PushMsgObj){
+function pushNotification(msgObj:PushMsgObj):Promise<any>{
 
 	console.log("msgObj...");
 	console.log(msgObj);

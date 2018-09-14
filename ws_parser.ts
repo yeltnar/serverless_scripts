@@ -81,7 +81,6 @@ class MasterParser extends AbstractParser{
         if( !obj.result ){
         }
 
-
         writeToOutFile(result);
     return result;
     }
@@ -141,7 +140,7 @@ function writeToOutFile(out_data){
 
     if (!fs.existsSync(out_folder_location)){
         fs.mkdirSync(out_folder_location);
-        fs.writeFile(out_folder_location+"/.gitignore", "*", ()=>{})
+        fs.writeFileSync(out_folder_location+"/.gitignore", "*", ()=>{})
     }
 
     //out_file_location

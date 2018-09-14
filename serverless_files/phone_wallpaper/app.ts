@@ -34,7 +34,7 @@ class PhoneWallpaper extends HttpParser{
         let query_body = reqObj.query_body
         console.log("using preselected: "+query_body.imgUrl);
         try{
-            this.sendSetPhoneWallpaperRequest({"wallpaper_url":query_body.imgUrl});
+            await this.sendSetPhoneWallpaperRequest({"wallpaper_url":query_body.imgUrl});
         }catch(e){
             console.error(e);
         }
@@ -47,7 +47,7 @@ class PhoneWallpaper extends HttpParser{
         console.log("running top wallpaper");
         try{
             let wallpaper_info = await this.getPhoneWallpaperFromInternet();
-            this.sendSetPhoneWallpaperRequest(wallpaper_info);
+            await this.sendSetPhoneWallpaperRequest(wallpaper_info);
             toReturn = {};
             if( wallpaper_info.wallpaper_url === undefined ){
                 wallpaper_info.wallpaper_url = "undefined";
@@ -78,7 +78,7 @@ class PhoneWallpaper extends HttpParser{
         console.log("setting new wallpaper");
         try{
             let walpaper_info = await this.getPhoneWallpaperFromInternet( true )
-            this.sendSetPhoneWallpaperRequest(walpaper_info);
+            await this.sendSetPhoneWallpaperRequest(walpaper_info);
         }catch(e){
             console.error(e);
         }
@@ -143,8 +143,26 @@ class PhoneWallpaper extends HttpParser{
                 },
                 "json":true
             };
-            await requestP(options);
-            this.pushNotification({title:"set_wallpaper", message:wallpaper_url, link:wallpaper_url});
+            console.log("about to set")
+            try{
+                console.log("in try")
+                console.log("options")
+                console.log(options)
+                await requestP(options).then((result)=>{
+                    console.log(result)
+                });
+                console.log("send wallpaper success")
+            }catch(e){
+                console.error("error wallpaper request notification"); // TODO move to push notification area
+            }
+            console.log("about to send notification")
+            try{
+                await this.pushNotification({title:"set_wallpaper", message:wallpaper_url, link:wallpaper_url});
+                console.log("set wallpaper success")
+            }catch(e){
+                console.error("error sending notification"); // TODO move to push notification area
+            }
+            console.log("after send notification")
             used_wallpaper.push(wallpaper_url);
             used_wallpaper=used_wallpaper.slice(-10);
             this.saveUsedWallpapers(used_wallpaper)
