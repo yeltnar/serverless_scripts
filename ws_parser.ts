@@ -25,6 +25,7 @@ process.on("message", async(obj)=>{
     if( obj.response_device ){
         if( obj.response_device.device_name ){
             deviceName = obj.response_device.device_name;
+            init_pushNotification(deviceName);
         }
         if( obj.response_device.file_name!==undefined ){
             out_file_name = obj.response_device.file_name;
@@ -67,6 +68,11 @@ class MasterParser extends AbstractParser{
     async _parse( obj ){
 
         let result:any=[];
+
+        if( obj.response_device && obj.response_device.device_name ){
+            deviceName = obj.response_device.device_name;
+            init_pushNotification(deviceName);
+        }
 
         try{
             result = await mainParserContainer.parseExposed(obj);
