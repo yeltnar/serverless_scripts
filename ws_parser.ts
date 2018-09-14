@@ -19,8 +19,7 @@ let deviceName = "";
 process.on("exit", (m)=>{
     //console.log("exiting");
 });
-
-process.on("message", async(obj)=>{
+process.on("message", async function on_message_callback(obj){
 
     if( obj.response_device ){
         if( obj.response_device.device_name ){
@@ -37,7 +36,11 @@ process.on("message", async(obj)=>{
     //console.log(m)
     const result = await masterParser.parse( obj );
     process.send( result );
-    process.exit();
+
+    // TODO don't do this if still waiting on more data
+    if( true ){ 
+        process.removeListener("message", on_message_callback);
+    }
 });
 
 
