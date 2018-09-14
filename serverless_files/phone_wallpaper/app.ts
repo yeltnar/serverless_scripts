@@ -143,26 +143,18 @@ class PhoneWallpaper extends HttpParser{
                 },
                 "json":true
             };
-            console.log("about to set")
             try{
-                console.log("in try")
-                console.log("options")
-                console.log(options)
-                await requestP(options).then((result)=>{
-                    console.log(result)
-                });
+                await requestP(options);
                 console.log("send wallpaper success")
             }catch(e){
                 console.error("error wallpaper request notification"); // TODO move to push notification area
             }
-            console.log("about to send notification")
             try{
                 await this.pushNotification({title:"set_wallpaper", message:wallpaper_url, link:wallpaper_url});
                 console.log("set wallpaper success")
             }catch(e){
                 console.error("error sending notification"); // TODO move to push notification area
             }
-            console.log("after send notification")
             used_wallpaper.push(wallpaper_url);
             used_wallpaper=used_wallpaper.slice(-10);
             this.saveUsedWallpapers(used_wallpaper)
