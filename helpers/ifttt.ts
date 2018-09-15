@@ -32,7 +32,21 @@ function pushNotification(msgObj:PushMsgObj):Promise<any>{
 		throw "msgObj must be an object";
 	}
 
-	title = title+"/"+device_name
+	let date = new Date();
+	
+	let time_string = (()=>{
+		var now = new Date();
+		let month = now.getMonth();
+		let date = now.getDate();
+		let year = now.getFullYear();
+		let hours:any = now.getHours();
+		let minutes:any = now.getMinutes();
+		hours =  hours < 10 ? "0"+hours : hours;
+		minutes =  minutes < 10 ? "0"+minutes : minutes;
+		return hours+":"+minutes+" "+month+"/"+date+"/"+year;
+	})();
+
+	title = title+"/"+device_name+"/"+time_string;
 
 	let url = iftttConfig.first+iftttConfig.push_notification+iftttConfig.second
 
