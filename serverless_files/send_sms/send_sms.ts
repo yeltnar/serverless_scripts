@@ -61,13 +61,13 @@ class SendSms extends HttpParser{
         return await this.sendEmail( msg, email );
     }
 
-    sendEmail=( msg:string, person:string ):Promise<object>=>{
+    sendEmail=( msg:string, email:string ):Promise<object>=>{
 
         const options = { 
             method: 'GET',
             url: 'https://script.google.com/macros/s/AKfycbyZgLvyNWTE-We8gH2C6X77wsnHd3huN2Uh0_L8fYO-cn97jEE/exec',
             qs:{ 
-                recipient: '3254503713@txt.att.net',
+                recipient: email,
                 subject: 'subject',
                 body: 'body' 
             } 
