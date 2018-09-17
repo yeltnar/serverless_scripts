@@ -50,7 +50,6 @@ process.on("message", async function on_message_callback(obj){
         //console.log(m)
         const result = await masterParser.parse( obj );
         process.send( result );
-        process.send( {msg_from_ws_parser:"UPDATE_STATE"} );
 
         // TODO don't do this if still waiting on more data
         if( true ){ 

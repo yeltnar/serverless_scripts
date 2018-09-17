@@ -3,6 +3,16 @@ const fs = require('fs');
 
 const state_obj_path:string = "state/master_state.json";
 
+let state_has_changed = false;
+
+const checkForStateChange=()=>{
+    if( state_has_changed ){
+        process.send( {msg_from_ws_parser:"UPDATE_STATE"} );
+        console.log("state changed; sent message");
+    }
+}
+process.on("exit",checkForStateChange);
+
 class State{
     private stateObj:any={};
 
@@ -20,6 +30,7 @@ class State{
         this.replaceState(this.stateObj);
 
         this.registerForStateChanges(this.stateChanged);
+
     }
 
     private reduxParse=(state, action)=>{
@@ -89,6 +100,8 @@ class State{
     }
 
     private stateChanged=(changed_state)=>{
+
+        state_has_changed = true;
         
         console.log( "state changed->writing "/*+ JSON.stringify(Object.keys( changed_state ))*/ )
         try{
