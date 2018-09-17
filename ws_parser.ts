@@ -7,6 +7,9 @@ const config = require('config');
 const {exec} = require("child_process");
 const fs = require("fs");
 
+// stub for process send
+process.send = process.send || function(){console.warn("***process.send is not defined***");};
+
 let mainParserContainer = new MyParserContainer();
 
 // default values 
