@@ -1,6 +1,5 @@
 import helpers from '../helpers/helper'
 import StateLoader from './StateLoader.class'
-import State from './Redux';
 import ParserObj from './ResponseObj.interface'
 
 const schedule = require('node-schedule');

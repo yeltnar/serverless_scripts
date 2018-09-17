@@ -1,5 +1,4 @@
 import {Parser,ParserContainer,AbstractParser} from './parse_framework/Parser.class'
-import State from './parse_framework/Redux';
 import StateLoader from './parse_framework/StateLoader.class'
 
 let init_state_folder = "./state/";
