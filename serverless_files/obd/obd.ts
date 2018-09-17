@@ -4,6 +4,8 @@ import ResponseObj from '../../parse_framework/ResponseObj.interface'
 
 import MyParserContainer from '../../MyParserContainer.class';
 
+const requestP = require('request-promise-native');
+
 interface ObdEvent {
     type:string,
     category:string
@@ -191,6 +193,13 @@ class obdParser extends HttpParser{
                 }
 
 
+            }
+        },{
+            name:"renew_token",
+            testRegex:/renew_token/,
+            funct:async ( parserObj:ObdResponseObj )=>{
+                
+                return this.config.renewUrl;
             }
         }
     ]
