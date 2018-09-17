@@ -20,7 +20,7 @@ process.on("exit", (m)=>{
     //console.log("exiting");
 });
 
-let loading_state:Promise<any> = new Promise(()=>{});
+let loading_state:Promise<any> = new Promise((resolve)=>{resolve();});
 
 process.on("message", async function on_message_callback(obj){
 
