@@ -265,8 +265,18 @@ class obdParser extends HttpParser{
                 user_id_arr.forEach(( cur )=>{
                     console.log("adding "+cur+" to renew list")
                     promise_arr.push( this.renewToken( cur ).then((token_response)=>{
-                        return this.saveToken( token_response );
-                    }) );
+                        if( token_response.err===undefined ){
+                            return this.saveToken( token_response );
+                        }else{
+                            return token_response;
+                        }
+                    }).catch((err)=>{
+                        let title = "Error";
+                        let message = "oauth error 271";
+
+                        this.pushNotification({title, message})
+                        return err;
+                    }));
                 });
 
                 return await Promise.all(promise_arr).then((res_arr)=>{
@@ -334,6 +344,10 @@ class obdParser extends HttpParser{
         state.saved_users[user_id].token_type = token_type;
 
         this.state.setState(state);
+
+        let title = "Token Saved";
+        let message = user_id;
+        this.pushNotification({title,message})
 
         return "token saved"
     }
