@@ -1,7 +1,7 @@
 import {ParserContainer,parseInit, AbstractParser} from './parse_framework/Parser.class';
 
 import ObdParser from './serverless_files/obd/obd';
-import PhoneWallpaperParser  from './serverless_files/phone_wallpaper/app';
+import PhoneWallpaperParser  from './serverless_files/phone_wallpaper/phone_wallpaper';
 import HueParser  from './serverless_files/hue/hue';
 import WeatherParser  from './serverless_files/weather/weather';
 import GeofenceParser  from './serverless_files/geofence/geofence';
