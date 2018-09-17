@@ -10,6 +10,7 @@ import GetParsers  from './serverless_files/get_parsers/get_parsers';
 import Ping  from './serverless_files/ping/ping';
 import Person  from './serverless_files/person/person';
 import SlackParser from './serverless_files/slack/slack';
+import SendSms from './serverless_files/send_sms/send_sms';
 
 import {pushNotification} from './helpers/ifttt';
 import helpers from './helpers/helper';
@@ -32,6 +33,7 @@ class MyParserContainer extends ParserContainer{
         notify_leaving: new NotifyLeaving("notify_leaving", config.notify_leaving, this),
         ping: new Ping("ping", config.ping, this),
         get_parsers: new GetParsers("get_parsers", config.get_parsers, this),
+        sendSms: new SendSms("sendSms", config.sendSms, this),
         person: new Person("person", config.persons.drew, this)    
     }
 
