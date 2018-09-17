@@ -19,15 +19,20 @@ let deviceName = "";
 process.on("exit", (m)=>{
     //console.log("exiting");
 });
+
+let loading_state:Promise<any> = new Promise(()=>{});
+
 process.on("message", async function on_message_callback(obj){
 
     if( obj.msg_from_ws_connector!==undefined ){
 
         if(  obj.msg_from_ws_connector === "UPDATE_STATE" ){
-            StateLoader.updateState(); // need to reload state from fs
+            loading_state = StateLoader.updateState(); // need to reload state from fs
         }
 
     }else{
+
+        await loading_state;
 
         if( obj.response_device ){
             if( obj.response_device.device_name ){
