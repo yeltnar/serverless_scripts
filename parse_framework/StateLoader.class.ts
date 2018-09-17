@@ -1,11 +1,11 @@
-import State from './Redux';
+import ReduxState from './Redux';
 import helpers from '../helpers/helper'
 
 class StateLoader{
 
 
     // TODO this only allows for one state per app
-    private static state:State = new State();
+    private static state:ReduxState = new ReduxState();
     
     helpers; name; init_state_file;
 
@@ -19,7 +19,8 @@ class StateLoader{
 
     static updateState(){
         console.log("updating loaded master state")
-        StateLoader.state = new State();
+        StateLoader.state = new ReduxState();
+        console.log("state updated");
     }
 
     async getStateBreakReference(){
