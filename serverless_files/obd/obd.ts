@@ -99,18 +99,18 @@ class obdParser extends HttpParser{
                 if( event.category === "off" ){
         
                     engine_state = "off";
+                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
         
                 }else if( event.category === "on" ){
         
                     engine_state = "on";
+                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
         
                 }
                 
                 state.engine = engine_state;
 
                 const {lat,lon} = obj.request.body.location;
-    
-                await this.updateObdLocation(lat, lon);
 
                 let pushData = {
                     "title":"From car",
@@ -348,29 +348,26 @@ class obdParser extends HttpParser{
         state.location = location_obj;
     
         try{
-            let geofence_obj = {
-                query_body:{
-                    lat,
-                    lon
-                },
-                pathName:"geofence/get_close_locations"
-            }
-            state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
+            state.geofence_locations = await this.mainParserContainer.httpParsers.geofence.check_geofence(lat, lon);
         }catch(e){
             console.error(e);
         }
 
-        this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
-
         this.state.setState( state );
 
         return location_obj
-    }
-        
+    } 
 
     async _parse( parseObj:ResponseObj ){
 
         const obj = parseObj.obj;
+
+        try{
+            const {lat,lon} = obj.request.body.location;
+            await this.updateObdLocation(lat, lon);
+        }catch(e){
+            console.log("Could not update obd location");
+        }
 
         let event:ObdEvent = {type:undefined, category:undefined};
         let result;
