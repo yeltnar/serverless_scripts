@@ -86,7 +86,7 @@ class SendSms extends HttpParser{
             return reply_obj;
 
         }).catch(( err )=>{
-            this.pushNotification("SMS error", "phone "+person+" - msg:"+msg);
+            this.pushNotification({title:"Email error", message:"email "+email+" - msg:"+msg});
         })
     }
 }
