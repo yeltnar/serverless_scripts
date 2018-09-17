@@ -167,6 +167,31 @@ class obdParser extends HttpParser{
                 return parserObj.event.type==="trip";
 
             }
+        },{
+            name:"oauth",
+            testRegex:/oauth/,
+            funct:async ( parserObj:ObdResponseObj )=>{
+                const state = await this.state.getState();
+
+                try{
+                    
+                    state.token = parserObj.obj.request.query.code;
+                    this.state.setState(state);
+                    return "token saved"
+
+                }catch(e){
+
+                    let title = "Error";
+                    let message = "oauth error";
+
+                    this.pushNotification({title, message})
+
+
+                    return "error setting token";
+                }
+
+
+            }
         }
     ]
 
@@ -192,7 +217,7 @@ class obdParser extends HttpParser{
 
         let toReturn = await this.parserContainer.parsePrivate( obdParseObj );
         
-        toReturn = ["200"];// TODO remove
+        //toReturn = ["200"];// TODO remove
 
         if( Array.isArray(toReturn) && toReturn.length===1 ){
             toReturn = toReturn[0];
