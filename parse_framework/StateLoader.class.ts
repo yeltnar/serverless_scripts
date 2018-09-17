@@ -17,6 +17,11 @@ class StateLoader{
         this.name = name;
     }
 
+    static updateState(){
+        console.log("updating loaded master state")
+        StateLoader.state = new State();
+    }
+
     async getStateBreakReference(){
         let state_obj = StateLoader.state.getParserState(this.name) || {};
         return JSON.parse(JSON.stringify(state_obj));

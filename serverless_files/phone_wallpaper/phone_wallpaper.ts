@@ -74,8 +74,6 @@ class PhoneWallpaper extends HttpParser{
     }
 
     private newWallpaper=async ()=>{
-
-        console.log("setting new wallpaper");
         try{
             let walpaper_info = await this.getPhoneWallpaperFromInternet( true )
             await this.sendSetPhoneWallpaperRequest(walpaper_info);
@@ -151,7 +149,7 @@ class PhoneWallpaper extends HttpParser{
             }
             try{
                 await this.pushNotification({title:"set_wallpaper", message:wallpaper_url, link:wallpaper_url});
-                console.log("set wallpaper success")
+                console.log("set wallpaper success notification sent")
             }catch(e){
                 console.error("error sending notification"); // TODO move to push notification area
             }
@@ -185,6 +183,8 @@ class PhoneWallpaper extends HttpParser{
             });
     
             used_wallpapers = await this.getUsedWallpapers();
+
+            console.log("force_new "+force_new)
     
             if( force_new ){
     
@@ -195,6 +195,8 @@ class PhoneWallpaper extends HttpParser{
                     }
                     return acc;
                 }, undefined);
+
+                console.log("wallpaper_url in force new "+wallpaper_url)
     
             }else{
     
@@ -216,7 +218,6 @@ class PhoneWallpaper extends HttpParser{
     private saveWallpapers=async ( savedWallpaperArr )=>{
         //return await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr))
         let state = await this.state.getState();
-        console.log("savedWallpaperArr "+JSON.stringify(savedWallpaperArr))
         state.savedWallpaperArr = savedWallpaperArr;
         await this.state.setState(state);
     }
@@ -225,6 +226,7 @@ class PhoneWallpaper extends HttpParser{
         //return await this.helpers.fsPromise.writeFile(this.config.used_wallpaper_file, JSON.stringify(used_wallpaper));
         let state = await this.state.getState();
         state.usedWallpaperArr = used_wallpaper_arr;
+        
         await this.state.setState(state);
     }
 

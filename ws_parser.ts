@@ -34,6 +34,8 @@ process.on("message", async function on_message_callback(obj){
         }
     }
 
+    StateLoader.updateState(); // need to reload state from fs
+
     //console.log(m)
     const result = await masterParser.parse( obj );
     process.send( result );
@@ -52,6 +54,11 @@ class MasterParser extends AbstractParser{
     constructor(){
 
         super( "MasterParser", {}, new StateLoader("MasterParser", "masterParser.json"), mainParserContainer);
+    }
+
+    reloadState=()=>{
+        console.log("reloading state")
+        this.setState( new StateLoader("MasterParser", "masterParser.json") );
     }
 
     _abstractTransformObj( obj ){
