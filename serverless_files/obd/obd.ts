@@ -105,39 +105,24 @@ class obdParser extends HttpParser{
                     engine_state = "on";
         
                 }
-        
-                let location_obj = {
-                    lat:obj.request.body.location.lat, 
-                    lon:obj.request.body.location.lon
-                };
-    
-                try{
-                    let geofence_obj = {
-                        query_body:{
-                            lat:location_obj.lat,
-                            lon:location_obj.lon
-                        },
-                        pathName:"geofence/get_close_locations"
-                    }
-                    state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
-                }catch(e){
-                    console.error(e);
-                }
                 
                 state.engine = engine_state;
-                state.location = location_obj;
+
+                const {lat,lon} = obj.request.body.location;
     
+                await this.updateObdLocation(lat, lon);
+
                 let pushData = {
                     "title":"From car",
                     "message":{
                         geofence_locations:state.geofence_locations,
-                        location_obj,
+                        location_obj:{lat,lon},
                         engine_state
                     }, 
                     link
                 };
 
-                this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+
 
                 this.state.setState(state);
                 this.pushNotification( pushData );
@@ -350,6 +335,36 @@ class obdParser extends HttpParser{
         this.pushNotification({title,message})
 
         return "token saved"
+    }
+
+    private updateObdLocation=async (lat, lon):Promise<{lat:string, lon:string}>=>{
+
+        const state = await this.state.getState();
+
+        let location_obj = {
+            lat, 
+            lon
+        };
+        state.location = location_obj;
+    
+        try{
+            let geofence_obj = {
+                query_body:{
+                    lat,
+                    lon
+                },
+                pathName:"geofence/get_close_locations"
+            }
+            state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
+        }catch(e){
+            console.error(e);
+        }
+
+        this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+
+        this.state.setState( state );
+
+        return location_obj
     }
         
 

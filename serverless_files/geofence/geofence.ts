@@ -27,7 +27,7 @@ class geofence extends HttpParser{
         return toReturn;
     }
 
-    async check_geofence( in_lat, in_lon ){
+    async check_geofence( in_lat, in_lon ):Promise<Array<string>>{
  
          let matched_locations = [];
 
