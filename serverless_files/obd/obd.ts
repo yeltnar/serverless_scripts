@@ -96,17 +96,18 @@ class obdParser extends HttpParser{
                 let title = "Car ignition";
                 let engine_state;
         
-                if( event.category === "off" ){
+                // if( event.category === "off" ){
         
-                    engine_state = "off";
-                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+                //     engine_state = "off";
         
-                }else if( event.category === "on" ){
+                // }else if( event.category === "on" ){
         
-                    engine_state = "on";
-                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+                //     engine_state = "on";
         
-                }
+                // }
+
+                engine_state = event.category
+                this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
                 
                 state.engine = engine_state;
 
