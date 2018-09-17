@@ -365,6 +365,7 @@ class obdParser extends HttpParser{
         try{
             const {lat,lon} = obj.request.body.location;
             await this.updateObdLocation(lat, lon);
+            console.log("car now at "+lat+","+lon);
         }catch(e){
             console.log("Could not update obd location");
         }
