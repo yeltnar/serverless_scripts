@@ -17,7 +17,7 @@ class StateLoader{
         this.name = name;
     }
 
-    static updateState(){
+    static async updateState():Promise<any>{
         console.log("updating loaded master state")
         StateLoader.state = new ReduxState();
         console.log("state updated");
