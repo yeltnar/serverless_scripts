@@ -41,9 +41,11 @@ function pushNotification(msgObj:PushMsgObj):Promise<any>{
 		let year = now.getFullYear();
 		let hours:any = now.getHours();
 		let minutes:any = now.getMinutes();
+		let seconds:any = now.getSeconds();
 		hours =  hours < 10 ? "0"+hours : hours;
 		minutes =  minutes < 10 ? "0"+minutes : minutes;
-		return hours+":"+minutes+" "+month+"-"+date+"-"+year;
+		seconds =  seconds < 10 ? "0"+seconds : seconds;
+		return hours+":"+minutes+":"+seconds+" "+month+"-"+date+"-"+year;
 	})();
 
 	title = title+"/"+device_name+"/"+time_string;
