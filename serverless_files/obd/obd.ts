@@ -99,45 +99,30 @@ class obdParser extends HttpParser{
                 if( event.category === "off" ){
         
                     engine_state = "off";
+                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
         
                 }else if( event.category === "on" ){
         
                     engine_state = "on";
+                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
         
-                }
-        
-                let location_obj = {
-                    lat:obj.request.body.location.lat, 
-                    lon:obj.request.body.location.lon
-                };
-    
-                try{
-                    let geofence_obj = {
-                        query_body:{
-                            lat:location_obj.lat,
-                            lon:location_obj.lon
-                        },
-                        pathName:"geofence/get_close_locations"
-                    }
-                    state.geofence_locations = await this.mainParserContainer.parseExposed("geofence",geofence_obj);
-                }catch(e){
-                    console.error(e);
                 }
                 
                 state.engine = engine_state;
-                state.location = location_obj;
-    
+
+                const {lat,lon} = obj.request.body.location;
+
                 let pushData = {
                     "title":"From car",
                     "message":{
                         geofence_locations:state.geofence_locations,
-                        location_obj,
+                        location_obj:{lat,lon},
                         engine_state
                     }, 
                     link
                 };
 
-                this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+
 
                 this.state.setState(state);
                 this.pushNotification( pushData );
@@ -351,11 +336,39 @@ class obdParser extends HttpParser{
 
         return "token saved"
     }
-        
+
+    private updateObdLocation=async (lat, lon):Promise<{lat:string, lon:string}>=>{
+
+        const state = await this.state.getState();
+
+        let location_obj = {
+            lat, 
+            lon
+        };
+        state.location = location_obj;
+    
+        try{
+            state.geofence_locations = await this.mainParserContainer.httpParsers.geofence.check_geofence(lat, lon);
+        }catch(e){
+            console.error(e);
+        }
+
+        this.state.setState( state );
+
+        return location_obj
+    } 
 
     async _parse( parseObj:ResponseObj ){
 
         const obj = parseObj.obj;
+
+        try{
+            const {lat,lon} = obj.request.body.location;
+            await this.updateObdLocation(lat, lon);
+            console.log("car now at "+lat+","+lon);
+        }catch(e){
+            console.log("Could not update obd location");
+        }
 
         let event:ObdEvent = {type:undefined, category:undefined};
         let result;
