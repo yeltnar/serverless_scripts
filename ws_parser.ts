@@ -21,28 +21,36 @@ process.on("exit", (m)=>{
 });
 process.on("message", async function on_message_callback(obj){
 
-    if( obj.response_device ){
-        if( obj.response_device.device_name ){
-            deviceName = obj.response_device.device_name;
-            init_pushNotification(deviceName);
-        }
-        if( obj.response_device.file_name!==undefined ){
-            out_file_name = obj.response_device.file_name;
-        }
-        if( obj.response_device.out_file_folder!==undefined ){
-            out_folder_location = obj.response_device.out_file_folder;
-        }
-    }
+    if( obj.msg_from_ws_connector!==undefined ){
 
-    StateLoader.updateState(); // need to reload state from fs
+        if(  obj.msg_from_ws_connector === "UPDATE_STATE" ){
+            StateLoader.updateState(); // need to reload state from fs
+        }
 
-    //console.log(m)
-    const result = await masterParser.parse( obj );
-    process.send( result );
+    }else{
 
-    // TODO don't do this if still waiting on more data
-    if( true ){ 
-        process.removeListener("message", on_message_callback);
+        if( obj.response_device ){
+            if( obj.response_device.device_name ){
+                deviceName = obj.response_device.device_name;
+                init_pushNotification(deviceName);
+            }
+            if( obj.response_device.file_name!==undefined ){
+                out_file_name = obj.response_device.file_name;
+            }
+            if( obj.response_device.out_file_folder!==undefined ){
+                out_folder_location = obj.response_device.out_file_folder;
+            }
+        }
+
+        //console.log(m)
+        const result = await masterParser.parse( obj );
+        process.send( result );
+        process.send( {msg_from_ws_parser:"UPDATE_STATE"} );
+
+        // TODO don't do this if still waiting on more data
+        if( true ){ 
+            process.removeListener("message", on_message_callback);
+        }
     }
 });
 
@@ -54,11 +62,6 @@ class MasterParser extends AbstractParser{
     constructor(){
 
         super( "MasterParser", {}, new StateLoader("MasterParser", "masterParser.json"), mainParserContainer);
-    }
-
-    reloadState=()=>{
-        console.log("reloading state")
-        this.setState( new StateLoader("MasterParser", "masterParser.json") );
     }
 
     _abstractTransformObj( obj ){
