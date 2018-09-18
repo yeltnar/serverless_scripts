@@ -16,10 +16,6 @@ const checkForStateChange=()=>{
         console.log( "state changed->writing "/*+ JSON.stringify(Object.keys( changed_state ))*/ )
         try{
             fs.writeFileSync(state_obj_path, JSON.stringify(changed_state) );
-            console.log("written")
-            console.log("state_obj_path")
-            console.log(state_obj_path)
-            console.log(changed_state)
         }catch(e){
             console.error(e)
         }
@@ -68,10 +64,6 @@ class State{
                 state = newState;
 
                 promise_to_wait_on = callRegisteredCallbacks(state)
-
-                console.log("replacing state")
-                console.log("newState")
-                console.log(newState)
             }
 
             return promise_to_wait_on.then(()=>{
@@ -86,7 +78,6 @@ class State{
 
             this.registered_state_functs.forEach((cur:Function, i, arr)=>{
                 callpack_promise_arr.push( cur(state) );
-                console.log("callRegisteredCallbacks loop");
             });
 
             return await Promise.all( callpack_promise_arr ).catch((e)=>{})
