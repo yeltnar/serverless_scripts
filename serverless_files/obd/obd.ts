@@ -123,9 +123,7 @@ class obdParser extends HttpParser{
                     link
                 };
 
-
-
-                this.state.setState(state);
+                this.state.setState(state, "ignition setState");
                 this.pushNotification( pushData );
                 console.log( pushData.message );
             },
@@ -329,7 +327,7 @@ class obdParser extends HttpParser{
         state.saved_users[user_id].scope = scope;
         state.saved_users[user_id].token_type = token_type;
 
-        this.state.setState(state);
+        this.state.setState(state, "saveToken setState");
 
         let title = "Token Saved";
         let message = user_id;
@@ -354,7 +352,7 @@ class obdParser extends HttpParser{
             console.error(e);
         }
 
-        this.state.setState( state );
+        await this.state.setState( state, "updateObdLocation setState" );
 
         return location_obj
     } 

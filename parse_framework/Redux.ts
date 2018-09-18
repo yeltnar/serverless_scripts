@@ -22,6 +22,7 @@ const checkForStateChange=()=>{
 
     }
 }
+process.on("exit",()=>{console.log("exiting");});
 process.on("exit",checkForStateChange);
 
 class State{
@@ -29,8 +30,9 @@ class State{
     // currently just register on any changes... there are no sub groups
     private registered_state_functs:Array<Function>=[];
 
+    can_update_state = new Promise((resolve)=>{resolve();});
+
     constructor(){
-        this.init_replaceState();
 
         // do this first if you want them to be called for the first set of data
         this.registerForStateChanges((new_state)=>{
@@ -41,21 +43,25 @@ class State{
         // init state if it was there
         if( fs.existsSync(state_obj_path) ){
             const stateObj_str:string = fs.readFileSync(state_obj_path);
-            this.replaceState( JSON.parse(stateObj_str) );
+            this.can_update_state = this.init_replaceState( JSON.parse(stateObj_str) );
+        }else{
+            this.can_update_state = this.init_replaceState();
         }
-
-        //this.store = createStore( this.reduxParse, this.stateObj );
         
     }
 
-    init_replaceState():Promise<any>{return this.replaceState({});}
+    init_replaceState(newState={}):Promise<any>{
+        return this.replaceState(newState, false);
+    }
     // this must be called in the constructor 
     // if nothing is passed in it returns the state object
-    replaceState=(newState?):Promise<any>=>{
+    private replaceState=(newState?, call_callbacks=true):Promise<any>=>{
 
         let state = {};
 
-        this.replaceState = (newState?):Promise<any>=>{
+        this.replaceState = async(newState?, call_callbacks=true):Promise<any>=>{
+
+            await this.can_update_state;
 
             let promise_to_wait_on = new Promise((resolve)=>{resolve([])});
 
@@ -63,7 +69,9 @@ class State{
 
                 state = newState;
 
-                promise_to_wait_on = callRegisteredCallbacks(state)
+                if( call_callbacks ){
+                    promise_to_wait_on = callRegisteredCallbacks(state)
+                }
             }
 
             return promise_to_wait_on.then(()=>{
@@ -83,11 +91,27 @@ class State{
             return await Promise.all( callpack_promise_arr ).catch((e)=>{})
         }
 
-        return this.replaceState(newState);
+        return this.replaceState(newState, call_callbacks);
 
     }
 
-    replaceParserState=async(name:string, newState)=>{
+    replaceParserState=async(name:string, newState, caller_str?:string)=>{
+
+        (()=>{
+            let str="replace "+name;
+            str += caller_str!==undefined ? " - caller_str='"+caller_str+"'" : "" ;
+            console.log(str);
+        })()
+
+        
+
+        if( newState.location.lat===32.9175205 ){
+            try{
+                throw new Error("location repeaet");
+            }catch(e){
+                console.log(e.stack);
+            }
+        }
 
         let master_state = await this.getState();
         master_state[name] = newState;

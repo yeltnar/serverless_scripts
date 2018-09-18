@@ -33,7 +33,11 @@ class StateLoader{
         return state_obj;
     }
 
-    async setState( newState ){
+    async setState( newState, caller_str? ){
+
+        if(caller_str!==undefined){
+            console.log(caller_str);
+        }
 
         try{
 
@@ -49,7 +53,7 @@ class StateLoader{
 
             newState.previousState = lastState;
 
-            return StateLoader.state.replaceParserState(this.name, newState)
+            return StateLoader.state.replaceParserState(this.name, newState, caller_str)
         }catch(e){
             console.error(e);
         }
