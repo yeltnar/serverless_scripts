@@ -24,12 +24,12 @@ class StateLoader{
     }
 
     async getStateBreakReference(){
-        let state_obj = StateLoader.state.getParserState(this.name) || {};
+        let state_obj = await StateLoader.state.getParserState(this.name) || {};
         return JSON.parse(JSON.stringify(state_obj));
     }
 
     async getState(){
-        let state_obj = StateLoader.state.getParserState(this.name);
+        let state_obj = await StateLoader.state.getParserState(this.name);
         return state_obj;
     }
 
