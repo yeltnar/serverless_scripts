@@ -90,12 +90,11 @@ class Person extends HttpParser{
 
     set_location=async ( person:string, location:Array<string> )=>{
 
-        let old_state = await this.getPersonState(person);
 
-        if( !old_state || !old_state.location ){
-            if( old_state && old_state.location  ){
-                console.log('location didnt change location:'+location+"  old_state.location:"+old_state.location);
-            }
+        let old_state = await this.getPersonState(person) || {};
+
+        if( old_state.location===undefined ){
+            old_state.location = [];
         }
 
         let new_locations = [];
@@ -105,13 +104,17 @@ class Person extends HttpParser{
             }
         });
 
-        if( new_locations.length > 0 ){ 
+        if( new_locations.length > 0 ){ // do notification
 
             const title = "Location Changed";
             const message = new_locations.join(",");
 
             this.pushNotification({title, message});
             console.log({title, message});
+        }
+
+        if( location.length===0 ){
+            console.log("no matching locations found")
         }
 
         const personState = (await this.getPersonState( person )) || {};
@@ -125,6 +128,7 @@ class Person extends HttpParser{
         let state = this.state.getState();
         state[person] = personState;
         await this.state.setState(state);
+        console.log("set person state "+JSON.stringify(personState));
         return await this.getPersonState(person);
     }
 
@@ -136,16 +140,16 @@ class Person extends HttpParser{
 
         return;
 
-        let state = await this.state.getState();
+        // let state = await this.state.getState();
 
-        let title = "t";
-        let message = JSON.stringify(master_state.obd);
+        // let title = "t";
+        // let message = JSON.stringify(master_state.obd);
 
-        //if( master_state.obd  ){
-            let res = await this.pushNotification({title, message});
-            console.log(res);
-            console.log(master_state);
-        //}
+        // //if( master_state.obd  ){
+        //     let res = await this.pushNotification({title, message});
+        //     console.log(res);
+        //     console.log(master_state);
+        // //}
 
     }
 }

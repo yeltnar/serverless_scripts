@@ -87,9 +87,9 @@ class State{
 
     }
 
-    replaceParserState(name:string, newState){
+    replaceParserState=async(name:string, newState)=>{
 
-        let master_state = this.getState();
+        let master_state = await this.getState();
         master_state[name] = newState;
         this.replaceState(master_state); // this returns a promise but we don't wait for it to resolve
         return newState;
@@ -102,7 +102,7 @@ class State{
 
     getParserState=async(parser:string)=>{
         const state = await this.getState();
-        return state[parser];
+        return state[parser] || {};
     }
 
     registerForStateChanges = (funct:Function)=>{

@@ -368,7 +368,7 @@ class obdParser extends HttpParser{
             await this.updateObdLocation(lat, lon);
             console.log("car now at "+lat+","+lon);
         }catch(e){
-            console.log("Could not update obd location");
+            console.log({"msg":"Could not update obd location",e});
         }
 
         let event:ObdEvent = {type:undefined, category:undefined};
