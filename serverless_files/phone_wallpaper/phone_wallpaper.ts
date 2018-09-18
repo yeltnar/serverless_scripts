@@ -118,14 +118,15 @@ class PhoneWallpaper extends HttpParser{
 
     async sendSetPhoneWallpaperRequest(walpaper_info) {
     
-        let {wallpaper_url, used_wallpaper} = walpaper_info;
+        let {wallpaper_url, } = walpaper_info;
+        let used_wallpaper_arr = walpaper_info.used_wallpapers;
     
-        if(used_wallpaper===undefined){
+        if(used_wallpaper_arr===undefined){
             console.log("getting used wallpaper");
             try{
-                used_wallpaper = await this.getUsedWallpapers();
+                used_wallpaper_arr = await this.getUsedWallpapers();
             }catch(e){
-                used_wallpaper=[];
+                used_wallpaper_arr=[];
             }
         }
     
@@ -153,9 +154,13 @@ class PhoneWallpaper extends HttpParser{
             }catch(e){
                 console.error("error sending notification"); // TODO move to push notification area
             }
-            used_wallpaper.push(wallpaper_url);
-            used_wallpaper=used_wallpaper.slice(-10);
-            this.saveUsedWallpapers(used_wallpaper)
+
+            used_wallpaper_arr.push(wallpaper_url);
+            used_wallpaper_arr=used_wallpaper_arr.slice(-10);
+            await (this.saveUsedWallpapers(used_wallpaper_arr)).catch((e)=>{
+                console.log(e);
+                console.log("error with saveUsedWallpapers ")
+            })
         }else{
             console.log("not setting walpaper to " + wallpaper_url);
         }
@@ -216,9 +221,11 @@ class PhoneWallpaper extends HttpParser{
     // start of local functions
 
     private saveWallpapers=async ( savedWallpaperArr )=>{
+        console.log("saving wallpaper")
         //return await this.helpers.fsPromise.writeFile(this.config.saved_wallpaper_file, JSON.stringify(savedWallpaperArr))
         let state = await this.state.getState();
         state.savedWallpaperArr = savedWallpaperArr;
+        console.log("remove this saveWallpapers  ---  "+JSON.stringify(savedWallpaperArr));
         await this.state.setState(state);
     }
 

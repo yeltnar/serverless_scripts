@@ -103,16 +103,6 @@ class State{
             console.log(str);
         })()
 
-        
-
-        if( newState.location.lat===32.9175205 ){
-            try{
-                throw new Error("location repeaet");
-            }catch(e){
-                console.log(e.stack);
-            }
-        }
-
         let master_state = await this.getState();
         master_state[name] = newState;
         this.replaceState(master_state); // this returns a promise but we don't wait for it to resolve
