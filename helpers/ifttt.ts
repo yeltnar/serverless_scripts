@@ -31,8 +31,6 @@ function pushNotification(msgObj:PushMsgObj):Promise<any>{
 	}else{ // assume string
 		throw "msgObj must be an object";
 	}
-
-	let date = new Date();
 	
 	let time_string = (()=>{
 		var now = new Date();
