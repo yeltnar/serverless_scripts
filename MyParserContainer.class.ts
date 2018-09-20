@@ -1,4 +1,5 @@
 import {ParserContainer,parseInit, AbstractParser} from './parse_framework/Parser.class';
+import ResponseObj from './parse_framework/ResponseObj.interface'//'../parse_framework/ResponseObj.interface'
 
 import ObdParser from './serverless_files/obd/obd';
 import PhoneWallpaperParser  from './serverless_files/phone_wallpaper/phone_wallpaper';
@@ -39,6 +40,17 @@ class MyParserContainer extends ParserContainer{
         join: new Join("join", config.join, this)    
     }
 
+    initial_parse_exposed = async(obj: any, parserObj?: any):Promise<any[]>=>{
+        return [true];
+    };
+
+    new_parse_exposed = async(obj: ResponseObj, parserObj?: any):Promise<any[]>=>{
+
+        this.httpParsers.join.setDeviceName( obj.response_device.device_name );
+
+        return this.initial_parse_exposed(obj, parserObj);
+    };
+
     constructor(){
 
         super();
@@ -47,6 +59,9 @@ class MyParserContainer extends ParserContainer{
             const cur:AbstractParser = this.httpParsers[k];
             this.addPublicParser(cur);
         }
+
+        this.initial_parse_exposed = this.parseExposed;
+        this.parseExposed = this.new_parse_exposed;
     }
 }
 

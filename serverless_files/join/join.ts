@@ -6,10 +6,11 @@ import { url } from 'inspector';
 
 const requestP = require('request-promise-native');
 
-let device_name:string="fallback_name";
-
 class Join extends HttpParser{
+    
     testRegex = /join/;
+
+    device_name:string = "fallback_name";
 
     constructor(name, config, mainParserContainer){
         super(name, config, mainParserContainer);
@@ -60,7 +61,7 @@ class Join extends HttpParser{
             delete qs.url;
         }
 
-	    title = title+"/"+device_name+"/"+time_string;
+	    title = title+"/"+this.device_name+"/"+time_string;
 
         qs.title = title;
         qs.text = message;
@@ -73,6 +74,10 @@ class Join extends HttpParser{
         }
 
         requestP( options );
+    }
+
+    setDeviceName=( device_name:string )=>{
+        this.device_name = device_name;
     }
 }
 
