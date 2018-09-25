@@ -14,12 +14,14 @@ import SlackParser from './serverless_files/slack/slack';
 import SendSms from './serverless_files/send_sms/send_sms';
 import Join from './serverless_files/join/join';
 
-import {pushNotification} from './helpers/ifttt';
+//import {pushNotification} from './helpers/ifttt';
 import helpers from './helpers/helper';
 
 const config = require('config');
 
 
+
+let pushNotification = ( { title, message, link } )=>{};
 parseInit(pushNotification, helpers);
 
 
@@ -62,6 +64,8 @@ class MyParserContainer extends ParserContainer{
 
         this.initial_parse_exposed = this.parseExposed;
         this.parseExposed = this.new_parse_exposed;
+
+        pushNotification = this.httpParsers.join.sendNotification || pushNotification;
     }
 }
 

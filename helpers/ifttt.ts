@@ -75,4 +75,4 @@ function init_pushNotification(init_device_name){
 	device_name = init_device_name;
 }
 
-export {pushNotification, init_pushNotification}
+//export {pushNotification, init_pushNotification}

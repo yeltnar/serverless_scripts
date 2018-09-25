@@ -1,4 +1,4 @@
-import {init_pushNotification} from './helpers/ifttt' 
+//import {init_pushNotification} from './helpers/ifttt' 
 import MyParserContainer from './MyParserContainer.class';
 import {AbstractParser} from './parse_framework/Parser.class';
 import StateLoader from './parse_framework/StateLoader.class'
