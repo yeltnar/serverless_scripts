@@ -105,6 +105,10 @@ function compile( process_metadata:ChildProcessMetadataInterface ):Promise<void>
 
             const out_dir = process_metadata.location+"/build";
 
+            if( !fs.existsSync(out_dir) ){
+                fs.mkdirSync(out_dir);
+            }
+
             const toExec = "tsc "+process_metadata.location+"/"+process_metadata.main+" --outDir "+out_dir;
 
             console.log("Compiling: "+process_metadata.pm2_name+": "+toExec);
@@ -142,14 +146,14 @@ function run( process_metadata:ChildProcessMetadataInterface ):Promise<{error:Bo
             //"interpreter":"node"
             "args":[process_metadata.index],
             //"cwd":"",
-            //"force":true,
+            "force":true
 
         };
 
         if( process_metadata.should_compile ){
-            options.script = process_metadata.location+"/build/"+process_metadata.name+".js"
+            options.script = process_metadata.location+"/build/"+process_metadata.name+"/"+process_metadata.name+".js"
         }else{
-            options.script = process_metadata.location+"/"+process_metadata.main;
+            options.script = process_metadata.location+"/"+process_metadata.name+"/"+process_metadata.main;
         }
 
         pm2.start( options, function errback(err){
