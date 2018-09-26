@@ -1,0 +1,16 @@
+{
+  "name": "child_process_test",
+  "version": "1.0.0",
+  "description": "child process test",
+  "main": "child_process.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrew Brantley",
+  "license": "ISC",
+  "script_node":{
+    "type":"ts",
+    "name":"child_process_test",
+    "main":"child_process_test.ts"
+  }
+}
