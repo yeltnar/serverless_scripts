@@ -2,7 +2,6 @@ const pm2 = require('pm2');
 const {exec} = require("child_process");
 const fs = require('fs');
 
-const noDaemonMode = false;
 
 const child_process_arr:Array<ChildProcessMetadataInterface> = [];
 
@@ -15,6 +14,7 @@ Promise.all([ connectPm2(), loadChildProcessArr() ])
 
 function connectPm2():Promise<void>{
     return new Promise((resolve, reject)=>{
+        const noDaemonMode = false;
 
         pm2.connect(noDaemonMode, (err)=>{
             if( err ){
