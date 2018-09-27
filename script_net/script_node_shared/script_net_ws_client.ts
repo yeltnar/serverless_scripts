@@ -1,54 +1,33 @@
-import { HttpParser } from "../../HttpParser.class";
+import {ScriptNetParser} from "../script_node_shared/ScriptNetParser";
+import {WsDataClientInterface} from "../script_node_shared/interfaces/WsDataInterface"
 
-const WebSocket = require('ws');
+const WebSocket_old = require('ws');
+const WebSocket = require("isomorphic-ws"); // TODO test this to see if it works
 
-interface ConnectToScriptNetClientInterface{
-    "url"?:string,
-    "ip_protocol"?:string,
-    "max_ping_interval"?:number,
 
-    "device_name":string,
-    "device_group":string,
-    "token":string,
-    "token_type":string,
-
-    "should_parse":Function,
-    "message_callback":Function
-
+const defaultClientConnectionObj:WsDataClientInterface = {
+    server_url:"bluemix.net",
+    protocol:"wss",
+    url_test_regex: new RegExp(".*"),
+    max_ping_interval:5*1000*60
 }
 
-const defaultConnectionObj = {
+function connectToScriptNetAsServer( script_net_parser:ScriptNetParser ){
 
+    if( script_net_parser.server_connection_data === undefined ){
+        throw new Error("server_connection_data is undefined");
+    }
+
+    console.log("connect to script net server");
 }
 
-function connectToScriptNetAsClient( abstract_parser:HttpParser ){
-    console.log("connect to script net");
+function connectToScriptNetAsClient( script_net_parser:ScriptNetParser ) {
 
-    const connectionObj = {
+    if( script_net_parser.client_connection_data === undefined ){
+        throw new Error("client_connection_data is undefined");
+    }
 
-        device_name: abstract_parser.name,
-        device_group: abstract_parser.device_group,
-        token: abstract_parser.token,
-        should_parse: abstract_parser._shouldParse,
-        message_callback: abstract_parser.parse
-    };
-    abstract_parser.;
-
-
-
-
-
-    return startSocketConnection( connectionObj );;
-}
-
-// function connectToScriptNetAsServer( connectionObj?:ConnectToScriptNetClientInterface ){
-//     console.log("connect to script net");
-//     return ws_connection;
-// }
-
-function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface ) {
-
-    connectionObj = { ...defaultConnectionObj, ...connectionObj }
+    let connectionObj = { ...defaultClientConnectionObj, ...script_net_parser.client_connection_data }
 
     let ws;
 
@@ -60,10 +39,13 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
     function doStartConnection(){
 
         try{
-            console.log("attempting "+connectionObj.url+" "+(new Date().toString()));
-            ws = new WebSocket(connectionObj.url);
+            console.log("attempting "+connectionObj.server_url+" "+(new Date().toString()));
+            ws = new WebSocket(connectionObj.protocol+"://"+connectionObj.server_url);
         }catch( e ){
-            doStartConnection()
+            console.error(e);
+            setTimeout(()=>{
+                doStartConnection()
+            },1000)
         }
 
         if(!ws){return}
@@ -71,7 +53,7 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
         ws.on('open', () => {
             //clearInterval(connectInterval);
             send_to_ws({});
-            console.log("connected "+connectionObj.url+" "+(new Date().toString()));
+            console.log("connected "+connectionObj.server_url+" "+(new Date().toString()));
             resetRestartTimer();
         });
 
@@ -80,7 +62,7 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
                 
                 data = JSON.parse(data);
                 setDeviceInfo(data);
-                await connectionObj.message_callback( data );
+                await script_net_parser.messageCallback( data );
                 send_to_ws(data);
 
             }catch(e){
@@ -90,13 +72,13 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
         });
 
         ws.on('close', () => {
-            console.log("disconnected "+connectionObj.url+" "+(new Date().toString()));
+            console.log("disconnected "+connectionObj.server_url+" "+(new Date().toString()));
             //startSocketConnection()
             setTimeout(doStartConnection, 1000)
         });
 
         ws.on('ping',async (data)=>{
-            console.log(data.toString());
+            console.log("ping: "+data.toString());
             resetRestartTimer();
         })
     }
@@ -106,10 +88,11 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
         if( clearResetIntervalId !== undefined ){
             clearTimeout(clearResetIntervalId);
         }else{
-            console.log("clear interval set")
+            console.log("clear interval set: "+connectionObj.max_ping_interval)
         }
 
         clearResetIntervalId = setTimeout(()=>{
+            console.log("max_ping_interval ("+connectionObj.max_ping_interval+") lapsed ");
             restartConnection();
         },connectionObj.max_ping_interval);
     }
@@ -138,10 +121,9 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
 
             obj.response_device = obj.response_device || {};
 
-            obj.response_device.device_name = connectionObj.device_name;
-            obj.response_device.device_group = connectionObj.device_group;
-            obj.response_device.token = connectionObj.token;
-            obj.response_device.token_type = connectionObj.token_type;
+            obj.response_device.device_name = script_net_parser.device_name;
+            obj.response_device.device_group = script_net_parser.device_group;
+            obj.response_device.token = script_net_parser.token;
 
 
         }catch(e){
@@ -155,4 +137,7 @@ function startSocketConnection( connectionObj:ConnectToScriptNetClientInterface 
     return ws;
 }
 
-export {connectToScriptNetAsClient,ConnectToScriptNetClientInterface};
+export {
+    connectToScriptNetAsClient,
+    connectToScriptNetAsServer
+};

@@ -1,0 +1,11 @@
+{
+  "name": "join",
+  "version": "1.0.0",
+  "description": "",
+  "main": "join.ts",
+  "scripts": {
+    "test": "ts-node join.ts"
+  },
+  "author": "Andrew Brantley",
+  "license": "ISC"
+}

@@ -1,11 +1,11 @@
-import {ParserContainer, FunctionalParserObj, FunctionalParser} from '../../parse_framework/Parser.class'
-//import { HttpParser } from "../../HttpParser.class";
-//import ResponseObj from '../../parse_framework/ResponseObj.interface'
-import {ScriptNetParser} from '../../script_net/script_node_shared/ScriptNetParser';
-import {ScriptNetParserOldProp} from '../../script_net/script_node_shared/ScriptNetParserOldProp';
+import {ParserContainer, FunctionalParserObj, FunctionalParser} from '../../old_props/parse_framework/Parser.class'
+//import { HttpParser } from "../../old_props/parse_framework/HttpParser.class";
+import ResponseObj from '../../old_props/parse_framework/ResponseObj.interface'
+//import {ScriptNetParser} from '../../script_net/script_node_shared/ScriptNetParser';
+import {ScriptNetParserOldProp} from '../../script_node_shared/ScriptNetParserOldProp';
 
-import MessageInInterface from "../../script_net/script_node_shared/interfaces/MessageIn.interface"
-import MessageOutInterface from "../../script_net/script_node_shared/interfaces/MessageOut.interface"
+import MessageInInterface from '../../script_node_shared/interfaces/MessageIn.interface'
+import MessageOutInterface from "../../script_node_shared/interfaces/MessageOut.interface"
 
 const requestP = require('request-promise-native');
 
@@ -31,7 +31,7 @@ class Join extends ScriptNetParserOldProp{
         });
     }
 
-    parse=async( message_in:MessageInInterface ):Promise<MessageOutInterface>=>{
+    async parse( message_in:MessageInInterface ):Promise<MessageOutInterface>{
         return {
             result:{},
             message_in:message_in

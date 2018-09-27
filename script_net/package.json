@@ -1,0 +1,14 @@
+{
+  "name": "script_net",
+  "version": "1.0.0",
+  "description": "",
+  "main": "process_manager.ts",
+  "scripts": {
+    "test": "clear; ts-node process_manager.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "isomorphic-ws": "^4.0.1"
+  }
+}

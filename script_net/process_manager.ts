@@ -99,21 +99,27 @@ function compile( process_metadata:ChildProcessMetadataInterface ):Promise<void>
 
     return (new Promise(( resolve, reject )=>{
 
-        process_metadata.should_compile = process_metadata.type === "ts" || process_metadata.type==="typescript";
+        
+        process_metadata.should_compile = process_metadata.type === "ts" || process_metadata.type==="typescript" || process_metadata.main.includes("ts") ;
 
         if( process_metadata.should_compile ){
 
-            const out_dir = process_metadata.location+"/build";
+            const out_dir = "build";
+            const absolute_out_dir = process_metadata.location+"/"+out_dir
 
-            if( !fs.existsSync(out_dir) ){
-                fs.mkdirSync(out_dir);
+            if( !fs.existsSync(absolute_out_dir) ){
+                fs.mkdirSync(absolute_out_dir);
             }
 
-            const toExec = "tsc "+process_metadata.location+"/"+process_metadata.main+" --outDir "+out_dir;
+            const toExec = "tsc "+process_metadata.main+" --outDir "+out_dir;
 
-            console.log("Compiling: "+process_metadata.pm2_name+": "+toExec);
+            console.log("Compiling: "+process_metadata.pm2_name+": "+toExec+" (dir "+process_metadata.location+")");
+
+            const options = {
+                cwd:process_metadata.location
+            };
     
-            exec(toExec, undefined, (err, stdout, stderr)=>{
+            exec(toExec, options, (err, stdout, stderr)=>{
                 // if( err ){
                 //     reject(JSON.stringify({err,stderr}));
                 // }else{
@@ -137,7 +143,6 @@ function compile( process_metadata:ChildProcessMetadataInterface ):Promise<void>
 function run( process_metadata:ChildProcessMetadataInterface ):Promise<{error:Boolean, process_name:string}>{
 
     return new Promise((resolve, reject)=>{
-        console.log("Running: "+process_metadata.pm2_name);
 
         // http://pm2.keymetrics.io/docs/usage/pm2-api/
         const options = {
@@ -155,6 +160,7 @@ function run( process_metadata:ChildProcessMetadataInterface ):Promise<{error:Bo
         }else{
             options.script = process_metadata.location+"/"+process_metadata.name+"/"+process_metadata.main;
         }
+        console.log("Running: "+process_metadata.pm2_name+": "+options.script);
 
         pm2.start( options, function errback(err){
 

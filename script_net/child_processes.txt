@@ -1,1 +1,1 @@
-child_process_test
+/Users/Drew/playin/serverless_scripts/script_net/script_net_nodes/join
