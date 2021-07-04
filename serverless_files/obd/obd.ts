@@ -96,17 +96,18 @@ class obdParser extends HttpParser{
                 let title = "Car ignition";
                 let engine_state;
         
-                if( event.category === "off" ){
+                // if( event.category === "off" ){
         
-                    engine_state = "off";
-                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+                //     engine_state = "off";
         
-                }else if( event.category === "on" ){
+                // }else if( event.category === "on" ){
         
-                    engine_state = "on";
-                    this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
+                //     engine_state = "on";
         
-                }
+                // }
+
+                engine_state = event.category
+                this.mainParserContainer.httpParsers.person.set_location('Drew', state.geofence_locations);
                 
                 state.engine = engine_state;
 
@@ -122,9 +123,7 @@ class obdParser extends HttpParser{
                     link
                 };
 
-
-
-                this.state.setState(state);
+                this.state.setState(state, "ignition setState");
                 this.pushNotification( pushData );
                 console.log( pushData.message );
             },
@@ -328,7 +327,7 @@ class obdParser extends HttpParser{
         state.saved_users[user_id].scope = scope;
         state.saved_users[user_id].token_type = token_type;
 
-        this.state.setState(state);
+        this.state.setState(state, "saveToken setState");
 
         let title = "Token Saved";
         let message = user_id;
@@ -353,7 +352,7 @@ class obdParser extends HttpParser{
             console.error(e);
         }
 
-        this.state.setState( state );
+        await this.state.setState( state, "updateObdLocation setState" );
 
         return location_obj
     } 
@@ -367,7 +366,7 @@ class obdParser extends HttpParser{
             await this.updateObdLocation(lat, lon);
             console.log("car now at "+lat+","+lon);
         }catch(e){
-            console.log("Could not update obd location");
+            console.log({"msg":"Could not update obd location",e});
         }
 
         let event:ObdEvent = {type:undefined, category:undefined};
